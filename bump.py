@@ -1,19 +1,30 @@
 #!/usr/bin/env python3
-"""Bump extension/manifest.json version. Usage: python bump.py [major|minor|patch]"""
+"""Bump version in extension/manifest.json and frontend/package.json.
+Usage: python bump.py [major|minor|patch]"""
 import json, sys, pathlib
 
-manifest = pathlib.Path(__file__).parent / 'extension' / 'manifest.json'
-data = json.loads(manifest.read_text())
-major, minor, patch = map(int, data['version'].split('.'))
+root = pathlib.Path(__file__).parent
+manifest_path = root / 'extension' / 'manifest.json'
+pkg_path = root / 'frontend' / 'package.json'
 
 arg = sys.argv[1] if len(sys.argv) > 1 else 'patch'
-if arg == 'major':
-    major, minor, patch = major + 1, 0, 0
-elif arg == 'minor':
-    major, minor, patch = major, minor + 1, 0
-else:
-    patch += 1
 
-data['version'] = f'{major}.{minor}.{patch}'
-manifest.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n')
-print(f'bumped → {data["version"]}')
+def bump(version: str) -> str:
+    major, minor, patch = map(int, version.split('.'))
+    if arg == 'major':
+        return f'{major + 1}.0.0'
+    elif arg == 'minor':
+        return f'{major}.{minor + 1}.0'
+    else:
+        return f'{major}.{minor}.{patch + 1}'
+
+manifest = json.loads(manifest_path.read_text())
+new_version = bump(manifest['version'])
+manifest['version'] = new_version
+manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + '\n')
+
+pkg = json.loads(pkg_path.read_text())
+pkg['version'] = new_version
+pkg_path.write_text(json.dumps(pkg, indent=2) + '\n')
+
+print(f'bumped → {new_version}')
