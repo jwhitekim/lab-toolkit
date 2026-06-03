@@ -1,4 +1,8 @@
 .env
+.git/
+.claude/
+.github/
+extension/
 **/__pycache__
 **/*.pyc
 frontend/node_modules
