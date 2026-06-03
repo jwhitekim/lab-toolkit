@@ -51,8 +51,15 @@ document.getElementById('resetBtn').addEventListener('click', () => {
     setStatus('');
     fileInput.value = '';
 });
-document.getElementById('openWeb').addEventListener('click', () => {
-    chrome.tabs.create({ url: `${SERVER}/paper` });
+document.getElementById('openWeb').addEventListener('click', async () => {
+    try {
+        const res = await fetch(`${SERVER}/api/me`, { credentials: 'include' });
+        const data = await res.json();
+        const path = data.username ? `/${data.username}/paper` : '/paper';
+        chrome.tabs.create({ url: `${SERVER}${path}` });
+    } catch {
+        chrome.tabs.create({ url: `${SERVER}/paper` });
+    }
 });
 document.getElementById('browseBtn').addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', () => {
