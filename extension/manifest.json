@@ -23,6 +23,6 @@
   "permissions": ["storage", "tabs"],
   "host_permissions": [
     "http://localhost:9000/*",
-    "https://lab-toolkit.fly.dev/*"
+    "https://veloo.page/*"
   ]
 }
