@@ -1,10 +1,20 @@
 from datetime import datetime, date, timedelta, timezone
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from supabase import Client
 from database import get_supabase
 import schemas
 from dateutil import parser as dateutil_parser
+
+
+def _get_user_id(request: Request, sb: Client = Depends(get_supabase)) -> str:
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="인증이 필요합니다.")
+    result = sb.table("sessions").select("user_id").eq("token", token).single().execute()
+    if not result.data:
+        raise HTTPException(status_code=401, detail="세션이 만료됐습니다.")
+    return result.data["user_id"]
 
 
 def _parse_deadline(text: str) -> date | None:
@@ -51,8 +61,8 @@ def _fetch_one(sb: Client, todo_id: int) -> dict:
 
 
 @router.get("", response_model=List[schemas.TodoOut])
-def get_todos(filter: Optional[str] = None, sb: Client = Depends(get_supabase)):
-    query = sb.table("todos").select("*, steps(*)")
+def get_todos(filter: Optional[str] = None, sb: Client = Depends(get_supabase), user_id: str = Depends(_get_user_id)):
+    query = sb.table("todos").select("*, steps(*)").eq("user_id", user_id)
 
     if filter == "week":
         res = query.eq("done", False).order("created_at", desc=True).execute()
@@ -88,8 +98,8 @@ def get_todo(todo_id: int, sb: Client = Depends(get_supabase)):
 
 
 @router.post("", response_model=schemas.TodoOut)
-def create_todo(todo_in: schemas.TodoCreate, sb: Client = Depends(get_supabase)):
-    res = sb.table("todos").insert(todo_in.model_dump()).execute()
+def create_todo(todo_in: schemas.TodoCreate, sb: Client = Depends(get_supabase), user_id: str = Depends(_get_user_id)):
+    res = sb.table("todos").insert({"user_id": user_id, **todo_in.model_dump()}).execute()
     if not res.data:
         raise HTTPException(status_code=500, detail="Todo 생성에 실패했습니다.")
     todo = res.data[0]
