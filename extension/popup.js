@@ -1,4 +1,4 @@
-const SERVER = 'https://lab-toolkit.fly.dev';
+const SERVER = 'https://veloo.page';
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
 const statusEl = document.getElementById('status');
