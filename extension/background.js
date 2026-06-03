@@ -1,4 +1,4 @@
-const SERVER = 'https://lab-toolkit.fly.dev';
+const SERVER = 'https://veloo.page';
 let windowId = null;
 chrome.action.onClicked.addListener(() => {
     if (windowId !== null) {
