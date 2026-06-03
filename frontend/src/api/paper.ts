@@ -23,7 +23,7 @@ export interface PaperResult {
 async function checkRes(res: Response, label: string): Promise<void> {
   if (res.ok) return
   if (res.status === 401) {
-    window.location.href = '/login'
+    window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`
     throw new Error('세션이 만료됐습니다. 다시 로그인해주세요.')
   }
   let detail = ''

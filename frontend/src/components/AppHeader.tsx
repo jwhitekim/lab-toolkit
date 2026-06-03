@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useIsMobile } from '../hooks/useIsMobile'
 
 interface Props {
@@ -9,6 +9,7 @@ interface Props {
 export default function AppHeader({ title, right }: Props) {
   const navigate = useNavigate()
   const isMobile = useIsMobile()
+  const { username } = useParams<{ username: string }>()
   return (
     <header style={{
       height: 'var(--header-h)',
@@ -24,7 +25,7 @@ export default function AppHeader({ title, right }: Props) {
       flexShrink: 0,
     }}>
       <button
-        onClick={() => navigate('/')}
+        onClick={() => navigate(`/${username}/`)}
         style={{
           background: 'transparent', border: 'none', cursor: 'pointer',
           fontSize: isMobile ? 16 : 18, fontWeight: 700, color: 'var(--text-primary)',

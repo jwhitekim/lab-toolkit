@@ -74,7 +74,9 @@ export default function Login() {
         body: JSON.stringify({ username, password }),
       })
       if (res.ok) {
-        navigate(redirectTo)
+        const me = await fetch('/api/me').then(r => r.json())
+        const dest = redirectTo === '/' ? `/${me.username}/` : redirectTo
+        navigate(dest)
       } else {
         const data = await res.json()
         setError(res.status === 403 ? '관리자 승인 대기 중입니다.' : (data.error ?? '로그인에 실패했습니다.'))
