@@ -1,9 +1,21 @@
 {
   "manifest_version": 3,
   "name": "Paper Analyzer",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "PDF 논문을 드래그하거나 선택해서 즉시 분석",
+  "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
   "action": {
+    "default_icon": {
+      "16": "icon.png",
+      "32": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    },
     "default_popup": "popup.html",
     "default_title": "Paper Analyzer"
   },
@@ -20,7 +32,10 @@
     "service_worker": "background.js",
     "type": "module"
   },
-  "permissions": ["storage", "tabs"],
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
   "host_permissions": [
     "http://localhost:9000/*",
     "https://veloo.page/*"
