@@ -18,6 +18,7 @@ from backend.paper_analyzer import app as paper_app
 from backend.translator import app as translate_app
 from backend.arch_trainer import app as arch_app
 from backend.todo import app as todo_app
+from backend.contextor import app as contextor_app
 
 BASE = os.path.dirname(__file__)
 DIST = os.path.join(BASE, "frontend", "dist")
@@ -49,7 +50,7 @@ _login_attempts: dict[str, list[datetime]] = defaultdict(list)
 MAX_ATTEMPTS = 5
 LOCKOUT_MINUTES = 15
 
-_API_PREFIXES = ("/paper/", "/translate/", "/arch-trainer/", "/todo/")
+_API_PREFIXES = ("/paper/", "/translate/", "/model-review/", "/todo/", "/contextor/")
 _OPEN_PATHS = {"/login", "/logout", "/register", "/api/me", "/favicon.svg"}
 
 
@@ -244,8 +245,9 @@ async def me(request: Request):
 
 app.mount("/paper", paper_app)
 app.mount("/translate", translate_app)
-app.mount("/arch-trainer", arch_app)
+app.mount("/model-review", arch_app)
 app.mount("/todo", todo_app)
+app.mount("/contextor", contextor_app)
 app.mount("/assets", StaticFiles(directory=os.path.join(DIST, "assets")), name="assets")
 
 

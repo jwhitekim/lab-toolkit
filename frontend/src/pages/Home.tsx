@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { CheckSquare, Globe, FileText, GitBranch, ArrowUpRight } from 'lucide-react'
+import { CheckSquare, Globe, FileText, GitBranch, ArrowUpRight, BookOpen } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTodos } from '../hooks/useTodos'
 import * as paperApi from '../api/paper'
 import * as translatorApi from '../api/translator'
 import * as archApi from '../api/archTrainer'
+import * as contextorApi from '../api/contextor'
 import type { PaperHistoryItem } from '../api/paper'
 import type { TranslationHistoryItem } from '../api/translator'
 import type { ArchHistoryItem } from '../api/archTrainer'
@@ -16,10 +17,11 @@ const PRIORITY_BADGE: Record<string, { label: string; color: string; bg: string 
 }
 
 const APP_CARDS = [
-  { name: 'Paper Analyzer', desc: 'PDF 추출 및 논문 분석', href: '/paper',        unit: '분석',   countKey: 'paper' as const, Icon: FileText },
-  { name: 'Translator',     desc: '영어 논문 용어 번역',  href: '/translate',    unit: '번역',   countKey: 'tx'    as const, Icon: Globe },
-  { name: 'Models Review',  desc: '모델 설명 + AI 피드백', href: '/arch-trainer', unit: '피드백', countKey: 'arch'  as const, Icon: GitBranch },
-  { name: 'Todo List',      desc: '연구실 할 일 관리',    href: '/todo',         unit: '할 일',  countKey: 'todo'  as const, Icon: CheckSquare },
+  { name: 'Paper Analyzer', desc: 'PDF 추출 및 논문 분석',      href: '/paper',        unit: '분석',   countKey: 'paper'     as const, Icon: FileText },
+  { name: 'Translator',     desc: '영어 논문 문장 번역',        href: '/translate',    unit: '번역',   countKey: 'tx'        as const, Icon: Globe },
+  { name: 'Contextor',      desc: '단어 ML/DL 맥락별 풀이',    href: '/contextor',    unit: '조회',   countKey: 'contextor' as const, Icon: BookOpen },
+  { name: 'Model Review',  desc: '모델 설명 + AI 피드백',     href: '/model-review', unit: '피드백', countKey: 'arch'      as const, Icon: GitBranch },
+  { name: 'Todo List',      desc: '연구실 할 일 관리',         href: '/todo',         unit: '할 일',  countKey: 'todo'      as const, Icon: CheckSquare },
 ]
 
 function trunc(s: string, n: number): string {
@@ -34,7 +36,7 @@ export default function Home() {
   const [txHistory, setTxHistory] = useState<TranslationHistoryItem[]>([])
   const [paperHistory, setPaperHistory] = useState<PaperHistoryItem[]>([])
   const [archHistory, setArchHistory] = useState<ArchHistoryItem[]>([])
-  const [counts, setCounts] = useState({ paper: 0, tx: 0, arch: 0 })
+  const [counts, setCounts] = useState({ paper: 0, tx: 0, arch: 0, contextor: 0 })
   const [activityLoading, setActivityLoading] = useState(true)
 
   useEffect(() => {
@@ -45,11 +47,12 @@ export default function Home() {
       paperApi.getPaperCount(),
       translatorApi.getTranslationCount(),
       archApi.getArchCount(),
-    ]).then(([tx, paper, arch, paperCount, txCount, archCount]) => {
+      contextorApi.getContextorCount(),
+    ]).then(([tx, paper, arch, paperCount, txCount, archCount, contextorCount]) => {
       setTxHistory(tx.slice(0, 3))
       setPaperHistory(paper.slice(0, 3))
       setArchHistory(arch.slice(0, 3))
-      setCounts({ paper: paperCount, tx: txCount, arch: archCount })
+      setCounts({ paper: paperCount, tx: txCount, arch: archCount, contextor: contextorCount })
     }).catch(() => {}).finally(() => setActivityLoading(false))
   }, [])
 
@@ -256,7 +259,7 @@ export default function Home() {
                       <span>아키텍처 리뷰 기록이 없습니다</span>
                     </div>
                   ) : archHistory.map((item, i) => (
-                    <Link key={i} to={`/${username}/arch-trainer`} className="activity-item">
+                    <Link key={i} to={`/${username}/model-review`} className="activity-item">
                       {item.image_name ?? new Date(item.created_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
                     </Link>
                   ))}
