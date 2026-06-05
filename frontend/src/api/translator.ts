@@ -33,7 +33,7 @@ export interface TranslationHistoryItem {
   id: number
   source_text: string
   translated_text: string
-  type: 'word' | 'sentence'
+  type: 'sentence'
   created_at: string
 }
 

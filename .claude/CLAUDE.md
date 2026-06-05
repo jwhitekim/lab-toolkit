@@ -11,7 +11,7 @@ FastAPI 루트(main.py)가 4개 서브앱을 마운트하는 SPA 구조.
 [FastAPI Root — main.py]
     ├── /paper        → backend/paper_analyzer/
     ├── /translate    → backend/translator/
-    ├── /arch-trainer → backend/arch_trainer/
+    ├── /model-review → backend/arch_trainer/
     └── /todo         → backend/todo/
 ```
 

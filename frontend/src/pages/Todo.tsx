@@ -166,7 +166,7 @@ export default function TodoPage() {
   if (isMobile) {
     return (
       <div className="flex flex-col h-screen overflow-hidden" style={{ background: 'var(--bg-base)' }}>
-        <AppHeader title="할일" />
+        <AppHeader title="Todo List" />
         <MobileTabBar filter={filter} onFilter={setFilter} />
         {selectedId !== null ? (
           loading && !selectedTodo ? (
