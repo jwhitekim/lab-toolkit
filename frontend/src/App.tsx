@@ -6,13 +6,15 @@ import Translator from './pages/Translator'
 import ArchTrainer from './pages/ArchTrainer'
 import Todo from './pages/Todo'
 import Login from './pages/Login'
+import Contextor from './pages/Contextor'
 
 const PAGE_TITLES: Record<string, string> = {
   '': 'Home',
   'paper': 'Paper Analyzer',
   'translate': 'Translator',
-  'arch-trainer': 'Arch Trainer',
+  'model-review': 'Model Review',
   'todo': 'Todo',
+  'contextor': 'Contextor',
 }
 
 function RootRedirect() {
@@ -46,8 +48,9 @@ export default function App() {
       <Route path="/:username/" element={<Home />} />
       <Route path="/:username/paper" element={<PaperAnalyzer />} />
       <Route path="/:username/translate" element={<Translator />} />
-      <Route path="/:username/arch-trainer" element={<ArchTrainer />} />
+      <Route path="/:username/model-review" element={<ArchTrainer />} />
       <Route path="/:username/todo/*" element={<Todo />} />
+      <Route path="/:username/contextor" element={<Contextor />} />
     </Routes>
   )
 }

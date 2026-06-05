@@ -15,7 +15,7 @@ from pydantic import BaseModel
 
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
-app = FastAPI(title="논문 아키텍처 설명력 훈련")
+app = FastAPI(title="Model Review")
 client = anthropic.AsyncAnthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
 MODEL = os.environ.get("CLAUDE_MODEL_SMART", "claude-sonnet-4-6")

@@ -1,13 +1,9 @@
 """Translation Studio — FastAPI + Claude API"""
 import asyncio
-import json
 import logging
 import os
-import re
-import time
 
 import anthropic
-import requests
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -30,145 +26,59 @@ if _supabase_url and _supabase_key:
 
 # Context Layer 1: Role & Domain
 _SYSTEM_PROMPT = """\
-ROLE: AI/ML academic translator (English → Korean)
-DOMAIN: machine learning, deep learning, computer vision, NLP research papers
-REGISTER: 한국어 학술 논문 문체 (formal academic Korean)"""
+당신은 머신러닝 분야 박사과정 연구자이자 학술 번역가입니다.
+영어 ML/DL/CV/NLP 논문을 한국어로 번역하며, 독자는 같은 분야의
+한국인 대학원생입니다. 그들이 원문 없이도 자연스럽게 읽을 수 있는
+한국어 학술 문체로 번역합니다."""
 
 # Context Layer 2: Constraint Rules
 _RULES = """\
-PRESERVE_VERBATIM:
-  - math: equations, variables, symbols  (∇L, θ, x_i ...)
-  - identifiers: model names, dataset names, citation keys
-  - code: function names, class names
+원문 보존 (절대 번역하지 말 것):
+  - 수식·변수·기호: ∇L, θ, x_i, R^d 등
+  - 고유명사: 모델명, 데이터셋명, 인용 키 (BERT, ImageNet, [12] 등)
+  - 코드 식별자: 함수명, 클래스명
 
-PRESERVE_OR_BILINGUAL:
-  - convention: attention→어텐션(attention) | embedding→임베딩(embedding)
-  - keep_english: fine-tuning, transformer, encoder, decoder,
-                  token, layer, weight, bias, gradient, loss,
-                  batch, epoch, inference, prompt, dropout
+병기 또는 영어 유지:
+  - 정착 용어는 한국어(영어) 병기: 어텐션(attention), 임베딩(embedding)
+  - 영어 그대로 유지: fine-tuning, transformer, encoder, decoder,
+    token, layer, weight, bias, gradient, loss, batch, epoch,
+    inference, prompt, dropout, downstream
 
-STYLE:
-  - flow: natural Korean, not word-for-word
-  - structure: nominalization preferred (∼함, ∼됨, ∼임)
-  - forbidden: 직역체, 번역체 문장
+문체:
+  - 자연스러운 한국어 흐름 우선, 직역체·번역체 금지
+  - 명사형 종결 선호 (~함, ~됨, ~임)
+  - 원문의 문단·줄바꿈 구조 유지
+  - 원문에 없는 내용 추가 금지, 빠뜨리지 말 것
 
-OUTPUT: translation only — no explanation, no prefix"""
+피해야 할 것 (BAD):
+  - "우리는 ~를 제안한다" 식의 어색한 직역
+    → "본 논문에서는 ~를 제안한다"
+  - 용어를 음역만 하고 의미 없이 두는 것
+    → 정착 번역어가 있으면 그것을 사용
+
+출력: 번역문만. 설명·접두어·따옴표 없이."""
 
 # Context Layer 3: Few-shot examples
 _EXAMPLES = """\
-EXAMPLE_1:
-  input:  "We propose a novel attention mechanism that..."
-  output: "본 논문에서는 새로운 어텐션(attention) 메커니즘을 제안하며..."
+EXAMPLE_1 (단정문 + 용어 병기):
+  input:  "We propose a novel attention mechanism that captures long-range dependencies."
+  output: "본 논문에서는 장거리 의존성을 포착하는 새로운 어텐션(attention) 메커니즘을 제안한다."
 
-EXAMPLE_2:
-  input:  "The model is fine-tuned on downstream tasks using LoRA."
-  output: "해당 모델은 LoRA를 활용하여 downstream 태스크에 fine-tuning된다."
+EXAMPLE_2 (영어 유지 + 고유명사 보존):
+  input:  "The model is fine-tuned on downstream tasks using LoRA, following BERT."
+  output: "해당 모델은 BERT를 따라 LoRA를 활용하여 downstream 태스크에 fine-tuning된다."
 
-EXAMPLE_3:
-  input:  "Let x ∈ R^d be the input embedding."
-  output: "x ∈ R^d를 입력 임베딩(input embedding)이라 하자." """
+EXAMPLE_3 (수식 보존):
+  input:  "Let x ∈ R^d be the input embedding and θ denote the parameters."
+  output: "x ∈ R^d를 입력 임베딩(input embedding), θ를 파라미터라 하자."
 
-_NAVER_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-    "Referer":    "https://en.dict.naver.com/",
-    "Accept":     "application/json",
-}
+EXAMPLE_4 (긴 복문 + 명사형 종결):
+  input:  "While prior work focuses on accuracy, we argue that efficiency is equally critical, and we demonstrate this through extensive experiments on three benchmarks."
+  output: "기존 연구가 정확도에 초점을 맞추는 반면, 본 논문에서는 효율성 또한 동등하게 중요함을 주장하며, 세 가지 벤치마크에 대한 광범위한 실험을 통해 이를 입증한다."
 
-
-def _strip_tags(s: str) -> str:
-    return re.sub(r"<[^>]+>", "", s)
-
-
-def _get_phonetic(data: dict) -> tuple[str, str | None]:
-    phonetic = ""
-    audio_url = None
-    try:
-        for item in data["searchResultMap"]["searchResultListMap"]["WORD"]["items"]:
-            for sym in item.get("searchPhoneticSymbolList", []):
-                if not phonetic and sym.get("symbolValue"):
-                    phonetic = sym["symbolValue"]
-                if audio_url is None and sym.get("symbolFile"):
-                    audio_url = sym["symbolFile"]
-                if phonetic and audio_url:
-                    return phonetic, audio_url
-    except (KeyError, IndexError):
-        pass
-    return phonetic, audio_url
-
-
-def _parse_thesaurus(data: dict) -> tuple[list, list, list]:
-    """THESAURUS expOnly → meansRevisionCollector 파싱 (Oxford 구조)."""
-    try:
-        exp_only = data["searchResultMap"]["searchResultListMap"]["THESAURUS"]["items"][0]["expOnly"]
-        raw = json.loads(exp_only)
-    except (KeyError, IndexError, json.JSONDecodeError):
-        return [], [], []
-
-    definitions, examples = [], []
-    collectors = raw.get("meansRevisionCollector") or raw.get("multiExamples") or []
-    for collector in collectors:
-        pos = collector.get("partOfSpeech", "")
-        for mean in collector.get("means", []):
-            ori = _strip_tags(mean.get("exampleOri", ""))
-            definitions.append({
-                "pos":          pos,
-                "level":        mean.get("meanLevel") or mean.get("examLevel") or "",
-                "value":        _strip_tags(mean.get("value", "")),
-                "exampleOri":   ori,
-                "exampleTrans": _strip_tags(mean.get("exampleTrans", "")) if ori else "",
-            })
-            if ori:
-                examples.append({
-                    "pos":   pos,
-                    "ori":   ori,
-                    "trans": _strip_tags(mean.get("exampleTrans", "")),
-                })
-
-    synonyms: list[str] = []
-    try:
-        th = json.loads(raw.get("expThesaurus") or "null")
-        if th:
-            for posp in th.get("pospList", []):
-                for word in posp.get("wordList", []):
-                    if word.get("recommendYn") == 1:
-                        name = word.get("wordName", "")
-                        if name:
-                            synonyms.append(name)
-    except (json.JSONDecodeError, AttributeError):
-        pass
-
-    return definitions, examples, synonyms
-
-
-def _parse_word(data: dict) -> tuple[list, list]:
-    """WORD.meansCollector fallback (Oxford 구조 없는 단어용)."""
-    definitions, examples = [], []
-    try:
-        for item in data["searchResultMap"]["searchResultListMap"]["WORD"]["items"]:
-            for collector in item.get("meansCollector", []):
-                pos = collector.get("partOfSpeech", "")
-                for mean in collector.get("means", []):
-                    val = _strip_tags(mean.get("value", ""))
-                    if not val:
-                        continue
-                    ori = _strip_tags(mean.get("exampleOri", ""))
-                    definitions.append({
-                        "pos":          pos,
-                        "level":        "general",
-                        "value":        val,
-                        "exampleOri":   ori,
-                        "exampleTrans": _strip_tags(mean.get("exampleTrans", "")) if ori else "",
-                    })
-                    if ori:
-                        examples.append({
-                            "pos":   pos,
-                            "ori":   ori,
-                            "trans": _strip_tags(mean.get("exampleTrans", "")),
-                        })
-    except (KeyError, IndexError):
-        pass
-    return definitions, examples
-
+EXAMPLE_5 (수동태 → 자연스러운 능동 흐름):
+  input:  "It has been shown that dropout reduces overfitting."
+  output: "dropout이 과적합을 줄인다는 점은 기존 연구에서 입증된 바 있다." """
 
 class TranslateRequest(BaseModel):
     text: str
@@ -204,7 +114,6 @@ async def translate(req: TranslateRequest):
         except Exception:
             pass
 
-    tx_type = "word" if len(text.split()) <= 2 else "sentence"
     collected: list[str] = []
 
     async def stream():
@@ -233,7 +142,7 @@ async def translate(req: TranslateRequest):
                     lambda: _supabase.table("translation_history").insert({
                         "source_text": text,
                         "translated_text": full_text,
-                        "type": tx_type,
+                        "type": "sentence",
                     }).execute()
                 )
             except Exception:
@@ -262,41 +171,6 @@ async def get_translation_history(count: bool = False):
         return JSONResponse({"items": res.data})
     except Exception:
         return JSONResponse({"count": 0} if count else {"items": []})
-
-
-@app.get("/api/naver-dict")
-def naver_dict(query: str = ""):
-    query = query.strip()
-    if not query:
-        return JSONResponse({"results": []}, status_code=400)
-
-    params = {
-        "query":             query,
-        "m":                 "pc",
-        "shouldSearchVlive": "true",
-        "lang":              "ko",
-        "hid":               str(int(time.time() * 1000)),
-    }
-    resp = requests.get(
-        "https://en.dict.naver.com/api3/enko/search",
-        params=params,
-        headers=_NAVER_HEADERS,
-        timeout=5,
-    )
-    data = resp.json()
-
-    phonetic, audio_url = _get_phonetic(data)
-    definitions, examples, synonyms = _parse_thesaurus(data)
-    if not definitions:
-        definitions, examples = _parse_word(data)
-    return JSONResponse({
-        "query":       query,
-        "phonetic":    phonetic,
-        "audioUrl":    audio_url,
-        "definitions": definitions,
-        "examples":    examples,
-        "synonyms":    synonyms,
-    })
 
 
 if __name__ == "__main__":
