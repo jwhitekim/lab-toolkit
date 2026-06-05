@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
       proxy: {
         '/paper': apiUrl,
         '/translate': apiUrl,
-        '/arch-trainer': apiUrl,
+        '/model-review': apiUrl,
         '/todo': apiUrl,
       },
     },

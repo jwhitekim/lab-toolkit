@@ -115,7 +115,7 @@ export default function PaperAnalyzer() {
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: C.main }}>
       <AppHeader
-        title="논문 분석기"
+        title="Paper Analyzer"
         right={isMobile ? undefined : searchBar}
       />
 

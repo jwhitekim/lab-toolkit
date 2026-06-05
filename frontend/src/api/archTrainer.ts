@@ -1,4 +1,4 @@
-const BASE = '/arch-trainer'
+const BASE = '/model-review'
 
 export interface ExplanationJSON {
   overview: string
