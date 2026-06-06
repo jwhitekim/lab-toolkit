@@ -6,6 +6,7 @@ export function useTodos(filter: NavFilter) {
   const [todos, setTodos] = useState<Todo[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [toastError, setToastError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -45,10 +46,18 @@ export function useTodos(filter: NavFilter) {
   }
 
   const toggleDone = async (id: number) => {
-    const updated = await api.toggleTodoDone(id)
-    refresh(updated)
-    return updated
+    const original = todos.find(t => t.id === id)
+    if (!original) return
+    setTodos(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t))
+    try {
+      const updated = await api.toggleTodoDone(id)
+      refresh(updated)
+      return updated
+    } catch {
+      setTodos(prev => prev.map(t => t.id === id ? { ...t, done: original.done } : t))
+      setToastError('완료 처리 중 오류가 발생했습니다.')
+    }
   }
 
-  return { todos, loading, error, reload: load, addTodo, editTodo, removeTodo, toggleDone, refresh }
+  return { todos, loading, error, toastError, clearToastError: () => setToastError(null), reload: load, addTodo, editTodo, removeTodo, toggleDone, refresh }
 }
