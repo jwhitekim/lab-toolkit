@@ -103,3 +103,11 @@ create table if not exists arch_history (
 
 create index if not exists arch_history_user_id_idx    on arch_history (user_id);
 create index if not exists arch_history_created_at_idx on arch_history (created_at desc);
+
+create table contextor_history (
+  id bigint generated always as identity primary key,
+  query text not null,
+  result jsonb not null,
+  created_at timestamptz default now()
+);
+create index on contextor_history (query);
