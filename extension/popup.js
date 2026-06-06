@@ -51,8 +51,15 @@ document.getElementById('resetBtn').addEventListener('click', () => {
     setStatus('');
     fileInput.value = '';
 });
-document.getElementById('openWeb').addEventListener('click', () => {
-    chrome.tabs.create({ url: `${SERVER}/paper` });
+document.getElementById('openWeb').addEventListener('click', async () => {
+    try {
+        const res = await fetch(`${SERVER}/api/me`, { credentials: 'include' });
+        const data = await res.json();
+        const path = data.username ? `/${data.username}/paper` : '/paper';
+        chrome.tabs.create({ url: `${SERVER}${path}` });
+    } catch {
+        chrome.tabs.create({ url: `${SERVER}/paper` });
+    }
 });
 document.getElementById('browseBtn').addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', () => {
@@ -82,18 +89,16 @@ async function uploadFile(file) {
     resultEl.style.display = 'none';
     resultEl.innerHTML = '';
     const fileData = await fileToBase64(file);
-    await chrome.storage.local.set({ lastResult: { analyzing: true } });
-    chrome.runtime.sendMessage({ type: 'ANALYZE_PDF', fileData, fileName: file.name }, (result) => {
-        if (result.error) {
-            dropzone.style.display = '';
-            setStatus('❌ ' + result.error, 'error');
-        }
-        else if (result.data) {
-            setStatus('');
-            resetBar.style.display = 'block';
-            renderResult(result.data);
-        }
-    });
+    const result = await analyzePdf(fileData, file.name);
+    await chrome.storage.local.set({ lastResult: result });
+    if (result.error) {
+        dropzone.style.display = '';
+        setStatus('❌ ' + result.error, 'error');
+    } else if (result.data) {
+        setStatus('');
+        resetBar.style.display = 'block';
+        renderResult(result.data);
+    }
 }
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
@@ -102,6 +107,28 @@ function fileToBase64(file) {
         reader.onerror = reject;
         reader.readAsDataURL(file);
     });
+}
+async function analyzePdf(fileData, fileName) {
+    try {
+        const blob = base64ToBlob(fileData, 'application/pdf');
+        const fd = new FormData();
+        fd.append('file', blob, fileName);
+        const res = await fetch(`${SERVER}/paper/analyze-pdf`, {
+            method: 'POST',
+            body: fd,
+            credentials: 'include'
+        });
+        const data = await res.json();
+        return data.error ? { error: data.error } : { ok: true, data };
+    } catch {
+        return { error: '서버 연결 실패 — 서버가 실행 중인지 확인하세요.' };
+    }
+}
+function base64ToBlob(b64, mime) {
+    const bytes = atob(b64);
+    const arr = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+    return new Blob([arr], { type: mime });
 }
 function setStatus(html, cls = '') {
     statusEl.innerHTML = html;

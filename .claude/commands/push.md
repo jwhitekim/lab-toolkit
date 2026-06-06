@@ -13,8 +13,7 @@ description: 버전 범프 후 변경사항 커밋 및 푸시
    - feat (새 기능) → minor
    - fix / refactor / style / docs / chore → patch
    - 하위 호환 불가 변경 → major
-2. dev/staging 브랜치인 경우에만 `python bump.py <major|minor|patch>` 실행
-   다른 브랜치에서는 bump 없이 커밋만 진행
+2. dev 브랜치인 경우에만 `python bump.py <major|minor|patch>` 실행
 3. Conventional Commit 형식으로 메시지 생성 (한국어)
 4. `git add -A`
 5. `git commit -m "<생성된 메시지>"`
@@ -26,5 +25,5 @@ description: 버전 범프 후 변경사항 커밋 및 푸시
 - push 실패 시 원인 분석 후 보고할 것
 - .env 파일이 staged 되어 있으면 즉시 중단하고 경고할 것
 - 현재 브랜치가 main이면 즉시 중단하고 경고할 것:
-  "main 브랜치에서는 직접 푸시하지 않습니다. dev/staging → main은 PR로 머지해주세요."
-- 버전 범프(bump.py)는 dev/staging 브랜치에서만 실행할 것
+  "main 브랜치에서는 직접 푸시하지 않습니다. dev → main은 PR로 머지해주세요."
+- 버전 범프(bump.py)는 dev 브랜치에서만 실행할 것

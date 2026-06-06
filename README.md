@@ -81,13 +81,18 @@ npm run dev  # http://localhost:5173 (API → :9000 프록시)
 
 ---
 
-## 배포
+## Branch Strategy
 
-`main` 브랜치 푸시 시 `.github/workflows/deploy.yml`이 자동 실행됩니다.
-서버 SSH 접속 → 코드 pull → Docker 이미지 재빌드 → nginx + cloudflared 재시작.
+| Branch | Purpose |
+|--------|---------|
+| `main` | Production. Direct commits forbidden. |
+| `dev`  | All development work. PR → main to deploy. |
 
-**GitHub Secrets 설정** (Settings → Secrets):
+**Workflow:** `dev` → PR → `main` → GitHub Actions auto-deploy
 
+---
+
+## Deployment
 | Secret | 설명 |
 |--------|------|
 | `SERVER_HOST` | 서버 IP 또는 호스트명 |

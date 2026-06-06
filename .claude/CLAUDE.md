@@ -70,6 +70,14 @@ FastAPI 루트(main.py)가 4개 서브앱을 마운트하는 SPA 구조.
 - arch_trainer 작업   → backend/arch_trainer/CLAUDE.md 먼저 읽을 것
 - todo 작업           → backend/todo/CLAUDE.md 먼저 읽을 것
 
+## 브랜치 전략
+- main : 프로덕션. 직접 커밋 금지. dev → main PR로만 업데이트.
+- dev  : 개발 전용. 백엔드/프론트엔드 구분 없이 모든 작업.
+
+## 작업 흐름
+1. dev에서 작업 후 /push
+2. dev → main PR 머지 → GitHub Actions 자동 배포
+
 ## 자기 갱신 규칙
 - 새 모듈/파일 추가 시 이 파일 갱신
 - 환경변수 추가 시 위 목록에 추가
