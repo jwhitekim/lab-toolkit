@@ -45,6 +45,17 @@ npm run dev            # Vite dev server on :5173, proxies API calls to :9000
 
 ---
 
+## Branch Strategy
+
+| Branch | Purpose |
+|--------|---------|
+| `main` | Production. Direct commits forbidden. |
+| `dev`  | All development work. PR → main to deploy. |
+
+**Workflow:** `dev` → PR → `main` → GitHub Actions auto-deploy
+
+---
+
 ## Deployment
 
 Deployment is handled automatically by `.github/workflows/deploy.yml` on every push to `main`.
