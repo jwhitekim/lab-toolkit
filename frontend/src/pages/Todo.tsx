@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { NavFilter, Priority, Todo } from '../types'
 import { useTodos } from '../hooks/useTodos'
@@ -50,7 +50,13 @@ export default function TodoPage() {
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [listWidth, setListWidth] = useState(LIST_DEFAULT)
 
-  const { todos, loading, reload, addTodo, editTodo, removeTodo, toggleDone, refresh } = useTodos(filter)
+  const { todos, loading, reload, addTodo, editTodo, removeTodo, toggleDone, refresh, toastError, clearToastError } = useTodos(filter)
+
+  useEffect(() => {
+    if (!toastError) return
+    const t = setTimeout(clearToastError, 3000)
+    return () => clearTimeout(t)
+  }, [toastError, clearToastError])
   const { generateSteps, generateStrategy, generatingSteps, generatingStrategy } = useAi()
 
   const selectedTodo = todos.find(t => t.id === selectedId) ?? null
@@ -118,8 +124,8 @@ export default function TodoPage() {
     await reload()
   }, [reload])
 
-  const handleAddStep = useCallback(async (todoId: number, text: string) => {
-    await api.addStep(todoId, { text, order_index: 999 })
+  const handleAddStep = useCallback(async (todoId: number, text: string, orderIndex = 999) => {
+    await api.addStep(todoId, { text, order_index: orderIndex })
     await reload()
   }, [reload])
 
@@ -163,8 +169,20 @@ export default function TodoPage() {
     generatingStrategy,
   }
 
+  const toast = toastError ? (
+    <div style={{
+      position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+      background: '#1f2937', color: '#f9fafb', borderRadius: 8,
+      padding: '10px 16px', fontSize: 13, zIndex: 9999,
+      boxShadow: '0 4px 12px rgba(0,0,0,0.25)', pointerEvents: 'none',
+    }}>
+      {toastError}
+    </div>
+  ) : null
+
   if (isMobile) {
     return (
+      <>
       <div className="flex flex-col h-screen overflow-hidden" style={{ background: 'var(--bg-base)' }}>
         <AppHeader title="Todo List" />
         <MobileTabBar filter={filter} onFilter={setFilter} />
@@ -192,10 +210,13 @@ export default function TodoPage() {
           />
         )}
       </div>
+      {toast}
+      </>
     )
   }
 
   return (
+    <>
     <div className="flex flex-col h-screen overflow-hidden" style={{ background: 'var(--bg-base)' }}>
       <AppHeader title="할일" />
       <div className="flex flex-1 overflow-hidden">
@@ -232,5 +253,7 @@ export default function TodoPage() {
         )}
       </div>
     </div>
+    {toast}
+    </>
   )
 }

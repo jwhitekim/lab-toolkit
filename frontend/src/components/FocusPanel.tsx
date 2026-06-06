@@ -8,8 +8,8 @@ interface Props {
   onUpdate: (id: number, data: Partial<Todo>) => Promise<void>
   onDelete: (id: number) => Promise<void>
   onToggleStep: (stepId: number) => void
-  onAddStep: (todoId: number, text: string) => Promise<void>
-  onDeleteStep: (stepId: number) => void
+  onAddStep: (todoId: number, text: string, orderIndex?: number) => Promise<void>
+  onDeleteStep: (stepId: number) => Promise<void>
   onGenerateSteps: (todo: Todo) => Promise<{ steps: string[] }>
   onGenerateStrategy: (todo: Todo) => Promise<Todo>
   generatingSteps: boolean
@@ -75,6 +75,7 @@ export default function FocusPanel({
   const [editDeadline, setEditDeadline] = useState('')
   const [newStep, setNewStep] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [regeneratingSteps, setRegeneratingSteps] = useState(false)
 
   if (!todo) {
     return (
@@ -93,8 +94,24 @@ export default function FocusPanel({
   }
 
   const saveEdit = async () => {
+    const memoChanged = editMemo !== todo.memo
+    const hadSteps = todo.steps.length > 0
     await onUpdate(todo.id, { name: editName, memo: editMemo, priority: editPriority, deadline: editDeadline })
     setEditMode(false)
+
+    if (memoChanged && hadSteps) {
+      setRegeneratingSteps(true)
+      try {
+        await Promise.all(todo.steps.map(s => onDeleteStep(s.id)))
+        const result = await onGenerateSteps({ ...todo, memo: editMemo })
+        for (let i = 0; i < result.steps.length; i++) {
+          await onAddStep(todo.id, result.steps[i], i)
+        }
+      } catch { /* 조용히 실패 */ }
+      finally {
+        setRegeneratingSteps(false)
+      }
+    }
   }
 
   const handleAddStep = async () => {
@@ -205,7 +222,7 @@ export default function FocusPanel({
             <SectionHeader label="메모 · 맥락" />
             <p
               className="text-[13px] text-gray-700 dark:text-gray-300 leading-relaxed rounded-lg px-3 py-2.5"
-              style={{ background: 'var(--list)' }}
+              style={{ background: 'var(--list)', whiteSpace: 'pre-wrap' }}
             >
               {todo.memo}
             </p>
@@ -213,10 +230,15 @@ export default function FocusPanel({
         ) : null}
 
         {/* Steps */}
-        <div>
+        <div style={{ opacity: regeneratingSteps ? 0.5 : 1, transition: 'opacity 0.2s' }}>
           <SectionHeader
             label="AI 실행 단계"
-            action={
+            action={regeneratingSteps ? (
+              <span className="text-[10px] text-[#1d9e75] flex items-center gap-1">
+                <RefreshCw size={10} className="animate-spin" />
+                재생성 중...
+              </span>
+            ) :
               <button
                 onClick={handleGenerateSteps}
                 disabled={generatingSteps}
