@@ -8,7 +8,7 @@ interface Props {
   onUpdate: (id: number, data: Partial<Todo>) => Promise<void>
   onDelete: (id: number) => Promise<void>
   onToggleStep: (stepId: number) => void
-  onAddStep: (todoId: number, text: string) => Promise<void>
+  onAddStep: (todoId: number, text: string, orderIndex?: number) => Promise<void>
   onDeleteStep: (stepId: number) => Promise<void>
   onGenerateSteps: (todo: Todo) => Promise<{ steps: string[] }>
   onGenerateStrategy: (todo: Todo) => Promise<Todo>
@@ -104,8 +104,8 @@ export default function FocusPanel({
       try {
         await Promise.all(todo.steps.map(s => onDeleteStep(s.id)))
         const result = await onGenerateSteps({ ...todo, memo: editMemo })
-        for (const text of result.steps) {
-          await onAddStep(todo.id, text)
+        for (let i = 0; i < result.steps.length; i++) {
+          await onAddStep(todo.id, result.steps[i], i)
         }
       } catch { /* 조용히 실패 */ }
       finally {
