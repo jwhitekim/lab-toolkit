@@ -19,6 +19,7 @@ from backend.translator import app as translate_app
 from backend.arch_trainer import app as arch_app
 from backend.todo import app as todo_app
 from backend.contextor import app as contextor_app
+from backend.todo.core.scheduler import start_scheduler, stop_scheduler
 
 BASE = os.path.dirname(__file__)
 DIST = os.path.join(BASE, "frontend", "dist")
@@ -118,7 +119,11 @@ async def lifespan(_app: FastAPI):
         logging.warning(
             "SUPABASE_URL이 설정되지 않았습니다. 인증이 정상 동작하지 않을 수 있습니다."
         )
+    if os.getenv("SMTP_USER"):
+        start_scheduler()
     yield
+    if os.getenv("SMTP_USER"):
+        stop_scheduler()
 
 
 app = FastAPI(title="Lab Toolkit", lifespan=lifespan)
