@@ -70,3 +70,9 @@ export const generateStepsAsync = (data: { todo_id: number; todo_name: string; m
 
 export const generateStrategy = (data: { todo_id: number; todos: Partial<Todo>[] }) =>
   req<Todo>('/ai/generate-strategy', { method: 'POST', body: JSON.stringify(data) })
+
+export const getCalendarTodos = (start: string, end: string) =>
+  req<Todo[]>(`/todos/calendar?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`)
+
+export const getWeeklyReview = (weekStart: string) =>
+  req<import('../types').WeeklyReview>(`/reviews/weekly?week_start=${encodeURIComponent(weekStart)}`)

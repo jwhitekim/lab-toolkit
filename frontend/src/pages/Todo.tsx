@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { BarChart3, CalendarDays } from 'lucide-react'
 import type { NavFilter, Priority, Todo } from '../types'
 import { useTodos } from '../hooks/useTodos'
 import { useAi } from '../hooks/useAi'
@@ -45,6 +46,7 @@ const LIST_DEFAULT = 220
 
 export default function TodoPage() {
   const navigate = useNavigate()
+  const { username } = useParams<{ username: string }>()
   const isMobile = useIsMobile()
   const [filter, setFilter] = useState<NavFilter>('all')
   const [selectedId, setSelectedId] = useState<number | null>(null)
@@ -184,7 +186,26 @@ export default function TodoPage() {
     return (
       <>
       <div className="flex flex-col h-screen overflow-hidden" style={{ background: 'var(--bg-base)' }}>
-        <AppHeader title="Todo List" />
+        <AppHeader title="Todo List" right={
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              onClick={() => navigate(`/${username}/calendar`)}
+              aria-label="캘린더"
+              title="캘린더"
+              style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              <CalendarDays size={14} />
+            </button>
+            <button
+              onClick={() => navigate(`/${username}/todo/review`)}
+              aria-label="주간 리뷰"
+              title="주간 리뷰"
+              style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              <BarChart3 size={14} />
+            </button>
+          </div>
+        } />
         <MobileTabBar filter={filter} onFilter={setFilter} />
         {selectedId !== null ? (
           loading && !selectedTodo ? (
@@ -218,7 +239,24 @@ export default function TodoPage() {
   return (
     <>
     <div className="flex flex-col h-screen overflow-hidden" style={{ background: 'var(--bg-base)' }}>
-      <AppHeader title="할일" />
+      <AppHeader title="Todo List" right={
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button
+            onClick={() => navigate(`/${username}/calendar`)}
+            style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            <CalendarDays size={14} />
+            캘린더
+          </button>
+          <button
+            onClick={() => navigate(`/${username}/todo/review`)}
+            style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            <BarChart3 size={14} />
+            주간 리뷰
+          </button>
+        </div>
+      } />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar filter={filter} onFilter={setFilter} todos={todos} />
 

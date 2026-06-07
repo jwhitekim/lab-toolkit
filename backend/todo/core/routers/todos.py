@@ -1,4 +1,6 @@
 from datetime import datetime, date, timedelta, timezone
+
+KST = timezone(timedelta(hours=9))
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Request
 from supabase import Client
@@ -21,7 +23,7 @@ def _parse_deadline(text: str) -> date | None:
     if not text or not text.strip():
         return None
     text = text.strip()
-    today = datetime.now().date()
+    today = datetime.now(KST).date()
     monday = today - timedelta(days=today.weekday())
 
     if "오늘" in text:
@@ -41,11 +43,30 @@ def _parse_deadline(text: str) -> date | None:
 
 
 def _this_week_range() -> tuple[date, date]:
-    today = datetime.now().date()
+    today = datetime.now(KST).date()
     monday = today - timedelta(days=today.weekday())
     return monday, monday + timedelta(days=6)
 
 router = APIRouter(prefix="/api/todos", tags=["todos"])
+
+
+@router.get("/calendar", response_model=List[schemas.TodoOut])
+def get_calendar_todos(
+    start: str,
+    end: str,
+    sb: Client = Depends(get_supabase),
+    user_id: str = Depends(_get_user_id),
+):
+    res = (
+        sb.table("todos")
+        .select("*, steps(*)")
+        .eq("user_id", user_id)
+        .gte("start_time", start)
+        .lte("start_time", end)
+        .order("start_time")
+        .execute()
+    )
+    return [_sort_steps(t) for t in (res.data or [])]
 
 
 def _sort_steps(todo: dict) -> dict:
@@ -63,7 +84,7 @@ def _fetch_one(sb: Client, todo_id: int) -> dict:
 @router.get("", response_model=List[schemas.TodoOut])
 def get_todos(filter: Optional[str] = None, sb: Client = Depends(get_supabase), user_id: str = Depends(_get_user_id)):
     query = sb.table("todos").select("*, steps(*)").eq("user_id", user_id)
-
+    
     if filter == "week":
         res = query.eq("done", False).order("created_at", desc=True).execute()
     elif filter == "memo":
@@ -82,7 +103,7 @@ def get_todos(filter: Optional[str] = None, sb: Client = Depends(get_supabase), 
         ]
 
     if filter == "today":
-        today = datetime.now(timezone.utc).date().isoformat()
+        today = datetime.now(KST).date().isoformat()
         todos = [
             t for t in todos
             if (t.get("created_at") or "")[:10] == today
@@ -110,7 +131,22 @@ def create_todo(todo_in: schemas.TodoCreate, sb: Client = Depends(get_supabase),
 @router.patch("/{todo_id}", response_model=schemas.TodoOut)
 def update_todo(todo_id: int, todo_in: schemas.TodoUpdate, sb: Client = Depends(get_supabase)):
     data = todo_in.model_dump(exclude_none=True)
+    if "start_time" in data:
+        data["reminded"] = False
+        if "remind_at" not in data:
+            st = todo_in.start_time
+            if st.tzinfo is None:
+                st = st.replace(tzinfo=KST)
+            data["remind_at"] = (st - timedelta(minutes=30)).isoformat()
+
+    for key, value in list(data.items()):
+        if isinstance(value, datetime):
+            if value.tzinfo is None:
+                value = value.replace(tzinfo=KST)
+            data[key] = value.isoformat()
+
     sb.table("todos").update(data).eq("id", todo_id).execute()
+
     return _fetch_one(sb, todo_id)
 
 

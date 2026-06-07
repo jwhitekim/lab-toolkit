@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CheckSquare, Globe, FileText, GitBranch, ArrowUpRight, BookOpen } from 'lucide-react'
+import { CheckSquare, Globe, FileText, GitBranch, ArrowUpRight, BookOpen, CalendarDays } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTodos } from '../hooks/useTodos'
 import * as paperApi from '../api/paper'
@@ -22,6 +22,7 @@ const APP_CARDS = [
   { name: 'Contextor',      desc: '단어 ML/DL 맥락별 풀이',    href: '/contextor',    unit: '조회',   countKey: 'contextor' as const, Icon: BookOpen },
   { name: 'Model Review',  desc: '모델 설명 + AI 피드백',     href: '/model-review', unit: '피드백', countKey: 'arch'      as const, Icon: GitBranch },
   { name: 'Todo List',      desc: '연구실 할 일 관리',         href: '/todo',         unit: '할 일',  countKey: 'todo'      as const, Icon: CheckSquare },
+  { name: 'Calendar',       desc: '할일 타임블로킹 캘린더',    href: '/calendar',     unit: '예정',   countKey: 'calendar'  as const, Icon: CalendarDays },
 ]
 
 function trunc(s: string, n: number): string {
@@ -63,6 +64,7 @@ export default function Home() {
 
   const getCount = (key: typeof APP_CARDS[number]['countKey']) => {
     if (key === 'todo') return todosLoading ? null : todos.length
+    if (key === 'calendar') return todosLoading ? null : todos.filter(t => t.start_time).length
     return activityLoading ? null : counts[key]
   }
 

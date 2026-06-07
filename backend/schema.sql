@@ -111,3 +111,35 @@ create table contextor_history (
   created_at timestamptz default now()
 );
 create index on contextor_history (query);
+
+-- ── 캘린더·알림·주간 리뷰 마이그레이션 ────────────────────────────────────────
+alter table todos
+  add column if not exists start_time   timestamptz,
+  add column if not exists end_time     timestamptz,
+  add column if not exists remind_at    timestamptz,
+  add column if not exists reminded     boolean not null default false,
+  add column if not exists completed_at timestamptz;
+
+alter table users
+  add column if not exists email text;
+
+create index if not exists todos_start_time_idx on todos (start_time);
+create index if not exists todos_remind_at_idx  on todos (remind_at) where reminded = false;
+
+-- completed_at 자동 기록 트리거
+create or replace function set_completed_at()
+returns trigger as $$
+begin
+  if new.done = true and (old.done is distinct from true) then
+    new.completed_at := now();
+  elsif new.done = false then
+    new.completed_at := null;
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists trg_set_completed_at on todos;
+create trigger trg_set_completed_at
+  before update on todos
+  for each row execute function set_completed_at();
