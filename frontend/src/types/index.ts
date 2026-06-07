@@ -19,6 +19,21 @@ export interface Todo {
   created_at: string
   updated_at: string
   steps: Step[]
+  start_time?: string
+  end_time?: string
+  remind_at?: string
+  reminded?: boolean
+  completed_at?: string
+}
+
+export interface WeeklyReview {
+  week_start: string
+  week_end: string
+  completed: number
+  created: number
+  completion_rate: number
+  overdue: Todo[]
+  by_priority: Record<string, { done: number; todo: number }>
 }
 
 export type NavFilter = 'today' | 'week' | 'all' | 'memo'

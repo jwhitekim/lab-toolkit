@@ -44,6 +44,9 @@ class TodoUpdate(BaseModel):
     deadline: Optional[str] = None
     done: Optional[bool] = None
     ai_strategy: Optional[str] = None
+    start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
+    remind_at: Optional[datetime] = None
 
 
 class TodoOut(TodoBase):
@@ -53,6 +56,11 @@ class TodoOut(TodoBase):
     created_at: datetime
     updated_at: datetime
     steps: List[StepOut] = []
+    start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
+    remind_at: Optional[datetime] = None
+    reminded: bool = False
+    completed_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
 
