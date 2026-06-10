@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Loader2, Search, X } from 'lucide-react'
-import AppHeader from '../components/AppHeader'
-import { SessionExpiredMessage } from '../components/SessionExpiredMessage'
-import * as api from '../api/contextor'
-import type { ContextorResult, ContextorHistoryItem } from '../api/contextor'
+import AppHeader from '@/shared/components/AppHeader'
+import { SessionExpiredMessage } from '@/shared/components/SessionExpiredMessage'
+import * as api from './api'
+import type { ContextorResult, ContextorHistoryItem } from './api'
 import './Contextor.css'
 
 const MAX_CHARS = 60

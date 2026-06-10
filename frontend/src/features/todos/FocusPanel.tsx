@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { CalendarDays, Plus, RefreshCw, Edit2, Trash2 } from 'lucide-react'
-import type { Todo, Step, Priority } from '../types'
+import type { Todo, Step, Priority } from '@/shared/types'
 
 interface Props {
   todo: Todo | null

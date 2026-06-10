@@ -1,5 +1,5 @@
 import { useDndMonitor, useDroppable, useDraggable } from '@dnd-kit/core'
-import type { Todo } from '../types'
+import type { Todo } from '@/shared/types'
 
 const HOURS = Array.from({ length: 18 }, (_, i) => i + 6) // 06~23
 const DAYS = ['월', '화', '수', '목', '금', '토', '일']

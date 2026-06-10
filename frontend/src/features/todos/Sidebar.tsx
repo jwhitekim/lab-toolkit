@@ -1,4 +1,4 @@
-import type { NavFilter, Todo } from '../types'
+import type { NavFilter, Todo } from '@/shared/types'
 import dayjs from 'dayjs'
 
 interface Props {

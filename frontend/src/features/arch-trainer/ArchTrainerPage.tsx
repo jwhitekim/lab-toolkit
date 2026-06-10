@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { RotateCcw } from 'lucide-react'
-import AppHeader from '../components/AppHeader'
-import { useIsMobile } from '../hooks/useIsMobile'
-import * as api from '../api/archTrainer'
-import type { ExplanationJSON, FeedbackJSON, ArchHistoryItem } from '../api/archTrainer'
+import AppHeader from '@/shared/components/AppHeader'
+import { useIsMobile } from '@/shared/hooks/useIsMobile'
+import * as api from './api'
+import type { ExplanationJSON, FeedbackJSON, ArchHistoryItem } from './api'
 
 const C = {
   bg:         'var(--bg-base)',

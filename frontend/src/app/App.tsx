@@ -1,14 +1,13 @@
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
-import Home from './pages/Home'
-import PaperAnalyzer from './pages/PaperAnalyzer'
-import Translator from './pages/Translator'
-import ArchTrainer from './pages/ArchTrainer'
-import Todo from './pages/Todo'
-import Login from './pages/Login'
-import Contextor from './pages/Contextor'
-import Calendar from './pages/Calendar'
-import WeeklyReview from './pages/WeeklyReview'
+import HomePage from '@/pages/HomePage'
+import LoginPage from '@/pages/LoginPage'
+import { PaperAnalyzerPage } from '@/features/paper-analyzer'
+import { TranslatorPage } from '@/features/translator'
+import { ArchTrainerPage } from '@/features/arch-trainer'
+import { TodoPage } from '@/features/todos'
+import { ContextorPage } from '@/features/contextor'
+import { CalendarPage, WeeklyReviewPage } from '@/features/calendar'
 
 const PAGE_TITLES: Record<string, string> = {
   '': 'Home',
@@ -47,15 +46,15 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<RootRedirect />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/:username/" element={<Home />} />
-      <Route path="/:username/paper" element={<PaperAnalyzer />} />
-      <Route path="/:username/translate" element={<Translator />} />
-      <Route path="/:username/model-review" element={<ArchTrainer />} />
-      <Route path="/:username/todo/*" element={<Todo />} />
-      <Route path="/:username/todo/review" element={<WeeklyReview />} />
-      <Route path="/:username/calendar" element={<Calendar />} />
-      <Route path="/:username/contextor" element={<Contextor />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/:username/" element={<HomePage />} />
+      <Route path="/:username/paper" element={<PaperAnalyzerPage />} />
+      <Route path="/:username/translate" element={<TranslatorPage />} />
+      <Route path="/:username/model-review" element={<ArchTrainerPage />} />
+      <Route path="/:username/todo/*" element={<TodoPage />} />
+      <Route path="/:username/todo/review" element={<WeeklyReviewPage />} />
+      <Route path="/:username/calendar" element={<CalendarPage />} />
+      <Route path="/:username/contextor" element={<ContextorPage />} />
     </Routes>
   )
 }

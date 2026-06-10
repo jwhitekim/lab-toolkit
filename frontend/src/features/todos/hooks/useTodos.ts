@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import type { Todo, NavFilter } from '../types'
-import * as api from '../api/client'
+import type { Todo, NavFilter } from '@/shared/types'
+import * as api from '@/shared/api/client'
 
 export function useTodos(filter: NavFilter) {
   const [todos, setTodos] = useState<Todo[]>([])

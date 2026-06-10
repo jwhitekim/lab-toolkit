@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import AppHeader from '../components/AppHeader'
-import * as api from '../api/client'
-import type { WeeklyReview } from '../types'
+import AppHeader from '@/shared/components/AppHeader'
+import * as api from '@/shared/api/client'
+import type { WeeklyReview } from '@/shared/types'
 
 function getMonday(date: Date): Date {
   const d = new Date(date)

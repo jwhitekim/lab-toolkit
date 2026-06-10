@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ko'
-import type { Todo, NavFilter, Priority } from '../types'
+import type { Todo, NavFilter, Priority } from '@/shared/types'
 import TodoItem from './TodoItem'
 import AddTodoModal from './AddTodoModal'
-import { useIsMobile } from '../hooks/useIsMobile'
+import { useIsMobile } from '@/shared/hooks/useIsMobile'
 
 dayjs.locale('ko')
 

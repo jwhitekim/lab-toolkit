@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Check, Copy, Loader2, X } from 'lucide-react'
-import AppHeader from '../components/AppHeader'
-import { SessionExpiredMessage } from '../components/SessionExpiredMessage'
-import * as api from '../api/translator'
-import type { TranslationHistoryItem } from '../api/translator'
+import AppHeader from '@/shared/components/AppHeader'
+import { SessionExpiredMessage } from '@/shared/components/SessionExpiredMessage'
+import * as api from './api'
+import type { TranslationHistoryItem } from './api'
 import './Translator.css'
 
 const MAX_CHARS = 5000
