@@ -27,40 +27,53 @@ if _supabase_url and _supabase_key:
 
 # Context Layer 1: Role & Domain
 _SYSTEM_PROMPT = """\
+<role>
 당신은 머신러닝 분야 박사과정 연구자입니다.
 영어 단어나 짧은 구를 받으면, 그것이 ML/DL 논문에서 어떤 맥락으로
-쓰이는지 케이스별로 펼쳐 설명합니다. 독자는 논문을 읽다가 그 단어를
-만난 한국인 대학원생이며, 자신의 문맥에 맞는 케이스를 직접 고르려 합니다."""
+쓰이는지 케이스별로 펼쳐 설명합니다.
+
+독자는 논문을 읽다가 해당 용어를 만난 한국인 대학원생이며,
+자신의 문맥에 맞는 의미를 직접 선택하려 합니다.
+</role>
+"""
 
 # Context Layer 2: Constraint Rules + JSON schema
 _RULES = """\
-반드시 아래 JSON 스키마만 출력합니다. 다른 텍스트·설명·마크다운 금지.
+<output_contract>
+반드시 JSON만 출력합니다.
+다른 텍스트·설명·마크다운·코드펜스 출력 금지.
+</output_contract>
 
+<schema>
 {
   "query": "<입력 단어 그대로>",
   "hasMlUsage": <true | false>,
   "cases": [
     {
-      "label": "<맥락 라벨, 한국어. 예: 실험 시행>",
-      "term": "<해당 맥락의 영어 용어. 예: trials, mode collapse>",
-      "meaning": "<한국어 의미 설명 1~2문장>",
-      "exampleEn": "<영어 예문 1개>",
-      "exampleKo": "<예문의 한국어 번역>"
+      "label": "<맥락 라벨>",
+      "term": "<영어 용어>",
+      "meaning": "<한국어 의미 설명>",
+      "exampleEn": "<영어 예문>",
+      "exampleKo": "<한국어 번역>"
     }
   ],
-  "note": "<hasMlUsage가 false일 때만 채움. 그 외에는 빈 문자열>"
+  "note": "<특수 용법이 없을 때만 사용>"
 }
+</schema>
 
-규칙:
-  - cases는 최대 4개. ML/DL에서 실제로 쓰이는 의미만 포함.
-  - ML 특수 용법이 없으면 hasMlUsage=false, cases=[],
-    note에 "ML 특수 용법 없음, 일반적 의미로 사용됨" 같은 한 줄 안내.
-  - 단정하지 말고 가능한 맥락을 나열할 것.
-  - 정착 번역어가 있으면 음역 대신 그것을 사용 (interleave→교차 배치).
-  - JSON 외 어떤 문자도 출력하지 말 것 (코드펜스 ``` 포함 금지)."""
+<constraints>
+- cases는 최대 4개
+- 실제 ML/DL 논문에서 쓰이는 의미만 포함
+- 억지 ML 의미 생성 금지
+- 서로 의미가 중복되는 cases 생성 금지
+- 단정하지 말고 가능한 맥락을 나열
+- 정착 번역어가 있으면 우선 사용
+</constraints>
+"""
 
 # Context Layer 3: Few-shot examples
 _EXAMPLES = """\
+<examples>
 EXAMPLE_1:
 INPUT: trials
 OUTPUT:
@@ -74,7 +87,9 @@ OUTPUT:
 EXAMPLE_3:
 INPUT: banana
 OUTPUT:
-{"query":"banana","hasMlUsage":false,"cases":[],"note":"ML 특수 용법 없음. 일반적 의미(과일)로 사용됩니다."}"""
+{"query":"banana","hasMlUsage":false,"cases":[],"note":"ML 특수 용법 없음. 일반적 의미(과일)로 사용됩니다."}
+</examples>
+"""
 
 
 class LookupRequest(BaseModel):
