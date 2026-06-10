@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Pencil } from 'lucide-react'
-import type { Todo } from '../types'
+import type { Todo } from '@/shared/types'
 
 interface Props {
   todo: Todo

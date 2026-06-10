@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FileText } from 'lucide-react'
-import AppHeader from '../components/AppHeader'
-import { useIsMobile } from '../hooks/useIsMobile'
-import * as api from '../api/paper'
-import type { Candidate, PaperResult, PaperHistoryItem } from '../api/paper'
+import AppHeader from '@/shared/components/AppHeader'
+import { useIsMobile } from '@/shared/hooks/useIsMobile'
+import * as api from './api'
+import type { Candidate, PaperResult, PaperHistoryItem } from './api'
 
 type MainState =
   | { kind: 'idle' }
