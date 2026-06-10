@@ -24,61 +24,59 @@ if _supabase_url and _supabase_key:
     from supabase import create_client
     _supabase = create_client(_supabase_url, _supabase_key)
 
-# Context Layer 1: Role & Domain
-_SYSTEM_PROMPT = """\
-당신은 머신러닝 분야 박사과정 연구자이자 학술 번역가입니다.
-영어 ML/DL/CV/NLP 논문을 한국어로 번역하며, 독자는 같은 분야의
-한국인 대학원생입니다. 그들이 원문 없이도 자연스럽게 읽을 수 있는
-한국어 학술 문체로 번역합니다."""
+_SYSTEM = """\
+<role>
+ML/DL/CV/NLP 논문 번역기.
+영어 단어·문장·문단을 자연스러운 한국어로 번역한다.
+</role>
 
-# Context Layer 2: Constraint Rules
-_RULES = """\
-원문 보존 (절대 번역하지 말 것):
-  - 수식·변수·기호: ∇L, θ, x_i, R^d 등
-  - 고유명사: 모델명, 데이터셋명, 인용 키 (BERT, ImageNet, [12] 등)
-  - 코드 식별자: 함수명, 클래스명
+<rules>
+단어 또는 3어 이하의 짧은 구:
+- 목적은 용어의 의미 전달이다.
+- 기본 출력 형식은 한국어 의미 + 원어 병기이다.
+- 다만 한국어 번역이 부자연스럽거나 실제 사용 빈도가 낮은 경우 영어를 유지할 수 있다.
 
-병기 또는 영어 유지:
-  - 정착 용어는 한국어(영어) 병기: 어텐션(attention), 임베딩(embedding)
-  - 영어 그대로 유지: fine-tuning, transformer, encoder, decoder,
-    token, layer, weight, bias, gradient, loss, batch, epoch,
-    inference, prompt, dropout, downstream
+원문 보존:
+- 수식·변수·기호 보존: ∇L, θ, x_i, R^d 등
+- 고유명사 보존: 모델명, 데이터셋명, 인용 키(BERT, ImageNet, [12] 등)
+- 코드 식별자 보존: 함수명, 클래스명 등
+- 원문의 문단·줄바꿈 구조 유지
+- 원문에 없는 내용 추가 금지, 누락 금지
+
+용어 처리 (문장·문단에 한함):
+- 문장 흐름 안에서 다음 용어는 영어 유지:
+  fine-tuning, transformer, encoder, decoder, token, layer,
+  weight, bias, gradient, loss, batch, epoch, inference,
+  prompt, dropout, downstream
+- 정착 용어는 한국어(영어) 병기: 어텐션(attention), 임베딩(embedding)
 
 문체:
-  - 자연스러운 한국어 흐름 우선, 직역체·번역체 금지
-  - 명사형 종결 선호 (~함, ~됨, ~임)
-  - 원문의 문단·줄바꿈 구조 유지
-  - 원문에 없는 내용 추가 금지, 빠뜨리지 말 것
+- 자연스러운 한국어 학술 문체로 번역
+- 영어식 어순 직역 금지
+- 영어식 수동태 직역 금지
+- 불필요한 "우리는 ~" 사용 금지
+- "We propose ..."는 "본 논문에서는 ~를 제안함"으로 처리
+- 명사형 종결 선호: ~함, ~됨, ~임
+</rules>
 
-피해야 할 것 (BAD):
-  - "우리는 ~를 제안한다" 식의 어색한 직역
-    → "본 논문에서는 ~를 제안한다"
-  - 용어를 음역만 하고 의미 없이 두는 것
-    → 정착 번역어가 있으면 그것을 사용
+<examples>
+입력: transformer
+출력: 트랜스포머(transformer)
 
-출력: 번역문만. 설명·접두어·따옴표 없이."""
+입력: gradient
+출력: 기울기(gradient)
 
-# Context Layer 3: Few-shot examples
-_EXAMPLES = """\
-EXAMPLE_1 (단정문 + 용어 병기):
-  input:  "We propose a novel attention mechanism that captures long-range dependencies."
-  output: "본 논문에서는 장거리 의존성을 포착하는 새로운 어텐션(attention) 메커니즘을 제안한다."
+입력: We fine-tune the encoder on downstream tasks.
+출력: 본 논문에서는 downstream 작업에 대해 encoder를 fine-tuning함.
 
-EXAMPLE_2 (영어 유지 + 고유명사 보존):
-  input:  "The model is fine-tuned on downstream tasks using LoRA, following BERT."
-  output: "해당 모델은 BERT를 따라 LoRA를 활용하여 downstream 태스크에 fine-tuning된다."
+입력: Table 2 reports the loss on the validation set.
+출력: 표 2는 검증 세트에서의 loss를 보고함.
+</examples>
 
-EXAMPLE_3 (수식 보존):
-  input:  "Let x ∈ R^d be the input embedding and θ denote the parameters."
-  output: "x ∈ R^d를 입력 임베딩(input embedding), θ를 파라미터라 하자."
+<output>
+번역문만. 설명·접두어·따옴표 없이.
+</output>"""
 
-EXAMPLE_4 (긴 복문 + 명사형 종결):
-  input:  "While prior work focuses on accuracy, we argue that efficiency is equally critical, and we demonstrate this through extensive experiments on three benchmarks."
-  output: "기존 연구가 정확도에 초점을 맞추는 반면, 본 논문에서는 효율성 또한 동등하게 중요함을 주장하며, 세 가지 벤치마크에 대한 광범위한 실험을 통해 이를 입증한다."
-
-EXAMPLE_5 (수동태 → 자연스러운 능동 흐름):
-  input:  "It has been shown that dropout reduces overfitting."
-  output: "dropout이 과적합을 줄인다는 점은 기존 연구에서 입증된 바 있다." """
 
 class TranslateRequest(BaseModel):
     text: str
@@ -121,8 +119,8 @@ async def translate(req: TranslateRequest):
             async with _client.messages.stream(
                 model=CLAUDE_MODEL,
                 max_tokens=4096,
-                system=f"{_SYSTEM_PROMPT}\n\n{_RULES}",
-                messages=[{"role": "user", "content": f"{_EXAMPLES}\n\nINPUT:\n{text}"}],
+                system=_SYSTEM,
+                messages=[{"role": "user", "content": text}],
             ) as s:
                 async for chunk in s.text_stream:
                     collected.append(chunk)
@@ -138,11 +136,12 @@ async def translate(req: TranslateRequest):
         if _supabase:
             try:
                 full_text = "".join(collected)
+                type_value = "term" if len(text.split()) == 1 else "sentence"
                 await asyncio.to_thread(
                     lambda: _supabase.table("translation_history").insert({
                         "source_text": text,
                         "translated_text": full_text,
-                        "type": "sentence",
+                        "type": type_value,
                     }).execute()
                 )
             except Exception:
