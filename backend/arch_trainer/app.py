@@ -29,33 +29,91 @@ if _supabase_url and _supabase_key:
     _supabase = create_client(_supabase_url, _supabase_key)
 
 EXPLAIN_PROMPT = """\
-이 논문 아키텍처 그림을 분석해줘.
+<role>
+당신은 ML/DL/CV/NLP 논문 아키텍처 그림을 분석하는 연구 보조자입니다.
+그림에 보이는 모듈, 화살표, 입력·출력, 학습/추론 흐름을 근거로 기술적으로 설명합니다.
+</role>
 
-다음 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
+<output_contract>
+반드시 JSON만 출력합니다.
+마크다운, 코드펜스, 추가 설명을 출력하지 않습니다.
+</output_contract>
+
+<schema>
 {
-  "overview": "이 모델이 무엇을 하는 시스템인지 한두 문장으로",
-  "modules": "각 모듈의 이름, 역할, 작동 방식을 기술적으로 정확하게 서술. 탭 사용 금지, 불릿 사용 금지, 의문문으로 작성",
-  "data_flow": "입력이 각 단계를 거치며 어떻게 변환되어 출력까지 가는지 서술",
-  "contribution": "기존 방법과 다른 이 논문의 핵심 기여가 무엇인지 서술"
-}"""
+  "overview": "...",
+  "modules": [
+    {
+      "name": "...",
+      "role": "...",
+      "operation": "..."
+    }
+  ],
+  "data_flow": [
+    {
+      "step": 1,
+      "description": "..."
+    }
+  ],
+  "contribution": "...",
+  "uncertain_parts": [
+    "그림만으로 확정하기 어려운 부분"
+  ]
+}
+</schema>
+
+<constraints>
+- 그림에 보이는 정보에 근거해 설명합니다.
+- 보이지 않는 세부 구현을 단정하지 않습니다.
+- 모듈명은 그림에 적힌 원문 표현을 가능한 보존합니다.
+- data_flow는 입력에서 출력까지 순서대로 작성합니다.
+- uncertain_parts가 없으면 빈 배열로 둡니다.
+</constraints>
+"""
 
 FEEDBACK_PROMPT = """\
-사용자가 아키텍처를 이렇게 설명했어:
+<role>
+당신은 사용자의 논문 아키텍처 설명을 채점하고 교정하는 연구 멘토입니다.
+사용자 설명과 기준 분석을 비교하여 맞은 점, 빠진 점, 오해한 점을 구분합니다.
+</role>
+
+<input>
 <user_explanation>
 {user_explanation}
 </user_explanation>
 
-실제 아키텍처 분석은 이거야:
-<ai_explanation>
+<reference_analysis>
 {ai_explanation}
-</ai_explanation>
+</reference_analysis>
+</input>
 
-다음 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
-{{
-  "correct": "사용자가 맞게 짚은 핵심 개념",
-  "missing": "놓쳤거나 잘못 이해한 부분",
-  "suggestion": "개선 내용을 더 정확하게 표현하는 방법"
-}}"""
+<output_contract>
+반드시 JSON만 출력합니다.
+마크다운, 코드펜스, 추가 설명을 출력하지 않습니다.
+</output_contract>
+
+<schema>
+{
+  "correct": [
+    "사용자가 정확히 이해한 내용"
+  ],
+  "missing": [
+    "사용자가 빠뜨린 핵심 내용"
+  ],
+  "incorrect": [
+    "사용자가 잘못 이해한 내용"
+  ],
+  "suggestion": "사용자 설명을 더 정확하게 고친 문장"
+}
+</schema>
+
+<constraints>
+- user_explanation에 없는 내용을 correct에 넣지 않습니다.
+- reference_analysis에 근거해 비교합니다.
+- 틀린 부분과 빠진 부분을 구분합니다.
+- suggestion은 사용자가 그대로 참고할 수 있는 자연스러운 한국어 설명으로 작성합니다.
+</constraints>
+"""
 
 
 def _parse_json(text: str) -> dict:
