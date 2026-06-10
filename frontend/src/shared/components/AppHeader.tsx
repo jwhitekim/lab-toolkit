@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { useIsMobile } from '../hooks/useIsMobile'
+import { useIsMobile } from '@/shared/hooks/useIsMobile'
 
 interface Props {
   title?: string

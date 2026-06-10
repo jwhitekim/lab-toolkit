@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import type { Todo } from '../types'
-import * as api from '../api/client'
+import type { Todo } from '@/shared/types'
+import * as api from '@/shared/api/client'
 
 export function useAi() {
   const [generatingSteps, setGeneratingSteps] = useState(false)

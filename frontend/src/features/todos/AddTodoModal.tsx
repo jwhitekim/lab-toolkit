@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, Sparkles } from 'lucide-react'
-import type { Priority } from '../types'
+import type { Priority } from '@/shared/types'
 
 interface Props {
   onClose: () => void
