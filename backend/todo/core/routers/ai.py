@@ -4,7 +4,7 @@ import os
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from supabase import Client
 import anthropic
-from database import get_supabase
+from backend.database import get_supabase
 import schemas
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
