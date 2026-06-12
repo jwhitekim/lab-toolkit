@@ -4,7 +4,7 @@ KST = timezone(timedelta(hours=9))
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Request
 from supabase import Client
-from database import get_supabase
+from backend.database import get_supabase
 import schemas
 from dateutil import parser as dateutil_parser
 

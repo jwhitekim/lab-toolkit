@@ -17,12 +17,8 @@ app = FastAPI(title="Translation Studio")
 CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL_SMART", "claude-sonnet-4-6")
 _client = anthropic.AsyncAnthropic()
 
-_supabase_url = os.environ.get("SUPABASE_URL")
-_supabase_key = os.environ.get("SUPABASE_SERVICE_KEY") or os.environ.get("SUPABASE_KEY")
-_supabase = None
-if _supabase_url and _supabase_key:
-    from supabase import create_client
-    _supabase = create_client(_supabase_url, _supabase_key)
+from backend.database import get_supabase
+_supabase = get_supabase()
 
 _SYSTEM = """\
 <role>
