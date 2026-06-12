@@ -174,10 +174,10 @@ export default function FocusPanel({
             <textarea
               value={editMemo}
               onChange={e => setEditMemo(e.target.value)}
-              rows={3}
+              rows={10}
               placeholder="메모 · 맥락"
               className="w-full border rounded-lg px-3 py-2 text-[13px] outline-none focus:border-[#1d9e75] resize-none bg-transparent text-gray-700 dark:text-gray-300"
-              style={{ borderColor: 'var(--input-border)' }}
+              style={{ borderColor: 'var(--input-border)'}}
             />
             <div className="flex gap-3">
               <select
