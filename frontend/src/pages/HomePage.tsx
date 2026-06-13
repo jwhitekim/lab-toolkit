@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { CheckSquare, Globe, FileText, GitBranch, ArrowUpRight, BookOpen, CalendarDays } from 'lucide-react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTodos } from '@/features/todos/hooks/useTodos'
 import * as paperApi from '@/features/paper-analyzer/api'
 import * as translatorApi from '@/features/translator/api'
@@ -9,6 +8,7 @@ import * as contextorApi from '@/features/contextor/api'
 import type { PaperHistoryItem } from '@/features/paper-analyzer/api'
 import type { TranslationHistoryItem } from '@/features/translator/api'
 import type { ArchHistoryItem } from '@/features/arch-trainer/api'
+import { useShellNav, type ActiveApp } from '@/shared/hooks/useShellNav'
 import './HomePage.css'
 
 const PRIORITY_BADGE: Record<string, { label: string; color: string; bg: string }> = {
@@ -16,13 +16,13 @@ const PRIORITY_BADGE: Record<string, { label: string; color: string; bg: string 
   mid:    { label: '중간', color: '#e37400', bg: '#fef3e2' },
 }
 
-const APP_CARDS = [
-  { name: 'Paper Analyzer', desc: 'PDF 추출 및 논문 분석',      href: '/paper',        unit: '분석',   countKey: 'paper'     as const, Icon: FileText },
-  { name: 'Translator',     desc: '영어 논문 문장 번역',        href: '/translate',    unit: '번역',   countKey: 'tx'        as const, Icon: Globe },
-  { name: 'Contextor',      desc: '단어 ML/DL 맥락별 풀이',    href: '/contextor',    unit: '조회',   countKey: 'contextor' as const, Icon: BookOpen },
-  { name: 'Model Review',  desc: '모델 설명 + AI 피드백',     href: '/model-review', unit: '피드백', countKey: 'arch'      as const, Icon: GitBranch },
-  { name: 'Todo List',      desc: '연구실 할 일 관리',         href: '/todo',         unit: '할 일',  countKey: 'todo'      as const, Icon: CheckSquare },
-  { name: 'Calendar',       desc: '할일 타임블로킹 캘린더',    href: '/calendar',     unit: '예정',   countKey: 'calendar'  as const, Icon: CalendarDays },
+const APP_CARDS: { name: string; desc: string; appKey: ActiveApp; unit: string; countKey: 'paper' | 'tx' | 'arch' | 'contextor' | 'todo' | 'calendar'; Icon: typeof FileText }[] = [
+  { name: 'Paper Analyzer', desc: 'PDF 추출 및 논문 분석',      appKey: 'paper',        unit: '분석',   countKey: 'paper',     Icon: FileText },
+  { name: 'Translator',     desc: '영어 논문 문장 번역',        appKey: 'translate',    unit: '번역',   countKey: 'tx',        Icon: Globe },
+  { name: 'Contextor',      desc: '단어 ML/DL 맥락별 풀이',    appKey: 'contextor',    unit: '조회',   countKey: 'contextor', Icon: BookOpen },
+  { name: 'Model Review',   desc: '모델 설명 + AI 피드백',     appKey: 'model-review', unit: '피드백', countKey: 'arch',      Icon: GitBranch },
+  { name: 'Todo List',      desc: '연구실 할 일 관리',         appKey: 'todo',         unit: '할 일',  countKey: 'todo',      Icon: CheckSquare },
+  { name: 'Calendar',       desc: '할일 타임블로킹 캘린더',    appKey: 'calendar',     unit: '예정',   countKey: 'calendar',  Icon: CalendarDays },
 ]
 
 function trunc(s: string, n: number): string {
@@ -30,8 +30,7 @@ function trunc(s: string, n: number): string {
 }
 
 export default function Home() {
-  const navigate = useNavigate()
-  const { username } = useParams<{ username: string }>()
+  const { setActive } = useShellNav()
   const { todos, loading: todosLoading, toggleDone } = useTodos('all')
 
   const [txHistory, setTxHistory] = useState<TranslationHistoryItem[]>([])
@@ -65,7 +64,7 @@ export default function Home() {
   const getCount = (key: typeof APP_CARDS[number]['countKey']) => {
     if (key === 'todo') return todosLoading ? null : todos.length
     if (key === 'calendar') return todosLoading ? null : todos.filter(t => t.start_time).length
-    return activityLoading ? null : counts[key]
+    return activityLoading ? null : counts[key as keyof typeof counts]
   }
 
   const completedTodos = todos.filter(todo => todo.done).length
@@ -73,25 +72,16 @@ export default function Home() {
 
   return (
     <div className="home-root">
-      <header className="home-header">
-        <Link to={`/${username}/`} className="home-wordmark">veloo</Link>
-        <nav className="home-nav" aria-label="Primary">
-          {APP_CARDS.map(({ name, href }) => (
-            <Link key={href} to={`/${username}${href}`} className="home-nav-link">{name}</Link>
-          ))}
-        </nav>
-      </header>
-
       <main className="home-main">
         <section className="home-hero">
           <div>
             <h1 className="home-title">Now</h1>
             <p className="home-subtitle">논문 분석, 번역, 모델 리뷰, 할 일을 한 곳에서 확인합니다.</p>
           </div>
-          <Link to={`/${username}/todo`} className="home-primary-action">
+          <button onClick={() => setActive('todo')} className="home-primary-action">
             할 일 추가
             <ArrowUpRight size={15} />
-          </Link>
+          </button>
         </section>
 
         <section className="metric-grid" aria-label="Overview">
@@ -129,10 +119,10 @@ export default function Home() {
             </div>
           </div>
           <div className="app-grid">
-          {APP_CARDS.map(({ name, desc, href, unit, countKey, Icon }) => {
+          {APP_CARDS.map(({ name, desc, appKey, unit, countKey, Icon }) => {
             const count = getCount(countKey)
             return (
-              <Link key={href} to={`/${username}${href}`} className="app-card">
+              <button key={appKey} onClick={() => setActive(appKey)} className="app-card">
                 <div className="app-card-top">
                   <span className="app-icon"><Icon size={18} /></span>
                   <ArrowUpRight className="app-arrow" size={16} />
@@ -145,7 +135,7 @@ export default function Home() {
                     : `${unit} ${count}${unit === '할 일' ? '개' : '회'}`
                   }
                 </div>
-              </Link>
+              </button>
             )
           })}
           </div>
@@ -159,7 +149,7 @@ export default function Home() {
                 <h2 className="section-title">할 일</h2>
                 <p className="section-description">최근 작업 큐</p>
               </div>
-              <Link to={`/${username}/todo`} className="section-more">전체 보기 →</Link>
+              <button onClick={() => setActive('todo')} className="section-more">전체 보기 →</button>
             </div>
 
             {todosLoading ? (
@@ -205,7 +195,7 @@ export default function Home() {
               </div>
             )}
 
-            <button className="todo-add-btn" onClick={() => navigate(`/${username}/todo`)} type="button">
+            <button className="todo-add-btn" onClick={() => setActive('todo')} type="button">
               <span>+ 할 일 추가</span>
             </button>
           </div>
@@ -233,9 +223,9 @@ export default function Home() {
                       <span>최근 번역 기록이 없습니다</span>
                     </div>
                   ) : txHistory.map((item, i) => (
-                    <Link key={i} to={`/${username}/translate`} className="activity-item">
+                    <button key={i} onClick={() => setActive('translate')} className="activity-item">
                       {trunc(item.source_text, 25)}
-                    </Link>
+                    </button>
                   ))}
                 </div>
 
@@ -247,9 +237,9 @@ export default function Home() {
                       <span>분석한 논문이 없습니다</span>
                     </div>
                   ) : paperHistory.map((item, i) => (
-                    <Link key={i} to={`/${username}/paper`} className="activity-item">
+                    <button key={i} onClick={() => setActive('paper')} className="activity-item">
                       {trunc(item.title ?? '제목 없음', 30)}
-                    </Link>
+                    </button>
                   ))}
                 </div>
 
@@ -261,9 +251,9 @@ export default function Home() {
                       <span>아키텍처 리뷰 기록이 없습니다</span>
                     </div>
                   ) : archHistory.map((item, i) => (
-                    <Link key={i} to={`/${username}/model-review`} className="activity-item">
+                    <button key={i} onClick={() => setActive('model-review')} className="activity-item">
                       {item.image_name ?? new Date(item.created_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
-                    </Link>
+                    </button>
                   ))}
                 </div>
               </>
