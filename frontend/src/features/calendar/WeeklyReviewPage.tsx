@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
 import AppHeader from '@/shared/components/AppHeader'
+import { useShellNav } from '@/shared/hooks/useShellNav'
 import * as api from '@/shared/api/client'
 import type { WeeklyReview } from '@/shared/types'
 
@@ -21,8 +21,7 @@ const PRIORITY_LABEL: Record<string, string> = { urgent: '긴급', mid: '보통'
 const PRIORITY_COLOR: Record<string, string> = { urgent: '#a32d2d', mid: '#854f0b', normal: '#0f6e56' }
 
 export default function WeeklyReview() {
-  const { username } = useParams<{ username: string }>()
-  const navigate = useNavigate()
+  const { setActive } = useShellNav()
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()))
   const [data, setData] = useState<WeeklyReview | null>(null)
   const [loading, setLoading] = useState(false)
@@ -48,12 +47,12 @@ export default function WeeklyReview() {
   )
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-base)', overflow: 'hidden' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg-base)', overflow: 'hidden' }}>
       <AppHeader
         title="주간 리뷰"
         right={
           <button
-            onClick={() => navigate(`/${username}/todo`)}
+            onClick={() => setActive('todo')}
             style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}
           >
             할일 목록
@@ -115,7 +114,7 @@ export default function WeeklyReview() {
                   {data.overdue.map(t => (
                     <button
                       key={t.id}
-                      onClick={() => navigate(`/${username}/todo`)}
+                      onClick={() => setActive('todo')}
                       style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'var(--bg-additive)', border: 'none', borderRadius: 8, cursor: 'pointer', textAlign: 'left', fontSize: 13, color: 'var(--text-primary)' }}
                     >
                       <span style={{ width: 6, height: 6, borderRadius: '50%', background: PRIORITY_COLOR[t.priority], flexShrink: 0 }} />

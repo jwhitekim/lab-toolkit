@@ -113,7 +113,7 @@ export default function PaperAnalyzer() {
   )
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: C.main }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: C.main }}>
       <AppHeader
         title="Paper Analyzer"
         right={isMobile ? undefined : searchBar}
