@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
 import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { useShellNav } from '@/shared/hooks/useShellNav'
 import { useDraggable } from '@dnd-kit/core'
 import AppHeader from '@/shared/components/AppHeader'
 import WeekGrid from './WeekGrid'
@@ -51,8 +51,7 @@ function UnscheduledItem({ todo }: UnscheduledItemProps) {
 }
 
 export default function Calendar() {
-  const { username } = useParams<{ username: string }>()
-  const navigate = useNavigate()
+  const { setActive } = useShellNav()
   const [weekStart, setWeekStart] = useState(() => getWeekStart(new Date()))
   const [events, setEvents] = useState<Todo[]>([])
   const [unscheduled, setUnscheduled] = useState<Todo[]>([])
@@ -100,7 +99,7 @@ export default function Calendar() {
         title="Calendar"
         right={
           <button
-            onClick={() => navigate(`/${username}/todo`)}
+            onClick={() => setActive('todo')}
             style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}
           >
             리스트로
