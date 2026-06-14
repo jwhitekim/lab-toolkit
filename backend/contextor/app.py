@@ -62,7 +62,7 @@ _RULES = """\
 </schema>
 
 <constraints>
-- cases는 최대 4개
+- cases는 최대 5개
 - 실제 ML/DL 논문에서 쓰이는 의미만 포함
 - 억지 ML 의미 생성 금지
 - 서로 의미가 중복되는 cases 생성 금지

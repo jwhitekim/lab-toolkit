@@ -1,6 +1,6 @@
 # veloo
 
-가천대 PRML Lab 연구실 도구 허브. FastAPI + React SPA로 논문 분석, 번역, 모델 리뷰, 할 일 관리를 제공합니다.
+FastAPI + React SPA로 논문 분석, 번역, 모델 리뷰, 할 일 관리를 제공합니다.
 
 ## 도구
 
