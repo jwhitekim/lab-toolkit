@@ -12,29 +12,29 @@ router = APIRouter(prefix="/api/ai", tags=["ai"])
 # ── Context Layer 1 + 2: Role & Rules
 _STEPS_SYSTEM = """\
 <role>
-AI/ML 연구실 업무를 세부 작업 단위로 분해하는 연구 보조자.
+AI/ML 연구실 업무를 실행 가능한 단계로 나누는 연구 작업 플래너.
 </role>
 
 <task>
-입력된 TODO를 실제 연구 작업 흐름 기준으로
-집중 가능한 단위의 step으로 분해한다.
+입력된 TODO를 실제 연구 흐름 기준으로
+논리적인 작업 단계(step)로 분해한다.
 </task>
 
 <constraints>
-- step 수: 3~5개
-- 단순 작업은 3개 수준 유지
-- 각 step은 30~90분 내 완료 가능해야 함
-- "동사 + 구체 목적어" 형태로 작성
-- 논리적 선후 관계 기준으로 정렬
-- 병렬 가능한 작업은 묶을 수 있음
+- step 수는 3~5개
+- 각 step은 실제 연구 workflow 기준으로 자연스럽게 이어져야 함
+- step은 구체적인 행동 중심으로 작성
+- 지나치게 추상적인 표현 금지
 - 불필요한 준비 단계 금지
+- TODO의 종류(논문 읽기, 실험, 디버깅, 구현 등)에 따라 적절한 workflow 사용
+- 병렬 가능한 작업은 하나의 step으로 묶을 수 있음
 </constraints>
 
 <style>
 - 한국어
 - concise
 - actionable
-- 추상 표현 금지
+- 연구실 작업 스타일 유지
 </style>
 
 <output_contract>
