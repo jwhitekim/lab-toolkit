@@ -12,6 +12,7 @@ dayjs.locale('ko')
 interface Props {
   todos: Todo[]
   filter: NavFilter
+  onFilter: (f: NavFilter) => void
   selectedId: number | null
   onSelect: (id: number) => void
   onToggle: (id: number) => void
@@ -20,30 +21,34 @@ interface Props {
   width?: number
 }
 
-export default function TodoList({ todos, filter, selectedId, onSelect, onToggle, onEdit, onAdd, width }: Props) {
+const filterTabs: { label: string; key: NavFilter }[] = [
+  { label: '오늘', key: 'today' },
+  { label: '이번주', key: 'week' },
+  { label: '전체', key: 'all' },
+  { label: '메모', key: 'memo' },
+]
+
+export default function TodoList({ todos, filter, onFilter, selectedId, onSelect, onToggle, onEdit, onAdd, width }: Props) {
   const [showModal, setShowModal] = useState(false)
   const isMobile = useIsMobile()
 
   const active = todos.filter(t => !t.done)
   const done = todos.filter(t => t.done)
 
-  const filterLabel: Record<NavFilter, string> = {
-    today: dayjs().format('YYYY년 M월 D일'),
-    week: '이번주',
-    all: '전체',
-    memo: '메모',
-  }
+  const filterSubtitle = filter === 'today' ? dayjs().format('YYYY년 M월 D일') : null
 
   return (
     <div
       className="flex flex-col h-full border-r"
       style={{ width: width ?? '100%', flexShrink: width !== undefined ? 0 : undefined, borderRight: '1px solid var(--border-subtle)', background: 'var(--bg-additive)' }}
     >
-      <div className="px-3 pt-4 pb-2">
+      <div className="px-3 pt-4 pb-3" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>{filterLabel[filter]}</div>
-            <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 4 }}>{active.length}개 진행 중</div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>Todo List</div>
+            <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 4 }}>
+              {active.length}개 진행 중{filterSubtitle ? ` · ${filterSubtitle}` : ''}
+            </div>
           </div>
           {isMobile && (
             <button
@@ -61,6 +66,40 @@ export default function TodoList({ todos, filter, selectedId, onSelect, onToggle
               추가
             </button>
           )}
+        </div>
+
+        <div
+          role="tablist"
+          aria-label="Todo 필터"
+          className="mt-3 grid grid-cols-4 gap-1"
+          style={{ borderRadius: 'var(--radius-md)', background: 'var(--bg-base)', padding: 3 }}
+        >
+          {filterTabs.map(item => {
+            const isActive = filter === item.key
+            return (
+              <button
+                key={item.key}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => onFilter(item.key)}
+                style={{
+                  minWidth: 0,
+                  height: 32,
+                  border: 'none',
+                  borderRadius: 'var(--radius-sm)',
+                  background: isActive ? 'var(--selected-bg)' : 'transparent',
+                  color: isActive ? 'var(--selected-text)' : 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 13,
+                  fontWeight: isActive ? 600 : 500,
+                }}
+              >
+                {item.label}
+              </button>
+            )
+          })}
         </div>
       </div>
 

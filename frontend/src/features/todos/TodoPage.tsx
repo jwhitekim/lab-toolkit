@@ -1,51 +1,17 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { BarChart3, CalendarDays } from 'lucide-react'
-import { useShellNav } from '@/shared/hooks/useShellNav'
 import type { NavFilter, Priority, Todo } from '@/shared/types'
 import { useTodos } from './hooks/useTodos'
 import { useAi } from './hooks/useAi'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
-import AppHeader from '@/shared/components/AppHeader'
-import Sidebar from './Sidebar'
 import TodoList from './TodoList'
 import FocusPanel from './FocusPanel'
 import * as api from '@/shared/api/client'
 
-const navItems: { label: string; key: NavFilter }[] = [
-  { label: '오늘', key: 'today' },
-  { label: '이번주', key: 'week' },
-  { label: '전체', key: 'all' },
-  { label: '메모', key: 'memo' },
-]
-
-function MobileTabBar({ filter, onFilter }: { filter: NavFilter; onFilter: (f: NavFilter) => void }) {
-  return (
-    <div className="flex flex-shrink-0" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-      {navItems.map(item => (
-        <button
-          key={item.key}
-          onClick={() => onFilter(item.key)}
-          style={{
-            flex: 1, padding: '12px 0', fontSize: 14, fontWeight: 500,
-            borderTop: 'none', borderLeft: 'none', borderRight: 'none',
-            borderBottom: filter === item.key ? '2px solid var(--text-primary)' : '2px solid transparent',
-            color: filter === item.key ? 'var(--text-primary)' : 'var(--text-secondary)',
-            background: 'transparent', cursor: 'pointer', fontFamily: 'var(--font-sans)',
-          }}
-        >
-          {item.label}
-        </button>
-      ))}
-    </div>
-  )
-}
-
-const LIST_MIN = 120
-const LIST_MAX = 600
-const LIST_DEFAULT = 220
+const LIST_MIN = 280
+const LIST_MAX = 680
+const LIST_DEFAULT = 340
 
 export default function TodoPage() {
-  const { setActive } = useShellNav()
   const isMobile = useIsMobile()
   const [filter, setFilter] = useState<NavFilter>('all')
   const [selectedId, setSelectedId] = useState<number | null>(null)
@@ -185,27 +151,6 @@ export default function TodoPage() {
     return (
       <>
       <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
-        <AppHeader title="Todo List" right={
-          <div style={{ display: 'flex', gap: 6 }}>
-            {/* <button
-              onClick={() => setActive('calendar')}
-              aria-label="캘린더"
-              title="캘린더"
-              style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
-            >
-              <CalendarDays size={14} />
-            </button>
-            <button
-              onClick={() => setActive('weekly-review')}
-              aria-label="주간 리뷰"
-              title="주간 리뷰"
-              style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
-            >
-              <BarChart3 size={14} />
-            </button> */}
-          </div>
-        } />
-        <MobileTabBar filter={filter} onFilter={setFilter} />
         {selectedId !== null ? (
           loading && !selectedTodo ? (
             <div className="flex-1 flex items-center justify-center">
@@ -222,6 +167,7 @@ export default function TodoPage() {
           <TodoList
             todos={todos}
             filter={filter}
+            onFilter={setFilter}
             selectedId={selectedId}
             onSelect={setSelectedId}
             onToggle={handleToggleDone}
@@ -238,30 +184,11 @@ export default function TodoPage() {
   return (
     <>
     <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
-      <AppHeader title="Todo List" right={
-        <div style={{ display: 'flex', gap: 6 }}>
-          {/* <button
-            onClick={() => setActive('calendar')}
-            style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
-          >
-            <CalendarDays size={14} />
-            캘린더
-          </button>
-          <button
-            onClick={() => setActive('weekly-review')}
-            style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
-          >
-            <BarChart3 size={14} />
-            주간 리뷰
-          </button> */}
-        </div>
-      } />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar filter={filter} onFilter={setFilter} todos={todos} />
-
         <TodoList
           todos={todos}
           filter={filter}
+          onFilter={setFilter}
           selectedId={selectedId}
           onSelect={setSelectedId}
           onToggle={handleToggleDone}
