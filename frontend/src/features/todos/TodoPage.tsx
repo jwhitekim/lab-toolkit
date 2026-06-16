@@ -240,7 +240,7 @@ export default function TodoPage() {
     <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
       <AppHeader title="Todo List" right={
         <div style={{ display: 'flex', gap: 6 }}>
-          <button
+          {/* <button
             onClick={() => setActive('calendar')}
             style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
           >
@@ -253,7 +253,7 @@ export default function TodoPage() {
           >
             <BarChart3 size={14} />
             주간 리뷰
-          </button>
+          </button> */}
         </div>
       } />
       <div className="flex flex-1 overflow-hidden">
