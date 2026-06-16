@@ -15,7 +15,8 @@ load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 app = FastAPI(title="Contextor")
 
-CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL_SMART", "claude-sonnet-4-6")
+# CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL_SMART", "claude-sonnet-4-6")
+CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL_FAST", "claude-haiku-4-5-20251001")
 _client = anthropic.AsyncAnthropic()
 
 _supabase_url = os.environ.get("SUPABASE_URL")
@@ -134,7 +135,7 @@ async def lookup(req: LookupRequest):
     try:
         msg = await _client.messages.create(
             model=CLAUDE_MODEL,
-            max_tokens=1500,
+            max_tokens=900,
             system=f"{_SYSTEM_PROMPT}\n\n{_RULES}",
             messages=[{"role": "user", "content": f"{_EXAMPLES}\n\nINPUT: {text}\nOUTPUT:"}],
         )
