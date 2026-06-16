@@ -141,9 +141,15 @@ export default function FocusPanel({
   }
 
   const handleGenerateSteps = async () => {
-    const result = await onGenerateSteps(todo)
-    for (let i = 0; i < result.steps.length; i++) {
-      await onAddStep(todo.id, result.steps[i])
+    setRegeneratingSteps(true)
+    try {
+      await Promise.all(todo.steps.map(s => onDeleteStep(s.id)))
+      const result = await onGenerateSteps(todo)
+      for (let i = 0; i < result.steps.length; i++) {
+        await onAddStep(todo.id, result.steps[i], i)
+      }
+    } finally {
+      setRegeneratingSteps(false)
     }
   }
 
@@ -289,7 +295,7 @@ export default function FocusPanel({
             ) :
               <button
                 onClick={handleGenerateSteps}
-                disabled={generatingSteps}
+                disabled={generatingSteps || regeneratingSteps}
                 className="flex items-center gap-1 text-[10px] text-[#1d9e75] hover:text-[#188a64] disabled:opacity-50 font-normal normal-case"
               >
                 <RefreshCw size={10} className={generatingSteps ? 'animate-spin' : ''} />
@@ -332,6 +338,7 @@ export default function FocusPanel({
           {steps.length === 0 && !generatingSteps && (
             <button
               onClick={handleGenerateSteps}
+              disabled={generatingSteps || regeneratingSteps}
               className="mt-2 w-full py-2 text-[12px] text-[#1d9e75] border border-dashed border-[#1d9e75]/30 rounded-lg hover:bg-[#e1f5ee] dark:hover:bg-[#0a2318] transition-colors"
             >
               AI로 단계 자동 생성
