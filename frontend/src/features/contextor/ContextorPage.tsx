@@ -1,0 +1,145 @@
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { Loader2, Search, X } from 'lucide-react'
+import AppHeader from '@/shared/components/AppHeader'
+import { SessionExpiredMessage } from '@/shared/components/SessionExpiredMessage'
+import * as api from './api'
+import type { ContextorResult, ContextorHistoryItem } from './api'
+import './Contextor.css'
+
+const MAX_CHARS = 60
+
+export default function Contextor() {
+  const [query, setQuery] = useState('')
+  const [result, setResult] = useState<ContextorResult | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [sessionExpired, setSessionExpired] = useState(false)
+  const [history, setHistory] = useState<ContextorHistoryItem[]>([])
+
+  const abortRef = useRef<AbortController | null>(null)
+
+  const doLookup = useCallback(async (text: string) => {
+    const word = text.trim()
+    if (!word) return
+    abortRef.current?.abort()
+    setLoading(true)
+    setResult(null)
+    setError('')
+    setSessionExpired(false)
+    try {
+      const data = await api.lookup(word)
+      setResult(data)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    api.getContextorHistory().then(setHistory)
+  }, [])
+
+  const handleClear = () => {
+    setQuery('')
+    setResult(null)
+    setError('')
+    setSessionExpired(false)
+    setLoading(false)
+  }
+
+  return (
+    <div className="contextor-root">
+      <AppHeader title="Contextor" />
+
+      <main className="contextor-shell">
+        <div className="contextor-searchbar">
+          <Search size={16} className="contextor-search-icon" />
+          <input
+            className="contextor-input"
+            value={query}
+            onChange={e => setQuery(e.target.value.slice(0, MAX_CHARS))}
+            onKeyDown={e => { if (e.key === 'Enter') doLookup(query) }}
+            placeholder="단어를 입력하세요 (예: trials, interleave)"
+            autoFocus
+          />
+          {query && (
+            <button className="contextor-icon-btn" onClick={handleClear} title="지우기" type="button">
+              <X size={15} />
+            </button>
+          )}
+          <button
+            className="contextor-lookup-btn"
+            onClick={() => doLookup(query)}
+            disabled={!query.trim() || loading}
+            type="button"
+          >
+            조회
+          </button>
+        </div>
+
+        <div className="contextor-body">
+          {sessionExpired && <SessionExpiredMessage redirectTo="/contextor" />}
+
+          {!sessionExpired && loading && (
+            <div className="contextor-status">
+              <Loader2 size={16} className="contextor-spin" />
+              <span>맥락 분석 중</span>
+            </div>
+          )}
+
+          {!sessionExpired && error && (
+            <div className="contextor-error">{error}</div>
+          )}
+
+          {!sessionExpired && !loading && result && (
+            <div className="contextor-result">
+              <h2 className="contextor-query">{result.query}</h2>
+
+              {!result.hasMlUsage ? (
+                <p className="contextor-note">{result.note || 'ML 특수 용법이 없습니다.'}</p>
+              ) : (
+                <div className="contextor-cases">
+                  {result.cases.map((c, i) => (
+                    <article className="contextor-card" key={i}>
+                      <div className="contextor-card-head">
+                        <span className="contextor-card-label">{c.label}</span>
+                        <span className="contextor-card-term">{c.term}</span>
+                      </div>
+                      <p className="contextor-card-meaning">{c.meaning}</p>
+                      <div className="contextor-card-example">
+                        <p className="contextor-example-en">{c.exampleEn}</p>
+                        <p className="contextor-example-ko">{c.exampleKo}</p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {!sessionExpired && !loading && !error && !result && (
+            history.length > 0 ? (
+              <div className="contextor-history">
+                <div className="contextor-history-title">Recent</div>
+                {history.map(item => (
+                  <button
+                    key={item.id}
+                    className="contextor-history-item"
+                    onClick={() => { setQuery(item.query); setResult(item.result) }}
+                    type="button"
+                  >
+                    <span>{item.query}</span>
+                    <small>{item.result.hasMlUsage ? `${item.result.cases.length}개 맥락` : '일반 용법'}</small>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="contextor-muted">단어를 입력하면 ML/DL 맥락별로 펼쳐 보여줍니다.</div>
+            )
+          )}
+        </div>
+      </main>
+    </div>
+  )
+}

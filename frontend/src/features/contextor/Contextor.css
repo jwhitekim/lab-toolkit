@@ -1,0 +1,278 @@
+.contextor-root {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+  color: var(--text-primary);
+}
+
+.contextor-shell {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  background: var(--bg-base);
+}
+
+/* ── Search bar ───────────────────────────── */
+.contextor-searchbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--bg-additive) 34%, var(--bg-base));
+}
+
+.contextor-search-icon {
+  flex-shrink: 0;
+  color: var(--text-disabled);
+}
+
+.contextor-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 16px;
+}
+
+.contextor-input::placeholder {
+  color: var(--text-disabled);
+}
+
+.contextor-icon-btn {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.contextor-icon-btn:hover:not(:disabled) {
+  background: var(--bg-additive);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+
+.contextor-lookup-btn {
+  flex-shrink: 0;
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--text-primary);
+  color: var(--bg-base);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: var(--fw-semibold);
+  transition: opacity 0.15s;
+}
+
+.contextor-lookup-btn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.contextor-lookup-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ── Body ─────────────────────────────────── */
+.contextor-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.contextor-status,
+.contextor-muted,
+.contextor-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-disabled);
+  font-size: 14px;
+}
+
+.contextor-error {
+  color: var(--c-error);
+}
+
+.contextor-spin {
+  animation: contextor-spin 0.9s linear infinite;
+}
+
+@keyframes contextor-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Result ───────────────────────────────── */
+.contextor-result {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contextor-query {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: var(--fw-semibold);
+}
+
+.contextor-note {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--bg-additive) 34%, var(--bg-base));
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── Cases ────────────────────────────────── */
+.contextor-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+  gap: 14px;
+}
+
+.contextor-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.contextor-card:hover {
+  border-color: color-mix(in srgb, var(--text-disabled) 40%, var(--border-subtle));
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+
+.contextor-card-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.contextor-card-label {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: var(--fw-semibold);
+}
+
+.contextor-card-term {
+  padding: 2px 8px;
+  border-radius: 5px;
+  background: var(--bg-additive);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: var(--fw-medium);
+}
+
+.contextor-card-meaning {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.contextor-card-example {
+  margin-top: 2px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.contextor-example-en {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.contextor-example-ko {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ── History ──────────────────────────────── */
+.contextor-history-title {
+  margin-bottom: 10px;
+  color: var(--text-disabled);
+  font-size: 12px;
+  font-weight: var(--fw-medium);
+}
+
+.contextor-history-item {
+  width: 100%;
+  display: block;
+  padding: 11px 0;
+  border: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.contextor-history-item span,
+.contextor-history-item small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contextor-history-item span {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.contextor-history-item small {
+  margin-top: 3px;
+  color: var(--text-disabled);
+  font-size: 12px;
+}
+
+/* ── Responsive ───────────────────────────── */
+@media (max-width: 640px) {
+  .contextor-shell {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .contextor-query {
+    font-size: 22px;
+  }
+
+  .contextor-cases {
+    grid-template-columns: 1fr;
+  }
+}

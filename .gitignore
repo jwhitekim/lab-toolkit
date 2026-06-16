@@ -34,4 +34,5 @@ build/
 .vscode/
 .idea/
 
+# prompts
 prompt.md

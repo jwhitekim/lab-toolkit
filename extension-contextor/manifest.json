@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Contextor",
+  "version": "1.0.0",
+  "description": "수업·논문 중 모르는 단어를 ML/DL 맥락으로 즉시 검색",
+  "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icon.png",
+      "32": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    },
+    "default_popup": "popup.html",
+    "default_title": "Contextor"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+C",
+        "mac": "Alt+C"
+      },
+      "description": "Contextor 열기"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "http://localhost:9000/*",
+    "https://veloo.page/*"
+  ]
+}
