@@ -20,9 +20,9 @@ const APP_CARDS: { name: string; desc: string; appKey: ActiveApp; unit: string; 
   { name: 'Paper Analyzer', desc: 'PDF 추출 및 논문 분석',      appKey: 'paper',        unit: '분석',   countKey: 'paper',     Icon: FileText },
   { name: 'Translator',     desc: '영어 논문 문장 번역',        appKey: 'translate',    unit: '번역',   countKey: 'tx',        Icon: Globe },
   { name: 'Contextor',      desc: '단어 ML/DL 맥락별 풀이',    appKey: 'contextor',    unit: '조회',   countKey: 'contextor', Icon: BookOpen },
-  { name: 'Model Review',   desc: '모델 설명 + AI 피드백',     appKey: 'model-review', unit: '피드백', countKey: 'arch',      Icon: GitBranch },
-  { name: 'Todo List',      desc: '연구실 할 일 관리',         appKey: 'todo',         unit: '할 일',  countKey: 'todo',      Icon: CheckSquare },
-  { name: 'Calendar',       desc: '할일 타임블로킹 캘린더',    appKey: 'calendar',     unit: '예정',   countKey: 'calendar',  Icon: CalendarDays },
+  { name: 'Todo',      desc: '연구실 할 일 관리',         appKey: 'todo',         unit: '할 일',  countKey: 'todo',      Icon: CheckSquare },
+  // { name: 'Model Review',   desc: '모델 설명 + AI 피드백',     appKey: 'model-review', unit: '피드백', countKey: 'arch',      Icon: GitBranch },
+  // { name: 'Calendar',       desc: '할일 타임블로킹 캘린더',    appKey: 'calendar',     unit: '예정',   countKey: 'calendar',  Icon: CalendarDays },
 ]
 
 function trunc(s: string, n: number): string {
@@ -35,24 +35,23 @@ export default function Home() {
 
   const [txHistory, setTxHistory] = useState<TranslationHistoryItem[]>([])
   const [paperHistory, setPaperHistory] = useState<PaperHistoryItem[]>([])
-  const [archHistory, setArchHistory] = useState<ArchHistoryItem[]>([])
-  const [counts, setCounts] = useState({ paper: 0, tx: 0, arch: 0, contextor: 0 })
+  // const [archHistory, setArchHistory] = useState<ArchHistoryItem[]>([])
+  const [counts, setCounts] = useState({ paper: 0, tx: 0, contextor: 0 }) //arch: 0,
   const [activityLoading, setActivityLoading] = useState(true)
 
   useEffect(() => {
     Promise.all([
       translatorApi.getTranslationHistory(),
       paperApi.getHistory(),
-      archApi.getArchHistory(),
+      // archApi.getArchHistory(),
       paperApi.getPaperCount(),
       translatorApi.getTranslationCount(),
-      archApi.getArchCount(),
+      // archApi.getArchCount(),
       contextorApi.getContextorCount(),
-    ]).then(([tx, paper, arch, paperCount, txCount, archCount, contextorCount]) => {
+    ]).then(([tx, paper, paperCount, txCount, contextorCount]) => { //arch archCount,
       setTxHistory(tx.slice(0, 3))
       setPaperHistory(paper.slice(0, 3))
-      setArchHistory(arch.slice(0, 3))
-      setCounts({ paper: paperCount, tx: txCount, arch: archCount, contextor: contextorCount })
+      setCounts({ paper: paperCount, tx: txCount, contextor: contextorCount }) // setArchHistory(arch.slice(0, 3)) // arch: archCount,
     }).catch(() => {}).finally(() => setActivityLoading(false))
   }, [])
 
@@ -243,7 +242,7 @@ export default function Home() {
                   ))}
                 </div>
 
-                <div className="activity-card home-card">
+                {/* <div className="activity-card home-card">
                   <div className="activity-title">최근 피드백</div>
                   {archHistory.length === 0 ? (
                     <div className="activity-empty">
@@ -255,7 +254,7 @@ export default function Home() {
                       {item.image_name ?? new Date(item.created_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
                     </button>
                   ))}
-                </div>
+                </div> */}
               </>
             )}
           </div>

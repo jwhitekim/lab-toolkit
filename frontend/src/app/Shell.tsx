@@ -22,9 +22,9 @@ const NAV_ITEMS: NavItem[] = [
   { key: 'paper',        label: 'Paper Analyzer', Icon: FileText },
   { key: 'translate',    label: 'Translator',     Icon: Globe },
   { key: 'contextor',    label: 'Contextor',      Icon: BookOpen },
-  { key: 'model-review', label: 'Model Review',   Icon: GitBranch },
   { key: 'todo',         label: 'Todo',           Icon: CheckSquare },
-  { key: 'calendar',     label: 'Calendar',       Icon: CalendarDays },
+  // { key: 'model-review', label: 'Model Review',   Icon: GitBranch },
+  // { key: 'calendar',     label: 'Calendar',       Icon: CalendarDays },
 ]
 
 const APP_TITLE: Partial<Record<ActiveApp, string>> = {
