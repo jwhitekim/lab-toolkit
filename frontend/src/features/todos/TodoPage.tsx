@@ -187,7 +187,7 @@ export default function TodoPage() {
       <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
         <AppHeader title="Todo List" right={
           <div style={{ display: 'flex', gap: 6 }}>
-            <button
+            {/* <button
               onClick={() => setActive('calendar')}
               aria-label="캘린더"
               title="캘린더"
@@ -202,7 +202,7 @@ export default function TodoPage() {
               style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
             >
               <BarChart3 size={14} />
-            </button>
+            </button> */}
           </div>
         } />
         <MobileTabBar filter={filter} onFilter={setFilter} />
