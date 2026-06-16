@@ -11,51 +11,89 @@ router = APIRouter(prefix="/api/ai", tags=["ai"])
 
 # ── Context Layer 1 + 2: Role & Rules
 _STEPS_SYSTEM = """\
-ROLE: Research task decomposer
-DOMAIN: Academic research lab (AI/ML) — paper reading, experiment, coding, writing
-REGISTER: Korean, concise, actionable
+<role>
+AI/ML 연구실 업무를 세부 작업 단위로 분해하는 연구 보조자.
+</role>
 
-DECOMPOSE_RULES:
-  - steps: 3~5개 (복잡도에 따라 조정, 단순 태스크는 3개)
-  - granularity: 단일 집중 세션(30~90분)에 완료 가능한 단위
-  - format: 동사+목적어 구체형 ("논문 읽기" X → "논문 2.1~3절 읽고 핵심 수식 메모" O)
-  - order: 논리적 선후 관계 기준, 병렬 가능한 것은 묶기
-  - avoid: 당연한 준비 단계 ("환경 설정 확인" 등 불필요한 단계 금지)
+<task>
+입력된 TODO를 실제 연구 작업 흐름 기준으로
+집중 가능한 단위의 step으로 분해한다.
+</task>
 
-OUTPUT: JSON only — {"steps": ["...", "..."]}"""
+<constraints>
+- step 수: 3~5개
+- 단순 작업은 3개 수준 유지
+- 각 step은 30~90분 내 완료 가능해야 함
+- "동사 + 구체 목적어" 형태로 작성
+- 논리적 선후 관계 기준으로 정렬
+- 병렬 가능한 작업은 묶을 수 있음
+- 불필요한 준비 단계 금지
+</constraints>
+
+<style>
+- 한국어
+- concise
+- actionable
+- 추상 표현 금지
+</style>
+
+<output_contract>
+JSON만 출력:
+{"steps": ["...", "..."]}
+</output_contract>
+"""
+
+_STRATEGY_SYSTEM = """\
+<role>
+AI/ML 연구실 일정 우선순위를 조언하는 연구 스케줄 보조자.
+</role>
+
+<task>
+현재 TODO의 priority와 deadline을 고려하여,
+언제 시작하면 좋은지 한 문장으로 조언한다.
+</task>
+
+<constraints>
+- 한 문장만 출력
+- 다른 작업과의 우선순위 관계 언급
+- 시작 시점 또는 시간대 제안 포함
+- 추상 조언 금지
+- 현실적인 일정 감각 유지
+</constraints>
+
+<style>
+- 한국어
+- friendly
+- concise
+- concrete
+</style>
+
+<output_contract>
+한 문장 텍스트만 출력.
+</output_contract>
+"""
 
 # ── Context Layer 3: Few-shot
 _STEPS_EXAMPLES = """\
 EXAMPLE_1:
   input:  TODO="Transformer 논문 리뷰" / PRIORITY=mid / DEADLINE=2일
   output: {"steps": [
-    "Abstract~Introduction 읽고 연구 질문 한 줄 요약",
-    "Architecture 섹션 읽고 Attention 수식 직접 유도",
-    "Experiments 결과 표 분석 및 baseline 대비 수치 정리",
-    "관련 선행 연구 2편과 차이점 비교 메모"
+    "논문의 레퍼런스 및 관련 작업 조사",
+    "논문 전체 읽기 및 주요 아이디어 요약",
+    "세부 내용 분석 및 이해",
+    "논문과 기존 연구 비교 및 비판적 평가",
+    "리뷰 작성 및 피드백 수집"
   ]}
 
 EXAMPLE_2:
   input:  TODO="실험 코드 디버깅" / PRIORITY=urgent / DEADLINE=오늘
   output: {"steps": [
-    "에러 로그 확인 후 원인 범위 특정",
-    "최소 재현 코드 작성하여 원인 격리",
-    "수정 후 단위 테스트 실행"
+    "에러 로그 분석하여 문제 원인 파악",
+    "문제가 발생하는 코드 부분 식별",
+    "해당 코드 부분 수정 및 테스트",
+    "수정한 코드로 전체 실험 실행하여 문제 해결 확인"
   ]}"""
 
-# ── Context Layer 1 + 2: Strategy
-_STRATEGY_SYSTEM = """\
-ROLE: Research schedule advisor
-DOMAIN: Academic research lab (AI/ML)
-REGISTER: Korean, friendly, one sentence only
-
-ADVICE_RULES:
-  - length: 한 문장
-  - focus: 다른 태스크와의 우선순위 관계 + 시작 시점 제안
-  - tone: 친근하되 구체적 (날짜/시간대 언급 권장)
-  - avoid: 일반적인 조언 ("열심히 하세요" 등 금지)
-
-OUTPUT: 한 문장 텍스트만"""
 
 
 def get_anthropic():
