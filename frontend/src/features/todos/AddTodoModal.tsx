@@ -118,10 +118,10 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
           <div>
             <div className="text-[11px] text-gray-400 dark:text-gray-500 mb-2">마감</div>
             <input
+              type="date"
               value={deadline}
               onChange={e => setDeadline(e.target.value)}
-              placeholder="예: 이번주 금요일, 오늘, 다음주"
-              className="w-full text-[13px] rounded-lg px-3 py-2 outline-none border bg-transparent text-gray-700 dark:text-gray-300 placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:border-[#1d9e75] transition-colors"
+              className="w-full text-[13px] rounded-lg px-3 py-2 outline-none border bg-transparent text-gray-700 dark:text-gray-300 focus:border-[#1d9e75] transition-colors"
               style={{ borderColor: 'var(--input-border)' }}
             />
           </div>

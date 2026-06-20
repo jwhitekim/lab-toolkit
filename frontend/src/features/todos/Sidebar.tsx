@@ -18,7 +18,7 @@ export default function Sidebar({ filter, onFilter, todos }: Props) {
   const count = (key: NavFilter) => {
     if (key === 'today') {
       const today = dayjs().format('YYYY-MM-DD')
-      return todos.filter(t => dayjs(t.created_at).format('YYYY-MM-DD') === today || t.deadline?.includes('오늘')).length
+      return todos.filter(t => dayjs(t.created_at).format('YYYY-MM-DD') === today || t.deadline === today).length
     }
     if (key === 'week') return todos.filter(t => !t.done).length
     if (key === 'all') return todos.length

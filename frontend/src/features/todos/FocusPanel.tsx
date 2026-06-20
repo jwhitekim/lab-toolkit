@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CalendarDays, Plus, RefreshCw, Edit2, Trash2 } from 'lucide-react'
+import { Plus, RefreshCw, Edit2, Trash2 } from 'lucide-react'
 import type { Todo, Step, Priority } from '@/shared/types'
 
 interface Props {
@@ -73,8 +73,6 @@ export default function FocusPanel({
   const [editMemo, setEditMemo] = useState('')
   const [editPriority, setEditPriority] = useState<Priority>('normal')
   const [editDeadline, setEditDeadline] = useState('')
-  const [editStartTime, setEditStartTime] = useState('')
-  const [editEndTime, setEditEndTime] = useState('')
   const [newStep, setNewStep] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [regeneratingSteps, setRegeneratingSteps] = useState(false)
@@ -87,22 +85,11 @@ export default function FocusPanel({
     )
   }
 
-  const toLocalInput = (iso?: string) => {
-    if (!iso) return ''
-    try {
-      const d = new Date(iso)
-      const pad = (n: number) => String(n).padStart(2, '0')
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
-    } catch { return '' }
-  }
-
   const startEdit = () => {
     setEditName(todo.name)
     setEditMemo(todo.memo)
     setEditPriority(todo.priority)
     setEditDeadline(todo.deadline)
-    setEditStartTime(toLocalInput(todo.start_time))
-    setEditEndTime(toLocalInput(todo.end_time))
     setEditMode(true)
   }
 
@@ -114,8 +101,6 @@ export default function FocusPanel({
       memo: editMemo,
       priority: editPriority,
       deadline: editDeadline,
-      start_time: editStartTime ? new Date(editStartTime).toISOString() : undefined,
-      end_time: editEndTime ? new Date(editEndTime).toISOString() : undefined,
     })
     setEditMode(false)
 
@@ -197,34 +182,12 @@ export default function FocusPanel({
                 <option value="normal">낮음</option>
               </select>
               <input
+                type="date"
                 value={editDeadline}
                 onChange={e => setEditDeadline(e.target.value)}
-                placeholder="마감"
                 className="border rounded px-2 py-1 text-[12px] outline-none flex-1 bg-transparent text-gray-700 dark:text-gray-300"
                 style={{ borderColor: 'var(--input-border)' }}
               />
-            </div>
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="text-[10px] text-gray-400 dark:text-gray-500 block mb-0.5">시작</label>
-                <input
-                  type="datetime-local"
-                  value={editStartTime}
-                  onChange={e => setEditStartTime(e.target.value)}
-                  className="w-full border rounded px-2 py-1 text-[12px] outline-none bg-transparent text-gray-700 dark:text-gray-300"
-                  style={{ borderColor: 'var(--input-border)' }}
-                />
-              </div>
-              <div className="flex-1">
-                <label className="text-[10px] text-gray-400 dark:text-gray-500 block mb-0.5">종료</label>
-                <input
-                  type="datetime-local"
-                  value={editEndTime}
-                  onChange={e => setEditEndTime(e.target.value)}
-                  className="w-full border rounded px-2 py-1 text-[12px] outline-none bg-transparent text-gray-700 dark:text-gray-300"
-                  style={{ borderColor: 'var(--input-border)' }}
-                />
-              </div>
             </div>
             <div className="flex gap-2">
               <button onClick={saveEdit} className="px-3 py-1.5 text-[12px] bg-[#1d9e75] text-white rounded-lg">저장</button>
@@ -239,12 +202,6 @@ export default function FocusPanel({
                   {priorityLabel[todo.priority]}
                 </span>
                 {todo.deadline && <span className="text-[11px] text-gray-400 dark:text-gray-500">{todo.deadline}</span>}
-                {todo.start_time && (
-                  <span className="text-[11px] text-[#1d9e75] flex items-center gap-1">
-                    <CalendarDays size={11} />
-                    {new Date(todo.start_time).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                )}
                 {steps.length > 0 && (
                   <span className="text-[11px] text-gray-400 dark:text-gray-500">단계 {completedSteps}/{steps.length} 완료</span>
                 )}

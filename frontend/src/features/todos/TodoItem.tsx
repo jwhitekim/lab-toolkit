@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Pencil } from 'lucide-react'
+import dayjs from 'dayjs'
 import type { Todo } from '@/shared/types'
 
 interface Props {
@@ -99,7 +100,9 @@ export default function TodoItem({ todo, selected, onSelect, onToggle, onEdit }:
               {priorityLabel[todo.priority]}
             </span>
             {todo.deadline && (
-              <span style={{ fontSize: 10, color: 'var(--text-disabled)' }}>{todo.deadline}</span>
+              <span style={{ fontSize: 10, color: 'var(--text-disabled)' }}>
+                {/^\d{4}-\d{2}-\d{2}$/.test(todo.deadline) ? dayjs(todo.deadline).format('M/D') : todo.deadline}
+              </span>
             )}
           </div>
 
