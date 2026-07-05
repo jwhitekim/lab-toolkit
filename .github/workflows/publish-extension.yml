@@ -17,11 +17,11 @@
 #         uses: actions/checkout@v4
 
 #       - name: Validate manifest
-#         run: python -m json.tool extension/manifest.json > /dev/null
+#         run: python -m json.tool extensions/paper/manifest.json > /dev/null
 
 #       - name: Package extension
-#         working-directory: extension
-#         run: zip -r ../extension.zip . -x "*.DS_Store" "__MACOSX/*"
+#         working-directory: extensions/paper
+#         run: zip -r ../../extension.zip . -x "*.DS_Store" "__MACOSX/*"
 
 #       - name: Upload & release
 #         uses: mnao305/chrome-extension-upload@2.1.0
