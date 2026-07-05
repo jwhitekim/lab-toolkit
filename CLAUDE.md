@@ -12,7 +12,8 @@ FastAPI 루트(main.py)가 4개 서브앱을 마운트하는 SPA 구조.
     ├── /paper        → backend/paper_analyzer/
     ├── /translate    → backend/translator/
     ├── /model-review → backend/arch_trainer/
-    └── /todo         → backend/todo/
+    ├── /todo         → backend/todo/
+    └── /contextor    → backend/contextor/
 ```
 
 ## 기술 스택
@@ -69,6 +70,7 @@ FastAPI 루트(main.py)가 4개 서브앱을 마운트하는 SPA 구조.
 - translator 작업     → backend/translator/CLAUDE.md 먼저 읽을 것
 - arch_trainer 작업   → backend/arch_trainer/CLAUDE.md 먼저 읽을 것
 - todo 작업           → backend/todo/CLAUDE.md 먼저 읽을 것
+- contextor 작업      → backend/contextor/CLAUDE.md 먼저 읽을 것
 
 ## 브랜치 전략
 - main : 프로덕션. 직접 커밋 금지. dev → main PR로만 업데이트.

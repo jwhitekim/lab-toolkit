@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Bump version in extension/manifest.json and frontend/package.json.
+"""Bump version in extensions/paper/manifest.json and frontend/package.json.
 Usage: python bump.py [major|minor|patch]"""
 import json, sys, pathlib
 
 root = pathlib.Path(__file__).parent
-manifest_path = root / 'extension' / 'manifest.json'
+manifest_path = root / 'extensions' / 'paper' / 'manifest.json'
 pkg_path = root / 'frontend' / 'package.json'
 
 arg = sys.argv[1] if len(sys.argv) > 1 else 'patch'
