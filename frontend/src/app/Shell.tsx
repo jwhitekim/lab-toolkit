@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { Home, FileText, Globe, BookOpen, GitBranch, CheckSquare, CalendarDays } from 'lucide-react'
+import { Home, FileText, Globe, BookOpen, CheckSquare } from 'lucide-react'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { ShellNavContext, type ActiveApp } from '@/shared/hooks/useShellNav'
 import HomePage from '@/pages/HomePage'
@@ -10,6 +10,7 @@ import { ArchTrainerPage } from '@/features/arch-trainer'
 import { TodoPage } from '@/features/todos'
 import { ContextorPage } from '@/features/contextor'
 import { CalendarPage, WeeklyReviewPage } from '@/features/calendar'
+import './Shell.css'
 
 interface NavItem {
   key: ActiveApp
@@ -99,65 +100,41 @@ export default function Shell() {
 
   return (
     <ShellNavContext.Provider value={{ active, setActive }}>
-      <div style={{ height: '100vh', display: 'flex', overflow: 'hidden' }}>
-        {/* Sidebar */}
-        <nav style={{
-          width: 192, flexShrink: 0,
-          background: 'var(--bg-additive)',
-          borderRight: '1px solid var(--border-subtle)',
-          display: 'flex', flexDirection: 'column',
-          padding: '16px 0', overflowY: 'auto',
-        }}>
-          <div style={{
-            padding: '4px 20px 24px',
-            fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em',
-            color: 'var(--text-primary)', userSelect: 'none',
-          }}>
-            veloo
+      <div className="shell-desktop">
+        <header className="shell-topbar">
+          <div className="shell-brand-wrap">
+            <button
+              type="button"
+              className="shell-brand"
+              onClick={() => setActive('home')}
+              aria-label="veloo home"
+            >
+              <span className="shell-brand-mark">v</span>
+              <span>veloo</span>
+            </button>
           </div>
+          <nav className="shell-app-nav" aria-label="Apps">
           {NAV_ITEMS.map(({ key, label, Icon }) => {
             const isActive = active === key || (key === 'todo' && active === 'weekly-review')
             return (
               <button
                 key={key}
+                type="button"
                 onClick={() => setActive(key)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 9,
-                  padding: '7px 12px', margin: '1px 8px',
-                  borderRadius: 'var(--radius-sm)',
-                  background: isActive ? 'var(--selected-bg)' : 'transparent',
-                  color: isActive ? 'var(--selected-text)' : 'var(--text-secondary)',
-                  border: 'none', cursor: 'pointer',
-                  fontSize: 13, fontWeight: isActive ? 600 : 400,
-                  fontFamily: 'var(--font-sans)', textAlign: 'left',
-                  width: 'calc(100% - 16px)',
-                  transition: 'background 0.1s, color 0.1s',
-                }}
-                onMouseEnter={e => {
-                  if (!isActive) {
-                    const el = e.currentTarget as HTMLButtonElement
-                    el.style.background = 'var(--border-subtle)'
-                    el.style.color = 'var(--text-primary)'
-                  }
-                }}
-                onMouseLeave={e => {
-                  if (!isActive) {
-                    const el = e.currentTarget as HTMLButtonElement
-                    el.style.background = 'transparent'
-                    el.style.color = 'var(--text-secondary)'
-                  }
-                }}
+                className={`shell-app-tab${isActive ? ' is-active' : ''}`}
+                aria-current={isActive ? 'page' : undefined}
               >
-                <Icon size={15} />
-                {label}
+                <Icon size={16} strokeWidth={2.1} />
+                <span>{label}</span>
               </button>
             )
           })}
-        </nav>
-        {/* Content area */}
-        <div style={{ flex: 1, overflow: 'auto', minWidth: 0, minHeight: 0 }}>
+          </nav>
+          <div className="shell-topbar-end" aria-hidden="true" />
+        </header>
+        <main className="shell-content">
           {content}
-        </div>
+        </main>
       </div>
     </ShellNavContext.Provider>
   )
