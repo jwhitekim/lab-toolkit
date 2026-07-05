@@ -17,7 +17,7 @@ app = FastAPI(title="Translation Studio")
 CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL_SMART", "claude-sonnet-4-6")
 _client = anthropic.AsyncAnthropic()
 
-from backend.database import get_supabase
+from backend.app.database import get_supabase
 _supabase = get_supabase()
 
 _SYSTEM = """\

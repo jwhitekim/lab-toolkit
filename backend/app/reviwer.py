@@ -21,7 +21,7 @@ client = anthropic.AsyncAnthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 MODEL = os.environ.get("CLAUDE_MODEL_SMART", "claude-sonnet-4-6")
 _ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
 
-from backend.database import get_supabase
+from backend.app.database import get_supabase
 _supabase = get_supabase()
 
 EXPLAIN_PROMPT = """\

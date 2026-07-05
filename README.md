@@ -52,7 +52,7 @@ FastAPI + React SPA로 논문 분석, 번역, 모델 리뷰, 할 일 관리를 �
 # 백엔드
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python main.py          # http://localhost:9000
+python -m backend.main          # http://localhost:9000
 
 # 프론트엔드
 cd frontend
@@ -64,7 +64,7 @@ npm run dev             # http://localhost:5173
 
 ```bash
 cd frontend && npm run build && cd ..
-python main.py
+python -m backend.main
 ```
 
 ## Docker
