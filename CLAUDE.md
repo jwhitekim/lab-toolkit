@@ -65,12 +65,40 @@ FastAPI 루트(main.py)가 4개 서브앱을 마운트하는 SPA 구조.
 - 단일 스키마 파일: backend/schema.sql
 - Supabase 마이그레이션은 대시보드에서 직접 실행
 
-## 서브에이전트 위임 규칙
-- paper_analyzer 작업 → backend/paper_analyzer/CLAUDE.md 먼저 읽을 것
-- translator 작업     → backend/translator/CLAUDE.md 먼저 읽을 것
-- arch_trainer 작업   → backend/arch_trainer/CLAUDE.md 먼저 읽을 것
-- todo 작업           → backend/todo/CLAUDE.md 먼저 읽을 것
-- contextor 작업      → backend/contextor/CLAUDE.md 먼저 읽을 것
+## 서브앱 상세
+
+### paper_analyzer (`/paper`)
+논문 검색·분석. PDF 업로드 또는 제목/URL 검색 → Semantic Scholar로 메타데이터·저자 조회 → Claude로 요약 → SJR 저널 품질 조회.
+- 구조: `app.py`(엔드포인트) / `core/semantic_scholar.py`(검색·저자 enrich) / `core/claude_analyzer.py`(요약) / `core/journal_quality.py`(`data/scimagojr 2025.csv` 기반 SJR 조회) / `core/pdf_extractor.py`(PDF에서 제목·초록·DOI·arXiv ID·그림 추출) / `data/venue_aliases.json`(저널명 별칭)
+- 엔드포인트: `GET /history`, `POST /search`, `POST /analyze`(paper_id 또는 url), `POST /analyze-pdf`(최대 50MB)
+- `__init__.py`가 `core/`를 flat import 하도록 `sys.path`에 추가 — `core.xxx`로 임포트
+- `S2_API_KEY`로 Semantic Scholar 레이트리밋 완화, Supabase 미설정 시 히스토리/캐시는 조용히 비활성화
+
+### translator (`/translate`)
+ML/DL/CV/NLP 논문 문장·구·용어를 자연스러운 한국어로 번역하는 스트리밍 API. core/ 없이 `app.py` 단일 파일.
+- 엔드포인트: `POST /api/translate`(스트리밍, Supabase `translation_history` 캐시 히트 시 `X-Cache: HIT`), `GET /api/history`
+- 번역 규칙(수식·고유명사 보존, 특정 용어 영어 유지 등)은 `app.py`의 `_SYSTEM` 프롬프트에 하드코딩 — 톤/규칙 수정 시 여기를 고칠 것
+- `CLAUDE_MODEL_SMART`로 모델 오버라이드(기본 `claude-sonnet-4-6`)
+
+### arch_trainer (`/model-review`)
+논문 아키텍처 그림을 보고 스스로 설명하는 연습 → Claude가 기준 설명 생성, 사용자 설명을 채점/교정. core/ 없이 `app.py` 단일 파일.
+- 엔드포인트: `POST /api/explain`(이미지 업로드, 최대 10MB → JSON 스키마 설명 생성, Supabase `arch_history` 저장), `POST /api/feedback`(사용자 설명 채점), `GET /api/history`
+- Claude 응답은 JSON만 나오도록 프롬프트로 강제, `_parse_json`이 코드펜스 제거 — 스키마 변경 시 파싱 로직도 확인
+- `CLAUDE_MODEL_SMART`로 모델 오버라이드
+
+### todo (`/todo`)
+연구 할 일/단계/우선순위, AI 기반 단계 분해·전략 제안, 주간 리뷰, 마감일 리마인드 이메일.
+- 구조: `app.py`(라우터 include) / `core/routers/{todos,steps,ai,reviews}.py` / `core/scheduler.py`(리마인드 이메일, `SMTP_USER` 설정 시에만 시작) / `core/email_sender.py` / `core/schemas.py` / `core/research_todo.db`(로컬 SQLite, gitignore 대상)
+- 엔드포인트: `/api/todos`(CRUD, `/calendar` 목록, `/{id}/done`, `/{id}/steps`), `/api/steps/{id}`(CRUD, `/done`), `/api/ai/generate-steps`·`/generate-steps-async`·`/generate-strategy`, `/api/reviews/weekly`, `/health`
+- `__init__.py`가 `core/`를 flat import 하도록 `sys.path`에 추가 — `routers.xxx`, `database`, `schemas`로 임포트
+- 마감일은 달력 UI로 지정(텍스트 입력 아님). `frontend/src/features/calendar/`(타임블로킹 캘린더·주간 리뷰)는 현재 `Shell.tsx`에서 네비게이션이 주석 처리되어 임시 비활성 상태이나 라우팅은 남아 있음
+
+### contextor (`/contextor`)
+영어 단어/짧은 구를 ML/DL 논문 맥락별 의미로 구조화된 JSON으로 설명. `extensions/contextor/` 크롬 익스텐션(Alt+C)에서도 호출됨. core/ 없이 `app.py` 단일 파일.
+- 엔드포인트: `POST /api/lookup`(Supabase `contextor_history` 캐시), `GET /api/history`
+- 응답 스키마(`hasMlUsage`, `cases[]`, `note`)는 few-shot 프롬프트로 강제, `_extract_json`이 코드펜스 유무와 무관하게 JSON만 추출
+- 다른 서브앱과 달리 `CLAUDE_MODEL_FAST`(기본 `claude-haiku-4-5-20251001`)가 기본 — 응답 속도 우선
+- Supabase 클라이언트를 `backend.database.get_supabase()`가 아니라 `app.py` 내부에서 직접 생성 (다른 서브앱과의 사소한 불일치, 동작엔 문제 없음)
 
 ## 브랜치 전략
 - main : 프로덕션. 직접 커밋 금지. dev → main PR로만 업데이트.
@@ -81,6 +109,7 @@ FastAPI 루트(main.py)가 4개 서브앱을 마운트하는 SPA 구조.
 2. dev → main PR 머지 → GitHub Actions 자동 배포
 
 ## 자기 갱신 규칙
+- 레포 루트의 이 CLAUDE.md 하나만 맥락 문서로 참고함 — 서브앱별 CLAUDE.md는 만들지 않음
 - 새 모듈/파일 추가 시 이 파일 갱신
 - 환경변수 추가 시 위 목록에 추가
-- API 엔드포인트 변경 시 관련 CLAUDE.md에 반영
+- API 엔드포인트 변경 시 이 파일의 해당 서브앱 항목에 반영
