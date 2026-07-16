@@ -113,7 +113,7 @@ class GeminiProvider(AIProvider):
         self._client = genai.Client(api_key=api_key)
         self._models = {
             "fast": os.getenv("GEMINI_MODEL_FAST", "gemini-3.1-flash-lite"),
-            "smart": os.getenv("GEMINI_MODEL_SMART", "gemini-2.5-pro"),
+            "smart": os.getenv("GEMINI_MODEL_SMART", "gemini-3-flash-preview"),
         }
 
     def _model(self, tier: str) -> str:
