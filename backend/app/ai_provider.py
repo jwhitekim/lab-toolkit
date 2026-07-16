@@ -150,7 +150,7 @@ class GeminiProvider(AIProvider):
     async def stream(self, system, user, max_tokens=512, tier="smart"):
         from google.genai import types
 
-        async for chunk in self._client.aio.models.generate_content_stream(
+        async for chunk in await self._client.aio.models.generate_content_stream(
             model=self._model(tier),
             contents=user,
             config=types.GenerateContentConfig(
