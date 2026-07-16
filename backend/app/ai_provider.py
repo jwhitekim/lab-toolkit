@@ -112,7 +112,7 @@ class GeminiProvider(AIProvider):
             raise HTTPException(status_code=500, detail="GEMINI_API_KEY not set")
         self._client = genai.Client(api_key=api_key)
         self._models = {
-            "fast": os.getenv("GEMINI_MODEL_FAST", "gemini-2.5-flash"),
+            "fast": os.getenv("GEMINI_MODEL_FAST", "gemini-3.1-flash-lite"),
             "smart": os.getenv("GEMINI_MODEL_SMART", "gemini-2.5-pro"),
         }
 
