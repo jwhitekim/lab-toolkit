@@ -1,10 +1,9 @@
 import json
 import logging
-import os
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from supabase import Client
-import anthropic
 from backend.app.database import get_supabase
+from backend.app.ai_provider import get_ai_provider
 import schemas
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
@@ -98,28 +97,19 @@ EXAMPLE_2:
 
 
 
-def get_anthropic():
-    api_key = os.getenv("ANTHROPIC_API_KEY")
-    if not api_key:
-        raise HTTPException(status_code=500, detail="ANTHROPIC_API_KEY not set")
-    return anthropic.Anthropic(api_key=api_key)
-
-
 @router.post("/generate-steps")
 def generate_steps(req: schemas.GenerateStepsRequest):
-    client = get_anthropic()
-    message = client.messages.create(
-        model=os.getenv("CLAUDE_MODEL_FAST", "claude-haiku-4-5-20251001"),
-        max_tokens=512,
+    provider = get_ai_provider()
+    raw = provider.complete(
         system=f"{_STEPS_SYSTEM}\n\n{_STEPS_EXAMPLES}",
-        messages=[{"role": "user", "content": (
+        user=(
             f"TODO: {req.todo_name}\n"
             f"MEMO: {req.memo or '없음'}\n"
             f"PRIORITY: {req.priority}\n"
             f"DEADLINE: {req.deadline or '미정'}"
-        )}],
+        ),
+        max_tokens=512,
     )
-    raw = message.content[0].text.strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]
         if raw.startswith("json"):
@@ -143,19 +133,17 @@ def _write_steps_to_db(todo_id: int, steps: list[str], sb: Client) -> None:
 def _run_generate_steps(req: schemas.GenerateStepsRequest) -> None:
     sb = get_supabase()
     try:
-        client = get_anthropic()
-        message = client.messages.create(
-            model=os.getenv("CLAUDE_MODEL_FAST", "claude-haiku-4-5-20251001"),
-            max_tokens=512,
+        provider = get_ai_provider()
+        raw = provider.complete(
             system=f"{_STEPS_SYSTEM}\n\n{_STEPS_EXAMPLES}",
-            messages=[{"role": "user", "content": (
+            user=(
                 f"TODO: {req.todo_name}\n"
                 f"MEMO: {req.memo or '없음'}\n"
                 f"PRIORITY: {req.priority}\n"
                 f"DEADLINE: {req.deadline or '미정'}"
-            )}],
+            ),
+            max_tokens=512,
         )
-        raw = message.content[0].text.strip()
         if raw.startswith("```"):
             raw = raw.split("```")[1]
             if raw.startswith("json"):
@@ -179,7 +167,7 @@ def generate_steps_async(
 
 @router.post("/generate-strategy")
 def generate_strategy(req: schemas.GenerateStrategyRequest, sb: Client = Depends(get_supabase)):
-    client = get_anthropic()
+    provider = get_ai_provider()
 
     res = sb.table("todos").select("name").eq("id", req.todo_id).single().execute()
     if not res.data:
@@ -193,16 +181,14 @@ def generate_strategy(req: schemas.GenerateStrategyRequest, sb: Client = Depends
         for t in (all_todos.data or [])
     )
 
-    message = client.messages.create(
-        model=os.getenv("CLAUDE_MODEL_FAST", "claude-haiku-4-5-20251001"),
-        max_tokens=256,
+    strategy = provider.complete(
         system=_STRATEGY_SYSTEM,
-        messages=[{"role": "user", "content": (
+        user=(
             f"ALL_TODOS:\n{todos_text}\n\n"
             f"TARGET: {target_name}"
-        )}],
+        ),
+        max_tokens=256,
     )
-    strategy = message.content[0].text.strip()
 
     sb.table("todos").update({"ai_strategy": strategy}).eq("id", req.todo_id).execute()
 

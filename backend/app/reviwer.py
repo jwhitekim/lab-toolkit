@@ -1,24 +1,21 @@
 """논문 아키텍처 설명력 훈련 앱 — FastAPI 백엔드"""
 import asyncio
-import base64
 import json
 import logging
-import os
 import re
 from pathlib import Path
 
-import anthropic
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+from backend.app.ai_provider import get_ai_provider
+
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 app = FastAPI(title="Model Review")
-client = anthropic.AsyncAnthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
-MODEL = os.environ.get("CLAUDE_MODEL_SMART", "claude-sonnet-4-6")
 _ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
 
 from backend.app.database import get_supabase
@@ -129,34 +126,21 @@ async def explain(image: UploadFile = File(...)):
     if media_type not in _ALLOWED_IMAGE_TYPES:
         return JSONResponse({"error": "지원하지 않는 이미지 형식입니다. (jpeg/png/gif/webp만 허용)"}, status_code=400)
 
-    raw = await image.read()
-    if len(raw) > 10 * 1024 * 1024:
+    image_bytes = await image.read()
+    if len(image_bytes) > 10 * 1024 * 1024:
         return JSONResponse({"error": "이미지가 너무 큽니다 (최대 10MB)"}, status_code=400)
 
-    b64 = base64.standard_b64encode(raw).decode()
-
     try:
-        msg = await client.messages.create(
-            model=MODEL,
+        provider = get_ai_provider()
+        response_text = await asyncio.to_thread(
+            provider.complete,
+            system="",
+            user=EXPLAIN_PROMPT,
             max_tokens=2000,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": media_type,
-                                "data": b64,
-                            },
-                        },
-                        {"type": "text", "text": EXPLAIN_PROMPT},
-                    ],
-                }
-            ],
+            tier="smart",
+            images=[(media_type, image_bytes)],
         )
-        explanation_json = _parse_json(msg.content[0].text)
+        explanation_json = _parse_json(response_text)
     except Exception:
         logging.exception("arch_trainer error")
         return JSONResponse({"error": "서버 오류가 발생했습니다."}, status_code=500)
@@ -181,20 +165,18 @@ async def explain(image: UploadFile = File(...)):
 @app.post("/api/feedback")
 async def feedback(req: FeedbackRequest):
     try:
-        msg = await client.messages.create(
-            model=MODEL,
+        provider = get_ai_provider()
+        response_text = await asyncio.to_thread(
+            provider.complete,
+            system="",
+            user=FEEDBACK_PROMPT.format(
+                user_explanation=req.user_explanation.replace("<", "&lt;").replace(">", "&gt;"),
+                ai_explanation=json.dumps(req.ai_explanation, ensure_ascii=False, indent=2),
+            ),
             max_tokens=800,
-            messages=[
-                {
-                    "role": "user",
-                    "content": FEEDBACK_PROMPT.format(
-                        user_explanation=req.user_explanation.replace("<", "&lt;").replace(">", "&gt;"),
-                        ai_explanation=json.dumps(req.ai_explanation, ensure_ascii=False, indent=2),
-                    ),
-                }
-            ],
+            tier="smart",
         )
-        feedback_json = _parse_json(msg.content[0].text)
+        feedback_json = _parse_json(response_text)
     except Exception:
         logging.exception("arch_trainer error")
         return JSONResponse({"error": "서버 오류가 발생했습니다."}, status_code=500)

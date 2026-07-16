@@ -3,19 +3,17 @@ import asyncio
 import logging
 import os
 
-import anthropic
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse, JSONResponse
 from pathlib import Path
 from pydantic import BaseModel
 
+from backend.app.ai_provider import get_ai_provider
+
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 app = FastAPI(title="Translation Studio")
-
-CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL_SMART", "claude-sonnet-4-6")
-_client = anthropic.AsyncAnthropic()
 
 from backend.app.database import get_supabase
 _supabase = get_supabase()
@@ -111,16 +109,11 @@ async def translate(req: TranslateRequest):
     collected: list[str] = []
 
     async def stream():
+        provider = get_ai_provider()
         try:
-            async with _client.messages.stream(
-                model=CLAUDE_MODEL,
-                max_tokens=4096,
-                system=_SYSTEM,
-                messages=[{"role": "user", "content": text}],
-            ) as s:
-                async for chunk in s.text_stream:
-                    collected.append(chunk)
-                    yield chunk
+            async for chunk in provider.stream(system=_SYSTEM, user=text, max_tokens=4096, tier="smart"):
+                collected.append(chunk)
+                yield chunk
         except asyncio.CancelledError:
             raise
         except Exception:

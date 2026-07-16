@@ -32,6 +32,8 @@ FastAPI 루트(backend/main.py)가 5개 서브앱을 마운트하는 SPA 구조.
 | SUPABASE_SERVICE_KEY | 전 모듈        |
 | S2_API_KEY           | paper_analyzer |
 | SECURE_COOKIE        | backend/main.py |
+| AI_PROVIDER          | 전 모듈 (backend/app/ai_provider.py, "claude"\|"gemini", 기본 claude) |
+| GEMINI_API_KEY       | 전 모듈 (AI_PROVIDER=gemini일 때) |
 
 ## 브랜치 전략
 - main         : 프로덕션. 직접 커밋 금지. dev/staging PR 머지로만 업데이트.
@@ -55,6 +57,11 @@ FastAPI 루트(backend/main.py)가 5개 서브앱을 마운트하는 SPA 구조.
 - 각 서브앱은 FastAPI() 인스턴스로 독립 선언 후 backend/main.py에서 mount
 - Pydantic v2 문법 사용
 - 임시 파일은 /tmp에 저장, 요청 종료 시 삭제
+- AI 호출은 `backend/app/ai_provider.py`(Claude/Gemini 프로바이더 추상화, `AI_PROVIDER` env로 선택)를 통해 수행 — `backend/app/database.py`처럼 서브앱 전용 폴더가 아닌 `backend/app/` 레벨의 공용 모듈. 전 서브앱(paper_analyzer/translator/reviwer/todo/contextor)이 이 프로바이더를 사용
+  - `complete(system, user, max_tokens, tier="fast"|"smart", images=[(media_type, bytes), ...])`: 단일턴 완성 응답. `tier`로 CLAUDE_MODEL_FAST/SMART(또는 GEMINI_MODEL_FAST/SMART) 선택, `images`로 멀티모달(이미지) 입력 첨부(reviwer의 `/api/explain`이 사용)
+  - `stream(system, user, max_tokens, tier="smart")`: 토큰 단위 스트리밍(async generator). translator의 `/api/translate`가 사용
+  - sync 컨텍스트(todo 라우터, paper_analyzer)는 `complete()` 직접 호출, async 컨텍스트(contextor, reviwer)는 `asyncio.to_thread(provider.complete, ...)`로 감싸 이벤트 루프 블로킹 방지
+  - GeminiProvider의 스트리밍/이미지 입력 경로는 실제 google-genai SDK로 검증되지 않음 — AI_PROVIDER=gemini로 전환 시 반드시 동작 확인 필요
 
 ## 버전 관리
 - 버전 범프: python bump.py [major|minor|patch]
