@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Check, Copy, Loader2, X } from 'lucide-react'
-import AppHeader from '@/shared/components/AppHeader'
 import { SessionExpiredMessage } from '@/shared/components/SessionExpiredMessage'
 import * as api from './api'
 import type { TranslationHistoryItem } from './api'
@@ -96,8 +95,6 @@ export default function Translator() {
 
   return (
     <div className="translator-root">
-      <AppHeader title="Translator" />
-
       <main className="translator-shell">
         <section className="translator-workspace">
           <div className="translator-panel translator-panel--source">

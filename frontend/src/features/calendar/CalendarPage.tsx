@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { useShellNav } from '@/shared/hooks/useShellNav'
 import { useDraggable } from '@dnd-kit/core'
-import AppHeader from '@/shared/components/AppHeader'
 import WeekGrid from './WeekGrid'
 import * as api from '@/shared/api/client'
 import type { Todo } from '@/shared/types'
@@ -95,22 +94,16 @@ export default function Calendar() {
 
   return (
     <div className="cal-root">
-      <AppHeader
-        title="Calendar"
-        right={
-          <button
-            onClick={() => setActive('todo')}
-            style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}
-          >
-            리스트로
-          </button>
-        }
-      />
-
       <div className="cal-toolbar">
         <button className="cal-nav-btn" onClick={prevWeek}>‹</button>
         <span className="cal-week-label">{fmtWeek(weekStart)}</span>
         <button className="cal-nav-btn" onClick={nextWeek}>›</button>
+        <button
+          onClick={() => setActive('todo')}
+          style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}
+        >
+          리스트로
+        </button>
       </div>
 
       <DndContext sensors={sensors}>

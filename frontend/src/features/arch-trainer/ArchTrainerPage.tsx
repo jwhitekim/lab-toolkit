@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import { RotateCcw } from 'lucide-react'
-import AppHeader from '@/shared/components/AppHeader'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import * as api from './api'
 import type { ExplanationJSON, FeedbackJSON, ArchHistoryItem } from './api'
@@ -128,8 +127,6 @@ export default function ArchTrainer() {
         .reselect-btn:hover { background: #ffffff; }
         textarea::placeholder { color: var(--text-secondary); }
       `}</style>
-
-      <AppHeader title="Model Review" />
 
       <div style={{ maxWidth: 860, margin: '0 auto', padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
         {error && (

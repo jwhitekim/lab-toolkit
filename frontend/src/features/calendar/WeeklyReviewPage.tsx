@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import AppHeader from '@/shared/components/AppHeader'
 import { useShellNav } from '@/shared/hooks/useShellNav'
 import * as api from '@/shared/api/client'
 import type { WeeklyReview } from '@/shared/types'
@@ -48,18 +47,6 @@ export default function WeeklyReview() {
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg-base)', overflow: 'hidden' }}>
-      <AppHeader
-        title="주간 리뷰"
-        right={
-          <button
-            onClick={() => setActive('todo')}
-            style={{ fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}
-          >
-            할일 목록
-          </button>
-        }
-      />
-
       {/* Toolbar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 20px', borderBottom: '1px solid var(--border-subtle)' }}>
         <button onClick={prevWeek} style={{ background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, width: 28, height: 28, cursor: 'pointer', fontSize: 16, color: 'var(--text-secondary)' }}>‹</button>
@@ -67,6 +54,12 @@ export default function WeeklyReview() {
           {fmtDate(weekStart.toISOString())} – {fmtDate(new Date(weekStart.getTime() + 6 * 86400000).toISOString())}
         </span>
         <button onClick={nextWeek} style={{ background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, width: 28, height: 28, cursor: 'pointer', fontSize: 16, color: 'var(--text-secondary)' }}>›</button>
+        <button
+          onClick={() => setActive('todo')}
+          style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}
+        >
+          할일 목록
+        </button>
       </div>
 
       <div style={{ flex: 1, overflow: 'auto', padding: '20px 24px' }}>

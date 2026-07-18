@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FileText } from 'lucide-react'
-import AppHeader from '@/shared/components/AppHeader'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import * as api from './api'
 import type { Candidate, PaperResult, PaperHistoryItem } from './api'
@@ -114,17 +113,10 @@ export default function PaperAnalyzer() {
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: C.main }}>
-      <AppHeader
-        title="Paper Analyzer"
-        right={isMobile ? undefined : searchBar}
-      />
-
-      {/* 모바일 검색 행 */}
-      {isMobile && (
-        <div style={{ padding: '8px 12px', borderBottom: `1px solid ${C.border}`, flexShrink: 0, background: C.main }}>
-          {searchBar}
-        </div>
-      )}
+      {/* 검색 툴바 */}
+      <div style={{ padding: isMobile ? '8px 12px' : '12px 20px', borderBottom: `1px solid ${C.border}`, flexShrink: 0, background: C.main }}>
+        {searchBar}
+      </div>
 
       {/* Body */}
       {isMobile ? (

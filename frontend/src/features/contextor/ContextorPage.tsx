@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Loader2, Search, X } from 'lucide-react'
-import AppHeader from '@/shared/components/AppHeader'
 import { SessionExpiredMessage } from '@/shared/components/SessionExpiredMessage'
 import * as api from './api'
 import type { ContextorResult, ContextorHistoryItem } from './api'
@@ -50,8 +49,6 @@ export default function Contextor() {
 
   return (
     <div className="contextor-root">
-      <AppHeader title="Contextor" />
-
       <main className="contextor-shell">
         <div className="contextor-searchbar">
           <Search size={16} className="contextor-search-icon" />
