@@ -90,7 +90,7 @@ export default function PaperAnalyzer() {
   }
 
   const searchBar = (
-    <div style={{ display: 'flex', width: '100%', maxWidth: isMobile ? undefined : 580 }}>
+    <div style={{ display: 'flex', marginLeft: 'auto',  width: '100%', maxWidth: isMobile ? undefined : 580 }}>
       <input
         ref={inputRef}
         value={query}
