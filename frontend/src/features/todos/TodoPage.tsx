@@ -150,9 +150,9 @@ export default function TodoPage() {
   if (isMobile) {
     return (
       <>
-      <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
-        {selectedId !== null ? (
-          loading && !selectedTodo ? (
+      {selectedId !== null ? (
+        <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
+          {loading && !selectedTodo ? (
             <div className="flex-1 flex items-center justify-center">
               <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>불러오는 중...</span>
             </div>
@@ -162,20 +162,20 @@ export default function TodoPage() {
               {...focusPanelProps}
               onBack={() => setSelectedId(null)}
             />
-          )
-        ) : (
-          <TodoList
-            todos={todos}
-            filter={filter}
-            onFilter={setFilter}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            onToggle={handleToggleDone}
-            onEdit={(id, name) => handleUpdate(id, { name })}
-            onAdd={handleAdd}
-          />
-        )}
-      </div>
+          )}
+        </div>
+      ) : (
+        <TodoList
+          todos={todos}
+          filter={filter}
+          onFilter={setFilter}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          onToggle={handleToggleDone}
+          onEdit={(id, name) => handleUpdate(id, { name })}
+          onAdd={handleAdd}
+        />
+      )}
       {toast}
       </>
     )

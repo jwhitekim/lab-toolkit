@@ -39,10 +39,16 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
 
   return (
     <div
-      className="flex flex-col h-full border-r"
+      className={`flex flex-col border-r${isMobile ? '' : ' h-full'}`}
       style={{ width: width ?? '100%', flexShrink: width !== undefined ? 0 : undefined, borderRight: '1px solid var(--border-subtle)', background: 'var(--bg-additive)' }}
     >
-      <div className="px-3 pt-4 pb-3" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+      <div
+        className="px-3 pt-4 pb-3"
+        style={{
+          borderBottom: '1px solid var(--border-subtle)',
+          ...(isMobile ? { position: 'sticky' as const, top: 0, zIndex: 1, background: 'var(--bg-additive)' } : {}),
+        }}
+      >
         <div className="flex items-start justify-between gap-3">
           <div>
             <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>Todo List</div>
@@ -103,7 +109,7 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-2 pb-2 space-y-0.5">
+      <div className={`${isMobile ? '' : 'flex-1 overflow-y-auto '}px-2 pb-2 space-y-0.5`}>
         {active.map(todo => (
           <TodoItem
             key={todo.id}
