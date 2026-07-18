@@ -34,7 +34,7 @@
   color: var(--text-primary);
   cursor: pointer;
   font-family: var(--font-sans);
-  font-size: 17px;
+  font-size: 18px;
   font-weight: var(--fw-bold);
   letter-spacing: 0;
 }
@@ -60,8 +60,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 4px;
+  gap: 24px;
+  padding: 6px;
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
   background: var(--bg-additive);
@@ -79,14 +79,14 @@
   align-items: center;
   justify-content: center;
   gap: 0;
-  padding: 0 10px;
+  padding: 0 8px;
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: var(--fw-medium);
   line-height: 1;
   white-space: nowrap;
