@@ -1,5 +1,5 @@
 .shell-desktop {
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -45,15 +45,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  background: var(--text-primary);
-  color: var(--selected-text);
-  font-size: 16px;
-  font-weight: var(--fw-bold);
   line-height: 1;
 }
 
+.shell-brand-mark img {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
 .shell-app-nav {
+  width: fit-content;
   max-width: min(100%, 720px);
   display: flex;
   align-items: center;
@@ -76,8 +78,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 0 13px;
+  gap: 0;
+  padding: 0 10px;
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
@@ -89,10 +91,23 @@
   line-height: 1;
   white-space: nowrap;
   transition:
-    background-color 0.14s ease,
-    border-color 0.14s ease,
-    box-shadow 0.14s ease,
-    color 0.14s ease;
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease,
+    padding 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    gap 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shell-app-tab span {
+  display: inline-block;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease;
 }
 
 .shell-app-tab:hover {
@@ -101,11 +116,28 @@
 }
 
 .shell-app-tab.is-active {
+  gap: 7px;
+  padding: 0 13px;
   background: var(--bg-base);
   border-color: rgba(0, 0, 0, 0.08);
   color: var(--text-primary);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   font-weight: var(--fw-semibold);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease,
+    padding 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.3s,
+    gap 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
+}
+
+.shell-app-tab.is-active span {
+  max-width: 160px;
+  opacity: 1;
+  transition:
+    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.3s,
+    opacity 0.2s ease 0.3s;
 }
 
 .shell-app-tab:focus-visible,
@@ -129,10 +161,52 @@
   }
 
   .shell-app-nav {
-    justify-content: flex-start;
+    justify-self: center;
   }
 
   .shell-topbar-end {
     display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .shell-topbar {
+    min-height: 52px;
+    gap: 10px;
+    padding: 0 12px;
+  }
+
+  .shell-brand {
+    gap: 0;
+    padding: 0;
+  }
+
+  .shell-brand-text {
+    display: none;
+  }
+
+  .shell-app-nav {
+    gap: 2px;
+    padding: 3px;
+  }
+
+  .shell-app-tab {
+    height: 34px;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+
+  .shell-app-tab svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .shell-app-tab.is-active {
+    padding: 0 10px;
+    gap: 5px;
+  }
+
+  .shell-app-tab.is-active span {
+    max-width: 100px;
   }
 }

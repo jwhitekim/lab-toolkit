@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { Home, FileText, Globe, BookOpen, CheckSquare } from 'lucide-react'
-import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { ShellNavContext, type ActiveApp } from '@/shared/hooks/useShellNav'
 import HomePage from '@/pages/HomePage'
 import { PaperAnalyzerPage } from '@/features/paper-analyzer'
@@ -40,7 +39,6 @@ const APP_TITLE: Partial<Record<ActiveApp, string>> = {
 
 export default function Shell() {
   const [active, setActive] = useState<ActiveApp>('home')
-  const isMobile = useIsMobile()
 
   useEffect(() => {
     document.title = active === 'home' ? 'veloo' : (APP_TITLE[active] ?? 'veloo')
@@ -59,45 +57,6 @@ export default function Shell() {
     </>
   )
 
-  if (isMobile) {
-    return (
-      <ShellNavContext.Provider value={{ active, setActive }}>
-        <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
-            {content}
-          </div>
-          <nav style={{
-            display: 'flex',
-            borderTop: '1px solid var(--border-subtle)',
-            background: 'var(--bg-base)',
-            flexShrink: 0,
-          }}>
-            {NAV_ITEMS.map(({ key, label, Icon }) => {
-              const isActive = active === key || (key === 'todo' && active === 'weekly-review')
-              return (
-                <button
-                  key={key}
-                  onClick={() => setActive(key)}
-                  style={{
-                    flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    padding: '8px 2px 10px', gap: 3,
-                    background: 'transparent', border: 'none', cursor: 'pointer',
-                    color: isActive ? 'var(--text-primary)' : 'var(--text-disabled)',
-                    fontSize: 9, fontFamily: 'var(--font-sans)',
-                    fontWeight: isActive ? 600 : 400,
-                  }}
-                >
-                  <Icon size={18} />
-                  {label.split(' ')[0]}
-                </button>
-              )
-            })}
-          </nav>
-        </div>
-      </ShellNavContext.Provider>
-    )
-  }
-
   return (
     <ShellNavContext.Provider value={{ active, setActive }}>
       <div className="shell-desktop">
@@ -109,8 +68,10 @@ export default function Shell() {
               onClick={() => setActive('home')}
               aria-label="veloo home"
             >
-              <span className="shell-brand-mark">v</span>
-              <span>veloo</span>
+              <span className="shell-brand-mark">
+                <img src="/favicon.svg" alt="" width={20} height={20} />
+              </span>
+              <span className="shell-brand-text">veloo</span>
             </button>
           </div>
           <nav className="shell-app-nav" aria-label="Apps">
