@@ -227,8 +227,8 @@
   }
 
   .shell-app-tab {
-    height: 44px;
-    width: 44px;
+    height: 48px;
+    width: 48px;
     flex: 0 0 auto;
     padding: 0;
     border-radius: 50%;
@@ -252,8 +252,8 @@
   }
 
   .shell-app-tab svg {
-    width: 21px;
-    height: 21px;
+    width: 24px;
+    height: 24px;
     transition: fill 0.25s ease, transform 0.25s ease;
   }
 
