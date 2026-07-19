@@ -38,7 +38,22 @@ MAX_ATTEMPTS = 5
 LOCKOUT_MINUTES = 15
 
 _API_PREFIXES = ("/paper/", "/translate/", "/model-review/", "/todo/", "/contextor/")
-_OPEN_PATHS = {"/login", "/logout", "/register", "/api/me", "/favicon.svg"}
+_OPEN_PATHS = {
+    "/login",
+    "/logout",
+    "/register",
+    "/api/me",
+    "/apple-touch-icon.png",
+    "/favicon.svg",
+    "/icon-192.png",
+    "/icon-512.png",
+    "/icon-512.svg",
+    "/manifest.json",
+    "/manifest.webmanifest",
+    "/registerSW.js",
+    "/sw.js",
+}
+_OPEN_PREFIXES = ("/assets/", "/workbox-")
 
 
 def _get_ip(request: Request) -> str:
@@ -74,7 +89,7 @@ def _secure_cookie(request: Request) -> bool:
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
-        if path in _OPEN_PATHS or path.startswith("/assets/"):
+        if path in _OPEN_PATHS or path.startswith(_OPEN_PREFIXES):
             return await call_next(request)
 
         token = request.cookies.get("access_token")

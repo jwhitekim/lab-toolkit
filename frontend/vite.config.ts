@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => {
       react(),
       VitePWA({
         registerType: 'autoUpdate',
+        injectRegister: null,
         includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
         manifest: {
           name: 'veloo',

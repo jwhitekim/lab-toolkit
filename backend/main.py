@@ -1,11 +1,13 @@
 """veloo — 연구실 도구 모음 허브"""
 import logging
 import os
+import re
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.paper_analyzer import app as paper_app
 from backend.app.translator import app as translate_app
@@ -17,6 +19,25 @@ from backend.app.auth import router as auth_router, AuthMiddleware
 
 BASE = os.path.dirname(os.path.dirname(__file__))
 DIST = os.path.join(BASE, "frontend", "dist")
+LOCAL_ORIGIN_RE = (
+    r"^https?://"
+    r"(localhost|127\.0\.0\.1|0\.0\.0\.0|192\.168\.\d{1,3}\.\d{1,3}|"
+    r"10\.\d{1,3}\.\d{1,3}\.\d{1,3}|"
+    r"172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3})"
+    r"(:\d+)?$"
+)
+ROOT_STATIC_FILES = {
+    "apple-touch-icon.png",
+    "favicon.svg",
+    "icon-192.png",
+    "icon-512.png",
+    "icon-512.svg",
+    "manifest.json",
+    "manifest.webmanifest",
+    "registerSW.js",
+    "sw.js",
+}
+WORKBOX_FILE_RE = re.compile(r"^workbox-[\w-]+\.js$")
 
 
 @asynccontextmanager
@@ -31,6 +52,13 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="Lab Toolkit", lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=LOCAL_ORIGIN_RE,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.add_middleware(AuthMiddleware)
 app.include_router(auth_router)
 
@@ -45,6 +73,22 @@ app.mount("/assets", StaticFiles(directory=os.path.join(DIST, "assets")), name="
 @app.get("/favicon.svg")
 async def favicon():
     return FileResponse(os.path.join(DIST, "favicon.svg"), media_type="image/svg+xml")
+
+
+@app.get("/{filename}")
+async def root_static(filename: str):
+    if filename == "manifest.json":
+        path = os.path.join(DIST, "manifest.json")
+        if not os.path.isfile(path):
+            path = os.path.join(DIST, "manifest.webmanifest")
+        if os.path.isfile(path):
+            return FileResponse(path, media_type="application/manifest+json")
+
+    if filename in ROOT_STATIC_FILES or WORKBOX_FILE_RE.fullmatch(filename):
+        path = os.path.join(DIST, filename)
+        if os.path.isfile(path):
+            return FileResponse(path)
+    return FileResponse(os.path.join(DIST, "index.html"))
 
 
 @app.get("/{full_path:path}")
