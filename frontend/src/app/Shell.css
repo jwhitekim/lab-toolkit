@@ -62,9 +62,7 @@
   justify-content: center;
   gap: 24px;
   padding: 4px;
-  border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  background: var(--bg-additive);
   overflow-x: auto;
   scrollbar-width: none;
 }
