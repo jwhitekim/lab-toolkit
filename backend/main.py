@@ -87,7 +87,8 @@ async def root_static(filename: str):
     if filename in ROOT_STATIC_FILES or WORKBOX_FILE_RE.fullmatch(filename):
         path = os.path.join(DIST, filename)
         if os.path.isfile(path):
-            return FileResponse(path)
+            headers = {"Cache-Control": "no-cache"} if filename == "sw.js" else None
+            return FileResponse(path, headers=headers)
     return FileResponse(os.path.join(DIST, "index.html"))
 
 

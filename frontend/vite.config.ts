@@ -13,6 +13,8 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'autoUpdate',
         injectRegister: null,
+        // TODO(temp): iOS Safari에 남은 기존 서비스 워커를 강제 unregister + 캐시 삭제하기 위한 킬스위치. 배포 후 확인되면 false로 되돌릴 것.
+        selfDestroying: true,
         includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
         manifest: {
           name: 'veloo',
