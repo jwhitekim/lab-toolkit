@@ -1,39 +1,26 @@
-name: Deploy to Server
+name: Deploy
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Deploy via SSH
+      - name: Deploy over SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            cd ~/Joonspace/veloo.page
-            git pull origin main
-            docker stop veloo 2>/dev/null || true
-            docker rm veloo 2>/dev/null || true
-            docker build -t veloo .
-            docker run -d \
-              --name veloo \
-              --restart unless-stopped \
-              -p 9000:9000 \
-              --env-file .env \
-              veloo
-            sudo nginx -t && sudo systemctl restart nginx
-            sudo systemctl restart cloudflared
-            docker ps | grep veloo
-            sudo systemctl status nginx --no-pager -l | grep Active
-            sudo systemctl status cloudflared --no-pager -l | grep Active
-            curl -s -o /dev/null -w "veloo.page 응답: %{http_code}\n" https://veloo.page
+            wsl.exe -- bash -lc "set -e; cd /mnt/c/Users/admin/joonspace/veloo.page; git pull --ff-only origin main; docker compose up -d --build --remove-orphans; docker compose ps; sudo nginx -t; sudo systemctl reload nginx; curl --fail --silent --show-error --retry 10 --retry-delay 3 --retry-all-errors --output /dev/null https://veloo.page"
