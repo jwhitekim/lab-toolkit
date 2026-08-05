@@ -134,29 +134,27 @@ class GeminiProvider(AIProvider):
         parts.append(types.Part.from_text(text=user))
         return parts
 
-    def complete(self, system, user, max_tokens=512, tier="fast", images=None):
+    def _config(self, system: str, max_tokens: int):
         from google.genai import types
 
+        config = {"max_output_tokens": max_tokens}
+        if system.strip():
+            config["system_instruction"] = system
+        return types.GenerateContentConfig(**config)
+
+    def complete(self, system, user, max_tokens=512, tier="fast", images=None):
         response = self._client.models.generate_content(
             model=self._model(tier),
             contents=self._contents(user, images),
-            config=types.GenerateContentConfig(
-                system_instruction=system,
-                max_output_tokens=max_tokens,
-            ),
+            config=self._config(system, max_tokens),
         )
         return (response.text or "").strip()
 
     async def stream(self, system, user, max_tokens=512, tier="smart"):
-        from google.genai import types
-
         async for chunk in await self._client.aio.models.generate_content_stream(
             model=self._model(tier),
             contents=user,
-            config=types.GenerateContentConfig(
-                system_instruction=system,
-                max_output_tokens=max_tokens,
-            ),
+            config=self._config(system, max_tokens),
         ):
             if chunk.text:
                 yield chunk.text
