@@ -104,13 +104,17 @@ create table if not exists arch_history (
 create index if not exists arch_history_user_id_idx    on arch_history (user_id);
 create index if not exists arch_history_created_at_idx on arch_history (created_at desc);
 
-create table contextor_history (
-  id bigint generated always as identity primary key,
-  query text not null,
-  result jsonb not null,
+create table if not exists contextor_history (
+  id         bigint generated always as identity primary key,
+  user_id    uuid not null references users(id) on delete cascade,
+  query      text not null,
+  result     jsonb not null,
   created_at timestamptz default now()
 );
-create index on contextor_history (query);
+alter table contextor_history
+  add column if not exists user_id uuid references users(id) on delete cascade;
+create index if not exists contextor_history_user_id_idx on contextor_history (user_id);
+create index if not exists contextor_history_query_idx on contextor_history (query);
 
 -- ── 캘린더·알림·주간 리뷰 마이그레이션 ────────────────────────────────────────
 alter table todos

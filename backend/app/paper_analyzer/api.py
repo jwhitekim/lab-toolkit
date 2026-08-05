@@ -5,7 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
-from fastapi import FastAPI, Form, UploadFile, File
+from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -30,11 +30,11 @@ app.add_middleware(
 )
 
 
-def _check_paper_cache(paper_id: str) -> dict | None:
+def _check_paper_cache(paper_id: str, user_id: str) -> dict | None:
     if not _supabase or not paper_id:
         return None
     try:
-        res = _supabase.table("paper_history").select("result").eq("paper_id", paper_id).limit(1).execute()
+        res = _supabase.table("paper_history").select("result").eq("paper_id", paper_id).eq("user_id", user_id).limit(1).execute()
         if res.data:
             return res.data[0]["result"]
     except Exception:
@@ -42,33 +42,36 @@ def _check_paper_cache(paper_id: str) -> dict | None:
     return None
 
 
-def _save_paper_history(query: str | None, paper_id: str | None, title: str, result: dict) -> None:
+def _save_paper_history(user_id: str, query: str | None, paper_id: str | None, title: str, result: dict) -> None:
     if not _supabase:
         return
     try:
         _supabase.table("paper_history").insert({
+            "user_id": user_id,
             "query": query,
             "paper_id": paper_id,
             "title": title,
             "result": result,
         }).execute()
     except Exception:
-        pass
+        logging.exception("paper history save error")
 
 
 @app.get("/history")
-async def get_history(count: bool = False):
+async def get_history(request: Request, count: bool = False):
     if not _supabase:
         return JSONResponse({"count": 0} if count else {"items": []})
+    user_id = request.state.user_id
     try:
         if count:
             res = await asyncio.to_thread(
-                lambda: _supabase.table("paper_history").select("id", count="exact").execute()
+                lambda: _supabase.table("paper_history").select("id", count="exact").eq("user_id", user_id).execute()
             )
             return JSONResponse({"count": res.count or 0})
         res = await asyncio.to_thread(
             lambda: _supabase.table("paper_history")
                 .select("id,title,paper_id,query,created_at,result")
+                .eq("user_id", user_id)
                 .order("created_at", desc=True)
                 .limit(10)
                 .execute()
@@ -110,13 +113,14 @@ async def search(query: str = Form(...)):
 
 
 @app.post("/analyze")
-async def analyze(paper_id: str = Form(None), url: str = Form(None)):
+async def analyze(request: Request, paper_id: str = Form(None), url: str = Form(None)):
     try:
+        user_id = request.state.user_id
         paper = None
         resolved_paper_id = paper_id
 
         if paper_id:
-            cached = await asyncio.to_thread(_check_paper_cache, paper_id)
+            cached = await asyncio.to_thread(_check_paper_cache, paper_id, user_id)
             if cached:
                 return JSONResponse({**cached, "from_cache": True})
             paper = await asyncio.to_thread(fetch_paper_by_id, paper_id)
@@ -125,7 +129,7 @@ async def analyze(paper_id: str = Form(None), url: str = Form(None)):
             if paper:
                 resolved_paper_id = paper.get("paperId")
                 if resolved_paper_id:
-                    cached = await asyncio.to_thread(_check_paper_cache, resolved_paper_id)
+                    cached = await asyncio.to_thread(_check_paper_cache, resolved_paper_id, user_id)
                     if cached:
                         return JSONResponse({**cached, "from_cache": True})
         else:
@@ -154,7 +158,7 @@ async def analyze(paper_id: str = Form(None), url: str = Form(None)):
 
         result = {"basic": basic, "analysis": analysis, "authors": authors, "quality": quality}
 
-        await asyncio.to_thread(_save_paper_history, url or paper_id, resolved_paper_id, basic["title"], result)
+        await asyncio.to_thread(_save_paper_history, user_id, url or paper_id, resolved_paper_id, basic["title"], result)
 
         return JSONResponse(result)
 
@@ -164,8 +168,9 @@ async def analyze(paper_id: str = Form(None), url: str = Form(None)):
 
 
 @app.post("/analyze-pdf")
-async def analyze_pdf(file: UploadFile = File(...)):
+async def analyze_pdf(request: Request, file: UploadFile = File(...)):
     try:
+        user_id = request.state.user_id
         from core.pdf_extractor import extract_from_pdf
 
         if file.content_type != "application/pdf" and not (file.filename or "").lower().endswith(".pdf"):
@@ -226,7 +231,7 @@ async def analyze_pdf(file: UploadFile = File(...)):
 
         result = {"basic": basic, "analysis": analysis, "authors": authors, "quality": quality}
 
-        await asyncio.to_thread(_save_paper_history, None, resolved_paper_id, title, result)
+        await asyncio.to_thread(_save_paper_history, user_id, None, resolved_paper_id, title, result)
 
         return JSONResponse({**result, "figures": figures})
 

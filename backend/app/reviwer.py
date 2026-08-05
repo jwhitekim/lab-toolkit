@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -121,7 +121,8 @@ class FeedbackRequest(BaseModel):
 
 
 @app.post("/api/explain")
-async def explain(image: UploadFile = File(...)):
+async def explain(request: Request, image: UploadFile = File(...)):
+    user_id = request.state.user_id
     media_type = image.content_type or "image/png"
     if media_type not in _ALLOWED_IMAGE_TYPES:
         return JSONResponse({"error": "지원하지 않는 이미지 형식입니다. (jpeg/png/gif/webp만 허용)"}, status_code=400)
@@ -150,6 +151,7 @@ async def explain(image: UploadFile = File(...)):
         try:
             res = await asyncio.to_thread(
                 lambda: _supabase.table("arch_history").insert({
+                    "user_id": user_id,
                     "image_name": image.filename,
                     "explanation": explanation_json,
                 }).execute()
@@ -157,13 +159,14 @@ async def explain(image: UploadFile = File(...)):
             if res.data:
                 history_id = res.data[0]["id"]
         except Exception:
-            pass
+            logging.exception("arch history save error")
 
     return JSONResponse({"explanation": explanation_json, "history_id": history_id})
 
 
 @app.post("/api/feedback")
-async def feedback(req: FeedbackRequest):
+async def feedback(req: FeedbackRequest, request: Request):
+    user_id = request.state.user_id
     try:
         provider = get_ai_provider()
         response_text = await asyncio.to_thread(
@@ -187,6 +190,7 @@ async def feedback(req: FeedbackRequest):
                 lambda: _supabase.table("arch_history")
                     .update({"feedback": feedback_json})
                     .eq("id", req.history_id)
+                    .eq("user_id", user_id)
                     .execute()
             )
         except Exception:
@@ -196,18 +200,20 @@ async def feedback(req: FeedbackRequest):
 
 
 @app.get("/api/history")
-async def get_arch_history(count: bool = False):
+async def get_arch_history(request: Request, count: bool = False):
     if not _supabase:
         return JSONResponse({"count": 0} if count else {"items": []})
+    user_id = request.state.user_id
     try:
         if count:
             res = await asyncio.to_thread(
-                lambda: _supabase.table("arch_history").select("id", count="exact").execute()
+                lambda: _supabase.table("arch_history").select("id", count="exact").eq("user_id", user_id).execute()
             )
             return JSONResponse({"count": res.count or 0})
         res = await asyncio.to_thread(
             lambda: _supabase.table("arch_history")
                 .select("id,image_name,explanation,created_at")
+                .eq("user_id", user_id)
                 .order("created_at", desc=True)
                 .limit(5)
                 .execute()

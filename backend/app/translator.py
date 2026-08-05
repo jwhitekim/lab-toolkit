@@ -4,7 +4,7 @@ import logging
 import os
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse, JSONResponse
 from pathlib import Path
 from pydantic import BaseModel
@@ -77,8 +77,9 @@ class TranslateRequest(BaseModel):
 
 
 @app.post("/api/translate")
-async def translate(req: TranslateRequest):
+async def translate(req: TranslateRequest, request: Request):
     text = req.text.strip()
+    user_id = request.state.user_id
     if not text:
         return JSONResponse({"error": "텍스트가 비어 있습니다."}, status_code=400)
 
@@ -88,6 +89,7 @@ async def translate(req: TranslateRequest):
             cached_res = await asyncio.to_thread(
                 lambda: _supabase.table("translation_history")
                     .select("translated_text")
+                    .eq("user_id", user_id)
                     .eq("source_text", text)
                     .limit(1)
                     .execute()
@@ -125,33 +127,39 @@ async def translate(req: TranslateRequest):
         if _supabase:
             try:
                 full_text = "".join(collected)
-                type_value = "term" if len(text.split()) == 1 else "sentence"
+                type_value = "word" if len(text.split()) == 1 else "sentence"
                 await asyncio.to_thread(
                     lambda: _supabase.table("translation_history").insert({
+                        "user_id": user_id,
                         "source_text": text,
                         "translated_text": full_text,
                         "type": type_value,
                     }).execute()
                 )
             except Exception:
-                pass
+                logging.exception("translation history save error")
 
     return StreamingResponse(stream(), media_type="text/plain; charset=utf-8")
 
 
 @app.get("/api/history")
-async def get_translation_history(count: bool = False):
+async def get_translation_history(request: Request, count: bool = False):
     if not _supabase:
         return JSONResponse({"count": 0} if count else {"items": []})
+    user_id = request.state.user_id
     try:
         if count:
             res = await asyncio.to_thread(
-                lambda: _supabase.table("translation_history").select("id", count="exact").execute()
+                lambda: _supabase.table("translation_history")
+                    .select("id", count="exact")
+                    .eq("user_id", user_id)
+                    .execute()
             )
             return JSONResponse({"count": res.count or 0})
         res = await asyncio.to_thread(
             lambda: _supabase.table("translation_history")
                 .select("id,source_text,translated_text,type,created_at")
+                .eq("user_id", user_id)
                 .order("created_at", desc=True)
                 .limit(10)
                 .execute()

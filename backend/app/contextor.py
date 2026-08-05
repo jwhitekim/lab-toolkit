@@ -5,7 +5,7 @@ import logging
 import os
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pathlib import Path
 from pydantic import BaseModel
@@ -109,8 +109,9 @@ def _extract_json(raw: str) -> dict:
 
 
 @app.post("/api/lookup")
-async def lookup(req: LookupRequest):
+async def lookup(req: LookupRequest, request: Request):
     text = req.text.strip()
+    user_id = request.state.user_id
     if not text:
         return JSONResponse({"error": "단어가 비어 있습니다."}, status_code=400)
 
@@ -120,6 +121,7 @@ async def lookup(req: LookupRequest):
             cached = await asyncio.to_thread(
                 lambda: _supabase.table("contextor_history")
                     .select("result")
+                    .eq("user_id", user_id)
                     .eq("query", text)
                     .limit(1)
                     .execute()
@@ -150,29 +152,32 @@ async def lookup(req: LookupRequest):
         try:
             await asyncio.to_thread(
                 lambda: _supabase.table("contextor_history").insert({
+                    "user_id": user_id,
                     "query": text,
                     "result": result,
                 }).execute()
             )
         except Exception:
-            pass
+            logging.exception("contextor history save error")
 
     return JSONResponse(result)
 
 
 @app.get("/api/history")
-async def get_history(count: bool = False):
+async def get_history(request: Request, count: bool = False):
     if not _supabase:
         return JSONResponse({"count": 0} if count else {"items": []})
+    user_id = request.state.user_id
     try:
         if count:
             res = await asyncio.to_thread(
-                lambda: _supabase.table("contextor_history").select("id", count="exact").execute()
+                lambda: _supabase.table("contextor_history").select("id", count="exact").eq("user_id", user_id).execute()
             )
             return JSONResponse({"count": res.count or 0})
         res = await asyncio.to_thread(
             lambda: _supabase.table("contextor_history")
                 .select("id,query,result,created_at")
+                .eq("user_id", user_id)
                 .order("created_at", desc=True)
                 .limit(10)
                 .execute()

@@ -97,13 +97,14 @@ class AuthMiddleware(BaseHTTPMiddleware):
             result = (
                 get_supabase()
                 .table("sessions")
-                .select("expires_at")
+                .select("user_id, expires_at")
                 .eq("token", token)
                 .execute()
             )
             if result.data:
                 expires_at = datetime.fromisoformat(result.data[0]["expires_at"])
                 if expires_at > datetime.now(timezone.utc):
+                    request.state.user_id = result.data[0]["user_id"]
                     return await call_next(request)
                 get_supabase().table("sessions").delete().eq("token", token).execute()
 
