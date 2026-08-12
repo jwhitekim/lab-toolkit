@@ -212,7 +212,7 @@
     width: calc(100% - (var(--space-lg) * 2));
     max-width: none;
     justify-content: space-evenly;
-    padding: 5px 10px;
+    padding: 3px 10px;
     border-radius: var(--radius-pill);
     border: 1px solid rgba(255, 255, 255, 0.4);
     background: rgba(255, 255, 255, 0.65);
@@ -240,8 +240,8 @@
   }
 
   .shell-app-tab {
-    height: 48px;
-    width: 48px;
+    height: 40px;
+    width: 40px;
     flex: 0 0 auto;
     padding: 0;
     border-radius: 50%;
