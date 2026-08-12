@@ -17,10 +17,10 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
+  { key: 'todo',         label: 'Todo',           Icon: CheckSquare },
   { key: 'paper',        label: 'Paper Analyzer', Icon: FileText },
   { key: 'translate',    label: 'Translator',     Icon: Globe },
   { key: 'contextor',    label: 'Contextor',      Icon: BookOpen },
-  { key: 'todo',         label: 'Todo',           Icon: CheckSquare },
   // { key: 'model-review', label: 'Model Review',   Icon: GitBranch },
   // { key: 'calendar',     label: 'Calendar',       Icon: CalendarDays },
 ]

@@ -40,21 +40,18 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
   return (
     <div
       className={`flex flex-col border-r${isMobile ? '' : ' h-full'}`}
-      style={{ width: width ?? '100%', flexShrink: width !== undefined ? 0 : undefined, borderRight: '1px solid var(--border-subtle)', background: 'var(--bg-additive)' }}
+      style={{ width: width ?? '100%', flexShrink: width !== undefined ? 0 : undefined, borderRight: '1px solid var(--border-subtle)', background: 'var(--bg-base)' }}
     >
       <div
         className="px-3 pt-4 pb-3"
         style={{
           borderBottom: '1px solid var(--border-subtle)',
-          ...(isMobile ? { position: 'sticky' as const, top: 0, zIndex: 1, background: 'var(--bg-additive)' } : {}),
+          ...(isMobile ? { position: 'sticky' as const, top: 0, zIndex: 1, background: 'var(--bg-base)' } : {}),
         }}
       >
         <div className="flex items-start justify-between gap-3">
-          <div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>Todo List</div>
-            <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 4 }}>
-              {active.length}개 진행 중{filterSubtitle ? ` · ${filterSubtitle}` : ''}
-            </div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
+            {active.length}개 진행 중{filterSubtitle ? ` · ${filterSubtitle}` : ''}
           </div>
           {isMobile && (
             <button
@@ -78,7 +75,7 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
           role="tablist"
           aria-label="Todo 필터"
           className="mt-3 grid grid-cols-4 gap-1"
-          style={{ borderRadius: 'var(--radius-md)', background: 'var(--bg-base)', padding: 3 }}
+          style={{ borderRadius: 'var(--radius-md)', background: 'var(--bg-additive)', padding: 3 }}
         >
           {filterTabs.map(item => {
             const isActive = filter === item.key

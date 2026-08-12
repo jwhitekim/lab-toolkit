@@ -54,6 +54,12 @@
   height: 32px;
 }
 
+.shell-brand-text {
+  font-family: 'Syne', var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
 .shell-app-nav {
   width: fit-content;
   max-width: min(100%, 720px);
@@ -175,65 +181,51 @@
   }
 
   .shell-brand {
-    gap: 0;
+    gap: 8px;
     padding: 0;
   }
 
   .shell-brand-text {
-    display: none;
+    font-size: 20px;
   }
 
   .shell-content {
-    padding-bottom: 88px;
+    padding-bottom: calc(54px + env(safe-area-inset-bottom, 0px));
   }
 
+  /* 인스타그램 스타일 — 화면 하단에 딱 붙는 전체 폭 바. 둥근 모서리/여백이 없어
+     기기 화면 모서리 굴곡과 어긋날 일이 없고, safe-area만큼 아래 패딩을 준다. */
   .shell-app-nav {
     position: fixed;
-    left: var(--space-lg);
-    bottom: max(16px, env(safe-area-inset-bottom, 16px));
-    transform: translateZ(0);
-    will-change: backdrop-filter, transform;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 100;
-    width: calc(100% - (var(--space-lg) * 2));
+    width: 100%;
     max-width: none;
     justify-content: space-evenly;
-    padding: 5px 10px; 
-    border-radius: var(--radius-pill);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    background: rgba(255, 255, 255, 0.65);
-    isolation: isolate;
+    gap: 0;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+    border-radius: 0;
+    border: none;
+    border-top: 1px solid var(--border-subtle);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    box-shadow:
-      0 8px 30px rgba(0, 0, 0, 0.12),
-      0 2px 8px rgba(0, 0, 0, 0.06);
-    transition:
-      transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-      left 0.3s ease,
-      width 0.3s ease;
-  }
-
-  .shell-app-nav:has(.shell-app-tab:active) {
-    transform: translateZ(0) scale(0.97);
-    transition: transform 0.08s ease-out;
   }
 
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .shell-app-nav {
-      background: rgba(255, 255, 255, 0.92);
+      background: var(--bg-base);
     }
   }
 
   .shell-app-tab {
-    height: 48px;
-    width: 48px;
-    flex: 0 0 auto;
+    height: 42px;
+    flex: 1;
     padding: 0;
-    border-radius: 50%;
-    transition:
-      transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-      background-color 0.2s ease,
-      color 0.2s ease;
+    border-radius: var(--radius-sm);
+    transition: transform 0.15s ease, color 0.2s ease;
   }
 
   .shell-app-tab:hover {
@@ -241,7 +233,7 @@
   }
 
   .shell-app-tab:active {
-    transform: scale(0.82);
+    transform: scale(0.88);
     transition: transform 0.08s ease-out;
   }
 
@@ -250,28 +242,16 @@
   }
 
   .shell-app-tab svg {
-    width: 24px;
-    height: 24px;
-    transition: fill 0.25s ease, transform 0.25s ease;
-  }
-
-  @keyframes shellTabPop {
-    0%   { transform: scale(0.7); }
-    60%  { transform: scale(1.12); }
-    100% { transform: scale(1); }
+    width: 23px;
+    height: 23px;
   }
 
   .shell-app-tab.is-active {
     padding: 0;
     gap: 0;
-    background: var(--bg-additive-hover);
+    background: transparent;
     color: var(--text-primary);
     border-color: transparent;
     box-shadow: none;
-    animation: shellTabPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .shell-app-tab.is-active svg {
-    transform: scale(1.05);
   }
 }
