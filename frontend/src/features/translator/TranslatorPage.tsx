@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Check, Copy, Loader2, X } from 'lucide-react'
 import { SessionExpiredMessage } from '@/shared/components/SessionExpiredMessage'
+import { HistoryDropdown } from '@/shared/components/HistoryDropdown'
 import * as api from './api'
 import type { TranslationHistoryItem } from './api'
 import './Translator.css'
@@ -136,15 +137,29 @@ export default function Translator() {
                 <span className="translator-label">Translation</span>
                 <span className="translator-language">Korean</span>
               </div>
-              <button
-                className="translator-icon-btn"
-                onClick={handleCopy}
-                disabled={!streamedText || translating}
-                title={copied ? '복사됨' : '복사'}
-                type="button"
-              >
-                {copied ? <Check size={15} /> : <Copy size={15} />}
-              </button>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <HistoryDropdown
+                  items={txHistory}
+                  label="최근 번역"
+                  triggerClassName="translator-icon-btn"
+                  onSelect={item => { setSource(item.source_text); setStreamedText(item.translated_text) }}
+                  renderItem={item => (
+                    <>
+                      <div style={{ fontSize: 13, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.source_text}</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-disabled)', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.translated_text}</div>
+                    </>
+                  )}
+                />
+                <button
+                  className="translator-icon-btn"
+                  onClick={handleCopy}
+                  disabled={!streamedText || translating}
+                  title={copied ? '복사됨' : '복사'}
+                  type="button"
+                >
+                  {copied ? <Check size={15} /> : <Copy size={15} />}
+                </button>
+              </div>
             </div>
 
             <div className="translator-output">
@@ -169,24 +184,7 @@ export default function Translator() {
               )}
 
               {!sessionExpired && !translating && !error && !streamedText && (
-                txHistory.length > 0 ? (
-                  <div className="translator-history">
-                    <div className="translator-history-title">Recent</div>
-                    {txHistory.map(item => (
-                      <button
-                        key={item.id}
-                        className="translator-history-item"
-                        onClick={() => { setSource(item.source_text); setStreamedText(item.translated_text) }}
-                        type="button"
-                      >
-                        <span>{item.source_text}</span>
-                        <small>{item.translated_text}</small>
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="translator-muted">번역 결과</div>
-                )
+                <div className="translator-muted">번역 결과</div>
               )}
             </div>
           </div>

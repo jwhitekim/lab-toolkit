@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Loader2, Search, X } from 'lucide-react'
 import { SessionExpiredMessage } from '@/shared/components/SessionExpiredMessage'
+import { HistoryDropdown } from '@/shared/components/HistoryDropdown'
 import * as api from './api'
 import type { ContextorResult, ContextorHistoryItem } from './api'
 import './Contextor.css'
@@ -65,6 +66,18 @@ export default function Contextor() {
               <X size={15} />
             </button>
           )}
+          <HistoryDropdown
+            items={history}
+            label="최근 조회"
+            triggerClassName="contextor-icon-btn"
+            onSelect={item => { setQuery(item.query); setResult(item.result) }}
+            renderItem={item => (
+              <>
+                <div style={{ fontSize: 13, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.query}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-disabled)', marginTop: 3 }}>{item.result.hasMlUsage ? `${item.result.cases.length}개 맥락` : '일반 용법'}</div>
+              </>
+            )}
+          />
           <button
             className="contextor-lookup-btn"
             onClick={() => doLookup(query)}
@@ -116,24 +129,7 @@ export default function Contextor() {
           )}
 
           {!sessionExpired && !loading && !error && !result && (
-            history.length > 0 ? (
-              <div className="contextor-history">
-                <div className="contextor-history-title">Recent</div>
-                {history.map(item => (
-                  <button
-                    key={item.id}
-                    className="contextor-history-item"
-                    onClick={() => { setQuery(item.query); setResult(item.result) }}
-                    type="button"
-                  >
-                    <span>{item.query}</span>
-                    <small>{item.result.hasMlUsage ? `${item.result.cases.length}개 맥락` : '일반 용법'}</small>
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="contextor-muted">단어를 입력하면 ML/DL 맥락별로 펼쳐 보여줍니다.</div>
-            )
+            <div className="contextor-muted">단어를 입력하면 ML/DL 맥락별로 펼쳐 보여줍니다.</div>
           )}
         </div>
       </main>

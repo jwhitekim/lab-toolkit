@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FileText } from 'lucide-react'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
+import { HistoryDropdown } from '@/shared/components/HistoryDropdown'
 import * as api from './api'
 import type { Candidate, PaperResult, PaperHistoryItem } from './api'
 
@@ -90,7 +91,7 @@ export default function PaperAnalyzer() {
   }
 
   const searchBar = (
-    <div style={{ display: 'flex', marginLeft: 'auto',  width: '100%', maxWidth: isMobile ? undefined : 580 }}>
+    <div style={{ display: 'flex', marginLeft: 'auto', flex: 1, minWidth: 0, maxWidth: isMobile ? undefined : 580 }}>
       <input
         ref={inputRef}
         value={query}
@@ -114,8 +115,19 @@ export default function PaperAnalyzer() {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: C.main }}>
       {/* 검색 툴바 */}
-      <div style={{ padding: isMobile ? '8px 12px' : '12px 20px', borderBottom: `1px solid ${C.border}`, flexShrink: 0, background: C.main }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: isMobile ? '8px 12px' : '12px 20px', borderBottom: `1px solid ${C.border}`, flexShrink: 0, background: C.main }}>
         {searchBar}
+        <HistoryDropdown
+          items={history}
+          label="최근 검색"
+          onSelect={item => { setSidebarData(item.result); setState({ kind: 'result', data: item.result }) }}
+          renderItem={item => (
+            <>
+              <div style={{ fontSize: 13, fontWeight: 600, color: C.text, lineHeight: 1.4, wordBreak: 'keep-all' }}>{item.title}</div>
+              <div style={{ fontSize: 12, color: C.textMuted, marginTop: 3 }}>{new Date(item.created_at).toLocaleDateString('ko-KR')}</div>
+            </>
+          )}
+        />
       </div>
 
       {/* Body */}
@@ -142,23 +154,6 @@ export default function PaperAnalyzer() {
               <p style={{ color: C.textSub, fontSize: 14, lineHeight: 1.8, margin: 0 }}>논문을 검색하면<br />기본 정보와 저널 품질이<br />여기에 표시됩니다.</p>
             ) : (
               <SidebarContent data={sidebarData} />
-            )}
-            {history.length > 0 && (
-              <div style={{ marginTop: 28, paddingTop: 28, borderTop: `1px solid ${C.border}` }}>
-                <SideLabel>🕘 최근 검색</SideLabel>
-                {history.map(item => (
-                  <button
-                    key={item.id}
-                    onClick={() => { setSidebarData(item.result); setState({ kind: 'result', data: item.result }) }}
-                    style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0', borderBottom: `1px dashed ${C.border}` }}
-                    onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
-                    onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-                  >
-                    <div style={{ fontSize: '0.82rem', fontWeight: 600, color: C.text, lineHeight: 1.4, wordBreak: 'keep-all' }}>{item.title}</div>
-                    <div style={{ fontSize: '0.72rem', color: C.textMuted, marginTop: 2 }}>{new Date(item.created_at).toLocaleDateString('ko-KR')}</div>
-                  </button>
-                ))}
-              </div>
             )}
           </aside>
 
