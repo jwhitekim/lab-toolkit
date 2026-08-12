@@ -196,20 +196,22 @@
   }
 
   .shell-content {
-    padding-bottom: 88px;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
   }
 
-  /* 최신 iOS 스타일 — 화면 하단에 떠 있는 알약(capsule) 독. border-radius를
-     기기 곡률에 맞춰 미세조정할 필요가 없도록 9999px(진짜 캡슐, 양끝이
-     항상 정확한 반원)를 써서 둥근 정도가 어긋날 여지 자체를 없앤다. */
+  /* 최신 iOS 26(Liquid Glass) 스타일 — 화면 하단에 떠 있는 알약(capsule) 독.
+     좌우/하단 21pt는 실제 iOS 26 탭바 값을 그대로 재현했다고 밝힌 오픈소스
+     FabBar(github.com/ryanashcraft/FabBar)의 수치를 그대로 따름. border-radius는
+     기기 곡률에 맞춰 미세조정할 필요가 없도록 9999px(진짜 캡슐, 양끝이 항상
+     정확한 반원)를 써서 둥근 정도가 어긋날 여지 자체를 없앤다. */
   .shell-app-nav {
     position: fixed;
-    left: var(--space-lg);
-    bottom: max(16px, env(safe-area-inset-bottom, 16px));
+    left: 21px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 21px);
     transform: translateZ(0);
     will-change: backdrop-filter, transform;
     z-index: 100;
-    width: calc(100% - (var(--space-lg) * 2));
+    width: calc(100% - 42px);
     max-width: none;
     justify-content: space-evenly;
     padding: 3px 10px;
@@ -240,8 +242,8 @@
   }
 
   .shell-app-tab {
-    height: 40px;
-    width: 40px;
+    height: 44px;
+    width: 44px;
     flex: 0 0 auto;
     padding: 0;
     border-radius: 50%;
