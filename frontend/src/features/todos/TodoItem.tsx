@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Pencil } from 'lucide-react'
 import dayjs from 'dayjs'
 import type { Todo } from '@/shared/types'
+import { priorityStyle, priorityLabel } from './priority'
 
 interface Props {
   todo: Todo
@@ -9,18 +10,6 @@ interface Props {
   onSelect: () => void
   onToggle: () => void
   onEdit: (id: number, name: string) => void
-}
-
-const priorityStyle: Record<string, React.CSSProperties> = {
-  urgent: { background: 'var(--selected-bg)', color: 'var(--selected-text)' },
-  mid:    { background: 'var(--bg-additive)', color: 'var(--text-primary)' },
-  normal: { background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)' },
-}
-
-const priorityLabel: Record<string, string> = {
-  urgent: '긴급',
-  mid:    '보통',
-  normal: '낮음',
 }
 
 export default function TodoItem({ todo, selected, onSelect, onToggle, onEdit }: Props) {

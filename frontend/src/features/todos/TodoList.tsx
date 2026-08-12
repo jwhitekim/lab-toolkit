@@ -123,7 +123,7 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
 
         {done.length > 0 && (
           <>
-            <div className="px-3 pt-3 pb-1 text-[11px] text-gray-400 dark:text-gray-600">완료됨 ({done.length})</div>
+            <div className="px-3 pt-3 pb-1 text-[11px] text-gray-400">완료됨 ({done.length})</div>
             {done.map(todo => (
               <TodoItem
                 key={todo.id}
@@ -138,7 +138,7 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
         )}
 
         {todos.length === 0 && (
-          <div className="px-3 py-8 text-center text-[12px] text-gray-400 dark:text-gray-600">
+          <div className="px-3 py-8 text-center text-[12px] text-gray-400">
             할 일이 없습니다
           </div>
         )}
