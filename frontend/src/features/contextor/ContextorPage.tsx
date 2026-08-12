@@ -59,7 +59,6 @@ export default function Contextor() {
             onChange={e => setQuery(e.target.value.slice(0, MAX_CHARS))}
             onKeyDown={e => { if (e.key === 'Enter') doLookup(query) }}
             placeholder="단어를 입력하세요 (예: trials, interleave)"
-            autoFocus
           />
           {query && (
             <button className="contextor-icon-btn" onClick={handleClear} title="지우기" type="button">
