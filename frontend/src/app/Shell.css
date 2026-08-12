@@ -196,7 +196,7 @@
   }
 
   .shell-content {
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 96px);
   }
 
   /* 최신 iOS 26(Liquid Glass) 스타일 — 화면 하단에 떠 있는 알약(capsule) 독.
@@ -214,7 +214,7 @@
     width: calc(100% - 42px);
     max-width: none;
     justify-content: space-evenly;
-    padding: 3px 10px;
+    padding: 17px 10px;
     border-radius: var(--radius-pill);
     border: 1px solid rgba(255, 255, 255, 0.4);
     background: rgba(255, 255, 255, 0.65);
@@ -242,8 +242,8 @@
   }
 
   .shell-app-tab {
-    height: 44px;
-    width: 44px;
+    height: 28px;
+    width: 28px;
     flex: 0 0 auto;
     padding: 0;
     border-radius: 50%;
@@ -267,8 +267,8 @@
   }
 
   .shell-app-tab svg {
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
     transition: fill 0.25s ease, transform 0.25s ease;
   }
 
