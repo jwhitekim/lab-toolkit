@@ -35,17 +35,6 @@ FastAPI 루트(backend/main.py)가 5개 서브앱을 마운트하는 SPA 구조.
 | AI_PROVIDER          | 전 모듈 (backend/app/ai_provider.py, "claude"\|"gemini", 기본 claude) |
 | GEMINI_API_KEY       | 전 모듈 (AI_PROVIDER=gemini일 때) |
 
-## 브랜치 전략
-- main         : 프로덕션. 직접 커밋 금지. dev/staging PR 머지로만 업데이트.
-- dev/backend  : 백엔드 개발 전용
-- dev/frontend : 프론트엔드 개발 전용
-- dev/staging  : 통합 검증. backend + frontend 머지 후 로컬 확인 후 main PR.
-
-## 작업 흐름
-1. 기능 개발: dev/backend 또는 dev/frontend에서 작업 후 /push
-2. 통합 검증: dev/staging에 양쪽 머지 → 로컬 실행으로 확인
-3. 배포: dev/staging → main PR 머지 → GitHub Actions 자동 배포
-
 ## 프론트엔드 규칙
 - 백엔드 호출은 상대경로 사용 (/paper, /translate, /arch-trainer, /todo)
 - 별도 baseURL 환경변수 불필요 (동일 origin 서빙)
@@ -66,7 +55,7 @@ FastAPI 루트(backend/main.py)가 5개 서브앱을 마운트하는 SPA 구조.
 ## 버전 관리
 - 버전 범프: python bump.py [major|minor|patch]
 - 앱(frontend/package.json)과 익스텐션(extensions/paper/manifest.json) 동시 업데이트
-- 버전 범프는 dev/staging 브랜치에서만 실행
+- 버전 범프는 main 브랜치에서 직접 실행
 
 ## 스키마
 - 단일 스키마 파일: backend/schema.sql
@@ -108,12 +97,12 @@ ML/DL/CV/NLP 논문 문장·구·용어를 자연스러운 한국어로 번역�
 - Supabase 클라이언트를 `backend.app.database.get_supabase()`가 아니라 `contextor_api.py` 내부에서 직접 생성 (다른 서브앱과의 사소한 불일치, 동작엔 문제 없음)
 
 ## 브랜치 전략
-- main : 프로덕션. 직접 커밋 금지. dev → main PR로만 업데이트.
-- dev  : 개발 전용. 백엔드/프론트엔드 구분 없이 모든 작업.
+- main만 사용. 1인 개발이므로 브랜치 분리 없이 main에 직접 커밋·푸시.
+- dev 브랜치는 사용하지 않음 (과거 운영되다 방치되어 폐기됨).
 
 ## 작업 흐름
-1. dev에서 작업 후 /push
-2. dev → main PR 머지 → GitHub Actions 자동 배포
+1. main에서 작업 후 /push
+2. 푸시 시 GitHub Actions 자동 배포
 
 ## 자기 갱신 규칙
 - 레포 루트의 이 CLAUDE.md 하나만 맥락 문서로 참고함 — 서브앱별 CLAUDE.md는 만들지 않음
