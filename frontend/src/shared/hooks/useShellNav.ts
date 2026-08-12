@@ -1,7 +1,6 @@
 import { createContext, useContext } from 'react'
 
 export type ActiveApp =
-  | 'home'
   | 'paper'
   | 'translate'
   | 'contextor'
@@ -15,5 +14,5 @@ interface ShellNav {
   setActive: (app: ActiveApp) => void
 }
 
-export const ShellNavContext = createContext<ShellNav>({ active: 'home', setActive: () => {} })
+export const ShellNavContext = createContext<ShellNav>({ active: 'todo', setActive: () => {} })
 export const useShellNav = () => useContext(ShellNavContext)

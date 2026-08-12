@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { Home, FileText, Globe, BookOpen, CheckSquare } from 'lucide-react'
+import { FileText, Globe, BookOpen, CheckSquare } from 'lucide-react'
 import { ShellNavContext, type ActiveApp } from '@/shared/hooks/useShellNav'
-import HomePage from '@/pages/HomePage'
 import { PaperAnalyzerPage } from '@/features/paper-analyzer'
 import { TranslatorPage } from '@/features/translator'
 import { ArchTrainerPage } from '@/features/arch-trainer'
@@ -18,7 +17,6 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { key: 'home',         label: 'Home',           Icon: Home },
   { key: 'paper',        label: 'Paper Analyzer', Icon: FileText },
   { key: 'translate',    label: 'Translator',     Icon: Globe },
   { key: 'contextor',    label: 'Contextor',      Icon: BookOpen },
@@ -38,15 +36,14 @@ const APP_TITLE: Partial<Record<ActiveApp, string>> = {
 }
 
 export default function Shell() {
-  const [active, setActive] = useState<ActiveApp>('home')
+  const [active, setActive] = useState<ActiveApp>('todo')
 
   useEffect(() => {
-    document.title = active === 'home' ? 'veloo' : (APP_TITLE[active] ?? 'veloo')
+    document.title = APP_TITLE[active] ?? 'veloo'
   }, [active])
 
   const content = (
     <>
-      {active === 'home'          && <HomePage />}
       {active === 'paper'         && <PaperAnalyzerPage />}
       {active === 'translate'     && <TranslatorPage />}
       {active === 'contextor'     && <ContextorPage />}
@@ -65,7 +62,7 @@ export default function Shell() {
             <button
               type="button"
               className="shell-brand"
-              onClick={() => setActive('home')}
+              onClick={() => setActive('todo')}
               aria-label="veloo home"
             >
               <span className="shell-brand-mark">
