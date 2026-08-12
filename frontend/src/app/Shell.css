@@ -55,7 +55,9 @@
 }
 
 .shell-brand-text {
-  font-family: 'Syne', var(--font-sans);
+  /* 아이콘 마크가 곡선 없이 각진 획으로만 이뤄져 있어, 둥글둥글한 Syne보다
+     각지고 기술적인 인상의 Space Grotesk가 마크와 더 어울림 */
+  font-family: 'Space Grotesk', var(--font-sans);
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -178,6 +180,10 @@
     min-height: 52px;
     gap: 10px;
     padding: 0 12px;
+    /* 독이 하단으로 빠지면서 이 줄엔 브랜드만 남으므로, 왼쪽에 붙이지 않고
+       바 전체 폭 기준 가운데로 둔다 */
+    grid-template-columns: 1fr;
+    justify-items: center;
   }
 
   .shell-brand {
@@ -190,42 +196,59 @@
   }
 
   .shell-content {
-    padding-bottom: calc(54px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: 88px;
   }
 
-  /* 인스타그램 스타일 — 화면 하단에 딱 붙는 전체 폭 바. 둥근 모서리/여백이 없어
-     기기 화면 모서리 굴곡과 어긋날 일이 없고, safe-area만큼 아래 패딩을 준다. */
+  /* 최신 iOS 스타일 — 화면 하단에 떠 있는 알약(capsule) 독. border-radius를
+     기기 곡률에 맞춰 미세조정할 필요가 없도록 9999px(진짜 캡슐, 양끝이
+     항상 정확한 반원)를 써서 둥근 정도가 어긋날 여지 자체를 없앤다. */
   .shell-app-nav {
     position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: var(--space-lg);
+    bottom: max(16px, env(safe-area-inset-bottom, 16px));
+    transform: translateZ(0);
+    will-change: backdrop-filter, transform;
     z-index: 100;
-    width: 100%;
+    width: calc(100% - (var(--space-lg) * 2));
     max-width: none;
     justify-content: space-evenly;
-    gap: 0;
-    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
-    border-radius: 0;
-    border: none;
-    border-top: 1px solid var(--border-subtle);
-    background: rgba(255, 255, 255, 0.92);
+    padding: 5px 10px;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.65);
+    isolation: isolate;
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow:
+      0 8px 30px rgba(0, 0, 0, 0.12),
+      0 2px 8px rgba(0, 0, 0, 0.06);
+    transition:
+      transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+      left 0.3s ease,
+      width 0.3s ease;
+  }
+
+  .shell-app-nav:has(.shell-app-tab:active) {
+    transform: translateZ(0) scale(0.97);
+    transition: transform 0.08s ease-out;
   }
 
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .shell-app-nav {
-      background: var(--bg-base);
+      background: rgba(255, 255, 255, 0.92);
     }
   }
 
   .shell-app-tab {
-    height: 42px;
-    flex: 1;
+    height: 48px;
+    width: 48px;
+    flex: 0 0 auto;
     padding: 0;
-    border-radius: var(--radius-sm);
-    transition: transform 0.15s ease, color 0.2s ease;
+    border-radius: 50%;
+    transition:
+      transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+      background-color 0.2s ease,
+      color 0.2s ease;
   }
 
   .shell-app-tab:hover {
@@ -233,7 +256,7 @@
   }
 
   .shell-app-tab:active {
-    transform: scale(0.88);
+    transform: scale(0.82);
     transition: transform 0.08s ease-out;
   }
 
@@ -242,16 +265,28 @@
   }
 
   .shell-app-tab svg {
-    width: 23px;
-    height: 23px;
+    width: 24px;
+    height: 24px;
+    transition: fill 0.25s ease, transform 0.25s ease;
+  }
+
+  @keyframes shellTabPop {
+    0%   { transform: scale(0.7); }
+    60%  { transform: scale(1.12); }
+    100% { transform: scale(1); }
   }
 
   .shell-app-tab.is-active {
     padding: 0;
     gap: 0;
-    background: transparent;
+    background: var(--bg-additive-hover);
     color: var(--text-primary);
     border-color: transparent;
     box-shadow: none;
+    animation: shellTabPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .shell-app-tab.is-active svg {
+    transform: scale(1.05);
   }
 }
