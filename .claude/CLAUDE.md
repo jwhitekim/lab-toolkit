@@ -1,7 +1,7 @@
 # veloo — CLAUDE.md
 
 ## 프로젝트 개요
-가천대 PRML Lab 연구실 도구 허브.
+개인 연구 허브 (가천대 PRML Lab 소속 연구자가 혼자 쓰는 개인용 도구, 랩 공용 도구 아님).
 FastAPI 루트(backend/main.py)가 5개 서브앱을 마운트하는 SPA 구조.
 배포: veloo.page (Docker + Cloudflare Tunnel, GitHub Actions 자동 배포)
 
