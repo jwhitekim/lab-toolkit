@@ -1,0 +1,54 @@
+.app-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.app-page-header-copy { min-width: 0; }
+
+.app-page-kicker {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.app-page-header h1 {
+  margin: 6px 0 5px;
+  color: var(--text-primary);
+  font-size: clamp(23px, 2.6vw, 31px);
+  font-weight: 650;
+  line-height: 1.18;
+  letter-spacing: -0.04em;
+}
+
+.app-page-header p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.app-page-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.app-page-badge > svg { width: 14px; height: 14px; }
+
+@media (max-width: 640px) {
+  .app-page-header { align-items: flex-start; margin-bottom: 18px; }
+  .app-page-header h1 { font-size: 22px; }
+  .app-page-badge { display: none; }
+}

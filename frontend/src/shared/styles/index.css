@@ -5,13 +5,17 @@
 /* ── Design system (YouTube-style) ────────────────────────── */
 :root {
   /* Colors */
+  --bg-canvas:          #f6f7f4;
   --bg-base:            #ffffff;
-  --bg-additive:        #f2f2f2;
-  --bg-additive-hover:  #e5e5e5;
-  --text-primary:       #0f0f0f;
-  --text-secondary:     #606060;
-  --text-disabled:      #909090;
-  --selected-bg:        #0f0f0f;
+  --bg-additive:        #f0f2ee;
+  --bg-additive-hover:  #e5e9e3;
+  --text-primary:       #1d2421;
+  --text-secondary:     #626b66;
+  --text-disabled:      #929a95;
+  --accent:             #2f6f5e;
+  --accent-hover:       #275b4e;
+  --accent-soft:        #e6f0ec;
+  --selected-bg:        #2f6f5e;
   --selected-text:      #ffffff;
   --border-subtle:      #e5e5e5;
 
@@ -31,10 +35,10 @@
 
   /* Typography */
   --font-sans:   "Roboto", "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif;
-  --fs-meta:     12px;
-  --fs-body:     14px;
-  --fs-title:    16px;
-  --fs-section:  20px;
+  --fs-meta:     11px;
+  --fs-body:     13px;
+  --fs-title:    15px;
+  --fs-section:  18px;
   --fw-regular:  400;
   --fw-medium:   500;
   --fw-semibold: 600;
@@ -59,18 +63,18 @@
   --c-header:     #ffffff;
   --c-border:     rgba(0, 0, 0, 0.07);
   --c-border-mid: rgba(0, 0, 0, 0.11);
-  --c-accent:     #0f0f0f;
-  --c-accent-dim: rgba(0, 0, 0, 0.08);
-  --c-accent-txt: #0f0f0f;
-  --c-text:       #0f0f0f;
-  --c-text-sub:   #606060;
-  --c-text-muted: #909090;
+  --c-accent:     #2f6f5e;
+  --c-accent-dim: #e6f0ec;
+  --c-accent-txt: #275b4e;
+  --c-text:       #1d2421;
+  --c-text-sub:   #626b66;
+  --c-text-muted: #929a95;
   --c-green:      #16763e;
   --c-green-dim:  rgba(22, 118, 62, 0.12);
   --c-error:      #c0392b;
 
-  --c-login-btn:      #0f0f0f;
-  --c-login-btn-off:  rgba(0, 0, 0, 0.30);
+  --c-login-btn:      #2f6f5e;
+  --c-login-btn-off:  rgba(47, 111, 94, 0.38);
   --c-login-btn-text: #ffffff;
   --c-error-dim:      rgba(192, 57, 43, 0.08);
 }
@@ -82,7 +86,8 @@
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background: var(--bg-base);
+  font-size: var(--fs-body);
+  background: var(--bg-canvas);
   color: var(--text-primary);
 }
 

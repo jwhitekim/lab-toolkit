@@ -1,3 +1,5 @@
+import { translate } from '@/shared/i18n'
+
 const BASE = '/model-review'
 
 export interface ExplanationJSON {
@@ -24,7 +26,7 @@ export async function explain(image: File): Promise<{ explanation: ExplanationJS
   const fd = new FormData()
   fd.append('image', image)
   const res = await fetch(`${BASE}/api/explain`, { method: 'POST', body: fd })
-  if (!res.ok) throw new Error(`설명 오류 (${res.status})`)
+  if (!res.ok) throw new Error(translate('reviewer.errors.explainFailed', { status: res.status }))
   const data = await res.json()
   if (data.error) throw new Error(data.error)
   return data
@@ -44,7 +46,7 @@ export async function feedback(
       history_id: historyId ?? null,
     }),
   })
-  if (!res.ok) throw new Error(`피드백 오류 (${res.status})`)
+  if (!res.ok) throw new Error(translate('reviewer.errors.feedbackFailed', { status: res.status }))
   const data = await res.json()
   if (data.error) throw new Error(data.error)
   return data

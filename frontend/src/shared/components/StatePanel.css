@@ -1,0 +1,45 @@
+.app-state-panel {
+  width: min(100%, 520px);
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 36px 24px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.app-state-icon {
+  width: 56px;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  border-radius: 18px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.app-state-icon svg { width: 25px; height: 25px; }
+.app-state-panel.is-loading .app-state-icon svg { animation: app-state-spin 0.8s linear infinite; }
+.app-state-panel.is-error .app-state-icon { background: var(--c-error-dim); color: var(--c-error); }
+.app-state-panel strong { color: var(--text-primary); font-size: 16px; }
+.app-state-panel p { max-width: 420px; margin: 7px 0 0; font-size: 13px; line-height: 1.6; }
+.app-state-action { margin-top: 16px; }
+
+.app-state-panel.is-compact {
+  min-height: 120px;
+  padding: 22px 12px;
+}
+.app-state-panel.is-compact .app-state-icon { width: 40px; height: 40px; margin-bottom: 10px; border-radius: 13px; }
+.app-state-panel.is-compact .app-state-icon svg { width: 19px; height: 19px; }
+.app-state-panel.is-compact strong { font-size: 13px; }
+
+@keyframes app-state-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .app-state-panel.is-loading .app-state-icon svg { animation-duration: 1.8s; }
+}

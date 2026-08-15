@@ -1,170 +1,27 @@
 import { useDndMonitor, useDroppable, useDraggable } from '@dnd-kit/core'
 import type { Todo } from '@/shared/types'
+import { useT } from '@/shared/i18n'
 
-const HOURS = Array.from({ length: 18 }, (_, i) => i + 6) // 06~23
-const DAYS = ['월', '화', '수', '목', '금', '토', '일']
-const SLOT_H = 48 // px per hour
+const HOURS = Array.from({ length: 18 }, (_, i) => i + 6)
+const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const
+const SLOT_H = 32
+function isoToLocal(iso: string) { return new Date(iso) }
+function cellId(day: number, hour: number) { return `cell-${day}-${hour}` }
 
-function isoToLocal(iso: string) {
-  return new Date(iso)
-}
-
-function cellId(day: number, hour: number) {
-  return `cell-${day}-${hour}`
-}
-
-interface EventBlockProps {
-  todo: Todo
-  dayIndex: number
-}
-
-function EventBlock({ todo, dayIndex }: EventBlockProps) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: `block-${todo.id}`,
-    data: { type: 'block', todo, dayIndex },
-  })
+function EventBlock({ todo, dayIndex }: { todo: Todo; dayIndex: number }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: `block-${todo.id}`, data: { type: 'block', todo, dayIndex } })
   if (!todo.start_time) return null
-  const start = isoToLocal(todo.start_time)
-  const end = todo.end_time ? isoToLocal(todo.end_time) : new Date(start.getTime() + 60 * 60 * 1000)
-  const startH = start.getHours() + start.getMinutes() / 60
-  const endH = end.getHours() + end.getMinutes() / 60
-  const top = (startH - 6) * SLOT_H
-  const height = Math.max((endH - startH) * SLOT_H, 20)
-
-  const priorityColor: Record<string, string> = {
-    urgent: '#a32d2d', mid: '#854f0b', normal: '#0f6e56',
-  }
-
-  return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      style={{
-        position: 'absolute',
-        top,
-        height,
-        left: 2,
-        right: 2,
-        background: priorityColor[todo.priority] ?? '#0f6e56',
-        color: '#fff',
-        borderRadius: 4,
-        fontSize: 11,
-        padding: '2px 4px',
-        overflow: 'hidden',
-        cursor: 'grab',
-        opacity: isDragging ? 0.4 : 1,
-        zIndex: 1,
-        lineHeight: 1.3,
-        userSelect: 'none',
-      }}
-      title={todo.name}
-    >
-      {todo.name}
-    </div>
-  )
+  const start = isoToLocal(todo.start_time); const end = todo.end_time ? isoToLocal(todo.end_time) : new Date(start.getTime() + 3600000)
+  const startH = start.getHours() + start.getMinutes() / 60; const endH = end.getHours() + end.getMinutes() / 60
+  const priorityColor: Record<string, string> = { urgent: '#b42318', mid: '#9a5b00', normal: 'var(--accent)' }
+  return <div ref={setNodeRef} {...listeners} {...attributes} style={{ position: 'absolute', top: (startH - 6) * SLOT_H, height: Math.max((endH - startH) * SLOT_H, 20), left: 2, right: 2, background: priorityColor[todo.priority] ?? 'var(--accent)', color: '#fff', borderRadius: 4, fontSize: 10, padding: '2px 4px', overflow: 'hidden', cursor: 'grab', opacity: isDragging ? 0.4 : 1, zIndex: 1, lineHeight: 1.3, userSelect: 'none' }} title={todo.name}>{todo.name}</div>
 }
+function DroppableCell({ id }: { id: string }) { const { setNodeRef, isOver } = useDroppable({ id }); return <div ref={setNodeRef} style={{ height: SLOT_H, borderBottom: '1px solid var(--border-subtle)', background: isOver ? 'color-mix(in srgb, var(--bg-additive) 60%, transparent)' : undefined, position: 'relative' }} /> }
 
-interface DroppableCellProps {
-  id: string
-  children?: React.ReactNode
-}
-
-function DroppableCell({ id, children }: DroppableCellProps) {
-  const { setNodeRef, isOver } = useDroppable({ id })
-  return (
-    <div
-      ref={setNodeRef}
-      style={{
-        height: SLOT_H,
-        borderBottom: '1px solid var(--border-subtle)',
-        background: isOver ? 'color-mix(in srgb, var(--bg-additive) 60%, transparent)' : undefined,
-        transition: 'background 0.1s',
-        position: 'relative',
-      }}
-    >
-      {children}
-    </div>
-  )
-}
-
-interface WeekGridProps {
-  weekStart: Date
-  events: Todo[]
-  onPlace: (id: number, start: string, end: string) => void
-  onMove: (id: number, start: string, end: string) => void
-}
-
-export default function WeekGrid({ weekStart, events, onPlace, onMove }: WeekGridProps) {
-  useDndMonitor({
-    onDragEnd(event) {
-      const { over, active } = event
-      if (!over) return
-      const overId = String(over.id)
-      if (!overId.startsWith('cell-')) return
-      const [, dayStr, hourStr] = overId.split('-')
-      const day = parseInt(dayStr)
-      const hour = parseInt(hourStr)
-      const cellDate = new Date(weekStart)
-      cellDate.setDate(cellDate.getDate() + day)
-      cellDate.setHours(hour, 0, 0, 0)
-      const endDate = new Date(cellDate.getTime() + 60 * 60 * 1000)
-      const start = cellDate.toISOString()
-      const end = endDate.toISOString()
-      const data = active.data.current
-      if (data?.type === 'unscheduled') {
-        onPlace(data.todo.id, start, end)
-      } else if (data?.type === 'block') {
-        onMove(data.todo.id, start, end)
-      }
-    },
-  })
-
-  const dayColumns = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(weekStart)
-    d.setDate(d.getDate() + i)
-    return d
-  })
-
-  const getEventsForDay = (dayIndex: number) => {
-    const d = dayColumns[dayIndex]
-    return events.filter(e => {
-      if (!e.start_time) return false
-      const s = isoToLocal(e.start_time)
-      return s.toDateString() === d.toDateString()
-    })
-  }
-
-  return (
-    <div style={{ display: 'flex', flex: 1, overflow: 'auto', minWidth: 0 }}>
-      {/* Time axis */}
-      <div style={{ width: 48, flexShrink: 0 }}>
-        <div style={{ height: 32 }} />
-        {HOURS.map(h => (
-          <div key={h} style={{ height: SLOT_H, fontSize: 10, color: 'var(--text-disabled)', paddingTop: 2, paddingRight: 4, textAlign: 'right' }}>
-            {h.toString().padStart(2, '0')}:00
-          </div>
-        ))}
-      </div>
-
-      {/* Day columns */}
-      {dayColumns.map((d, dayIndex) => (
-        <div key={dayIndex} style={{ flex: 1, minWidth: 80, borderLeft: '1px solid var(--border-subtle)' }}>
-          {/* Header */}
-          <div style={{ height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-subtle)' }}>
-            {DAYS[dayIndex]} {d.getDate()}
-          </div>
-          {/* Slots */}
-          <div style={{ position: 'relative' }}>
-            {HOURS.map(h => (
-              <DroppableCell key={h} id={cellId(dayIndex, h)} />
-            ))}
-            {getEventsForDay(dayIndex).map(ev => (
-              <EventBlock key={ev.id} todo={ev} dayIndex={dayIndex} />
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  )
+interface WeekGridProps { weekStart: Date; events: Todo[]; durationHours: number; visibleDayIndexes?: number[]; onPlace: (id: number, start: string, end: string) => void; onMove: (id: number, start: string, end: string) => void; onUnschedule: (id: number) => void }
+export default function WeekGrid({ weekStart, events, durationHours, visibleDayIndexes, onPlace, onMove, onUnschedule }: WeekGridProps) {
+  const t = useT(); const days = DAY_KEYS.map(key => t(`calendar.days.${key}`)); const dayIndexes = visibleDayIndexes ?? Array.from({ length: 7 }, (_, i) => i)
+  useDndMonitor({ onDragEnd({ over, active }) { if (!over) return; const overId = String(over.id); const data = active.data.current; if (overId === 'unscheduled-drop' && data?.type === 'block') { onUnschedule(data.todo.id); return }; if (!overId.startsWith('cell-')) return; const [, dayStr, hourStr] = overId.split('-'); const date = new Date(weekStart); date.setDate(date.getDate() + Number(dayStr)); date.setHours(Number(hourStr), 0, 0, 0); const end = new Date(date.getTime() + durationHours * 3600000); const startIso = date.toISOString(); const endIso = end.toISOString(); if (data?.type === 'unscheduled') onPlace(data.todo.id, startIso, endIso); else if (data?.type === 'block') onMove(data.todo.id, startIso, endIso) } })
+  const columns = dayIndexes.map(dayIndex => { const date = new Date(weekStart); date.setDate(date.getDate() + dayIndex); return { date, dayIndex } })
+  return <div className={`cal-time-grid${visibleDayIndexes ? ' is-single-day' : ''}`}><div style={{ width: 44, flexShrink: 0 }}><div style={{ height: 36 }} />{HOURS.map(hour => <div key={hour} style={{ height: SLOT_H, fontSize: 9, color: 'var(--text-disabled)', paddingTop: 2, paddingRight: 4, textAlign: 'right' }}>{String(hour).padStart(2, '0')}:00</div>)}</div>{columns.map(({ date, dayIndex }) => { const dayEvents = events.filter(event => event.start_time && isoToLocal(event.start_time).toDateString() === date.toDateString()); const today = date.toDateString() === new Date().toDateString(); return <div key={dayIndex} style={{ flex: 1, minWidth: visibleDayIndexes ? 0 : 92, borderLeft: '1px solid var(--border-subtle)', background: today ? 'color-mix(in srgb, var(--accent-soft) 34%, transparent)' : undefined }}><div style={{ height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 650, color: today ? 'var(--accent)' : 'var(--text-secondary)', borderBottom: '1px solid var(--border-subtle)', background: today ? 'var(--accent-soft)' : 'var(--bg-base)' }}>{days[dayIndex]} {date.getDate()}</div><div style={{ position: 'relative' }}>{HOURS.map(hour => <DroppableCell key={hour} id={cellId(dayIndex, hour)} />)}{dayEvents.map(event => <EventBlock key={event.id} todo={event} dayIndex={dayIndex} />)}</div></div> })}</div>
 }

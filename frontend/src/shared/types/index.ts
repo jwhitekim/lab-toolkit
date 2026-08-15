@@ -19,9 +19,9 @@ export interface Todo {
   created_at: string
   updated_at: string
   steps: Step[]
-  start_time?: string
-  end_time?: string
-  remind_at?: string
+    start_time?: string | null
+    end_time?: string | null
+    remind_at?: string | null
   reminded?: boolean
   completed_at?: string
 }

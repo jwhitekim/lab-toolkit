@@ -130,10 +130,13 @@ def create_todo(todo_in: schemas.TodoCreate, sb: Client = Depends(get_supabase),
 
 @router.patch("/{todo_id}", response_model=schemas.TodoOut)
 def update_todo(todo_id: int, todo_in: schemas.TodoUpdate, sb: Client = Depends(get_supabase)):
-    data = todo_in.model_dump(exclude_none=True)
+    # Explicit null values clear calendar assignments; omitted fields remain unchanged.
+    data = todo_in.model_dump(exclude_unset=True)
     if "start_time" in data:
         data["reminded"] = False
-        if "remind_at" not in data:
+        if todo_in.start_time is None:
+            data["remind_at"] = None
+        elif "remind_at" not in data:
             st = todo_in.start_time
             if st.tzinfo is None:
                 st = st.replace(tzinfo=KST)

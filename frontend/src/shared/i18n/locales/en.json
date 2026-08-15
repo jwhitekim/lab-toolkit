@@ -1,0 +1,334 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "delete": "Delete",
+    "clear": "Clear",
+    "recentHistory": "Recent History",
+    "sessionExpired": "Session has expired.",
+    "loginAgain": "Log in again"
+  },
+  "shell": {
+    "home": "Veloo Home",
+    "nav": {
+      "todo": "Tasks",
+      "calendar": "Calendar",
+      "paper": "Papers",
+      "translate": "Translate",
+      "contextor": "Concepts",
+      "model-review": "Architecture"
+    },
+    "workspace": {
+      "plan": "Plan",
+      "research": "Research",
+      "model-lab": "Model Lab"
+    },
+    "workspaceMobile": {
+      "plan": "Plan",
+      "research": "Research",
+      "model-lab": "Model Lab"
+    },
+    "workspaceAria": "Workspace",
+    "navMobile": {
+      "todo": "Todo",
+      "calendar": "Cal",
+      "paper": "Paper",
+      "translate": "Trans",
+      "contextor": "Context",
+      "model-review": "Model"
+    },
+    "language": "Language",
+    "weeklyReview": "Weekly Review"
+  },
+  "login": {
+    "tagline": "Enter with intent",
+    "enter": "Enter",
+    "tabLogin": "Log In",
+    "tabRegister": "Create Account",
+    "registeredMessage": "Your registration request has been submitted.",
+    "registeredNote": "You can log in after administrator approval.",
+    "backToLogin": "Back to Login",
+    "usernamePlaceholder": "Username",
+    "passwordPlaceholder": "Password",
+    "checking": "Checking...",
+    "processing": "Processing...",
+    "loginButton": "Log In",
+    "registerButton": "Register",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign Up",
+    "haveAccount": "Already have an account?",
+    "loginLink": "Log In",
+    "errors": {
+      "pendingApproval": "Awaiting administrator approval.",
+      "loginFailed": "Login failed.",
+      "registerFailed": "Registration failed.",
+      "serverError": "A server error occurred."
+    }
+  },
+  "paper": {
+    "searching": "Searching",
+    "unsupportedUrl": "DOI / arXiv ID not found in URL. Please search by paper title.",
+    "unknownError": "Unknown error",
+    "analyzing": "Analyzing (takes about 10–20 seconds)",
+    "searchPlaceholder": "Enter paper title or URL",
+    "clearQueryAria": "Clear search query",
+    "recentSearch": "Recent searches",
+    "analyzeButton": "Analyze",
+    "heroTitle": "Find papers and grasp the core insights quickly",
+    "heroDescription": "Verify theoretical summaries and journal quality with just a title, DOI, or arXiv URL.",
+    "aiBadge": "AI Theory Analysis",
+    "emptyTitle": "Search for a paper to analyze",
+    "emptyDescription": "Get a quick overview of the research problem, approach, conclusion, and journal credibility before diving into a long paper.",
+    "workflowAria": "Analysis workflow",
+    "workflow": {
+      "identifyTitle": "Identify Paper",
+      "identifyDesc": "Finds the correct paper from the title or URL.",
+      "analyzeTitle": "Core Analysis",
+      "analyzeDesc": "Summarizes the problem, method, and conclusion in an easy-to-read structure.",
+      "qualityTitle": "Quality Check",
+      "qualityDesc": "Compares journal rankings and citation metrics."
+    },
+    "sidebar": {
+      "cited": "{{count}} citations",
+      "noOriginalLink": "No original link",
+      "noData": "No data",
+      "noQuartile": "No Q-quartile ranking"
+    },
+    "candidates": {
+      "header": "🔍 Search Results — Select a paper to analyze",
+      "untitled": "(Untitled)",
+      "unknownVenue": "Unknown venue",
+      "meta": "{{year}} · {{venue}} · {{count}} citations"
+    },
+    "result": {
+      "theoryAnalysis": "🧠 Theoretical Analysis",
+      "relevance": "Relevance {{value}}",
+      "problem": "Problem",
+      "method": "Method",
+      "conclusion": "Conclusion",
+      "authorInfo": "👤 Author Info",
+      "noAuthorInfo": "No author info",
+      "profile": "Profile ↗",
+      "cited": "{{count}} citations"
+    },
+    "loaderDescription": "Please wait a moment. Gathering the analysis results.",
+    "errorTitle": "Failed to complete the analysis",
+    "errors": {
+      "sessionExpired": "Session expired. Please log in again.",
+      "searchFailed": "Search error",
+      "analyzeFailed": "Analysis error",
+      "pdfAnalyzeFailed": "PDF analysis error"
+    }
+  },
+  "translator": {
+    "heroTitle": "Seamless translation that flows naturally",
+    "heroDescription": "Translate English papers and technical documents into natural Korean in real-time.",
+    "sourceLabel": "Source",
+    "sourceLanguage": "English",
+    "resultLabel": "Translation",
+    "resultLanguage": "Korean",
+    "textPlaceholder": "Enter text",
+    "autoTranslate": "Auto translate",
+    "recentTranslation": "Recent translations",
+    "copied": "Copied",
+    "copy": "Copy",
+    "translating": "Translating",
+    "translatingDesc": "Translating while preserving the natural flow of sentences.",
+    "errorTitle": "Translation failed",
+    "resultEmptyTitle": "Translation Result",
+    "resultEmptyDesc": "Type English on the left to start automatically.",
+    "quickStart": "Quick Start",
+    "autoTranslateHint": "Translates automatically as you type",
+    "feature": {
+      "autoDetectTitle": "Auto-detect",
+      "autoDetectDesc": "Starts translating as soon as you stop typing.",
+      "streamingTitle": "Real-time streaming",
+      "streamingDesc": "Read long sentences instantly without waiting.",
+      "historyTitle": "Translation History",
+      "historyDesc": "Recall and compare your recent translation history."
+    },
+    "errors": {
+      "translateFailed": "Translation error ({{status}})",
+      "noStreaming": "Streaming is not supported in this environment.",
+      "dictionaryFailed": "Dictionary error"
+    }
+  },
+  "reviewer": {
+    "sections": {
+      "overview": "Overall Flow",
+      "modules": "Modules",
+      "data_flow": "Data Flow",
+      "contribution": "Core Contribution"
+    },
+    "feedback": {
+      "correct": "Correct understandings",
+      "missing": "Misunderstood or missing parts",
+      "suggestion": "Suggestions for improvement"
+    },
+    "enterDescriptionError": "Please enter a description.",
+    "heroTitle": "Learn by explaining the model structure",
+    "heroDescription": "Analyze architecture diagrams, explain them in your own words, and test your understanding with AI feedback.",
+    "historyBadge": "{{count}} analysis history",
+    "requestFailedTitle": "Failed to complete the request",
+    "recentAnalysis": "Recent Analysis",
+    "untitledImage": "Image",
+    "uploadTitle": "Upload Architecture Diagram",
+    "uploadHintBold": "Click or drag an image",
+    "uploadHintSuffix": " to upload",
+    "uploadFormats": "PNG, JPG, WEBP — up to 10MB",
+    "previewAlt": "Preview",
+    "reselect": "Select again",
+    "analyzingButton": "AI is analyzing...",
+    "getExplanationButton": "Get AI Explanation",
+    "guideAria": "Learning Guide",
+    "guide": {
+      "analyzeTitle": "Structure Analysis",
+      "analyzeDesc": "Identify modules and data flows from the architecture diagram.",
+      "explainTitle": "Self-Explanation",
+      "explainDesc": "Put your understanding into your own words to spot any gaps.",
+      "feedbackTitle": "Get Feedback",
+      "feedbackDesc": "Compare what you got right and what you missed with AI feedback."
+    },
+    "errors": {
+      "explainFailed": "Explanation error ({{status}})",
+      "feedbackFailed": "Feedback error ({{status}})"
+    },
+    "explainYourselfTitle": "Explain It Yourself",
+    "readyPrompt": "Ready. Try explaining it in your own words first.",
+    "textareaPlaceholder": "This model overall... and each module...",
+    "generatingFeedback": "Generating feedback...",
+    "getFeedbackButton": "Get Feedback",
+    "resultTitle": "Analysis Results",
+    "aiExplanationLabel": "AI Explanation",
+    "feedbackLabel": "Feedback",
+    "tryAgainHint": "Think you can explain it better? Try again.",
+    "explainAgain": "Explain again",
+    "newUpload": "Upload new paper"
+  },
+  "todo": {
+    "priority": {
+      "urgent": "Urgent",
+      "mid": "Medium",
+      "normal": "Low"
+    },
+    "filters": {
+      "today": "Today",
+      "week": "This Week",
+      "all": "All",
+      "memo": "Memo"
+    },
+    "filterAriaLabel": "Todo filters",
+    "addButton": "Add",
+    "addTodoFooter": "Add task",
+    "activeCount": "{{count}} in progress",
+    "noTodos": "No tasks",
+    "completedToggle": "Completed",
+    "loading": "Loading tasks",
+    "modal": {
+      "title": "Add Task",
+      "namePlaceholder": "What needs to be done?",
+      "memoPlaceholder": "Add context or background — feedback, notes, previous discussions, etc.",
+      "priorityLabel": "Priority",
+      "deadlineLabel": "Deadline",
+      "save": "Save"
+    },
+    "overview": {
+      "heroTitle": "Your day at a glance",
+      "heroDescription": "Select a task to view detailed steps and AI action strategies.",
+      "aiBadge": "AI Action Plan",
+      "inProgress": "In progress",
+      "urgentItems": "Urgent items",
+      "completionRate": "Completion rate",
+      "nextTodo": "Next task",
+      "selectFromList": "Select from the list to view details",
+      "emptyActive": "No tasks in progress. Try adding a new task."
+    },
+    "detail": {
+      "backToList": "← Back to list",
+      "memoPlaceholder": "Memo · Context",
+      "memoContext": "Memo · Context",
+      "stepsCompleted": "Steps {{done}}/{{total}} completed",
+      "aiSteps": "AI Action Steps",
+      "regenerating": "Regenerating...",
+      "generating": "Generating...",
+      "aiRegenerate": "AI Regenerate",
+      "addStepPlaceholder": "+ Add step",
+      "autoGenerateSteps": "Auto-generate steps with AI",
+      "aiStrategy": "AI Strategy",
+      "regenerate": "Regenerate",
+      "noStrategy": "No strategy available yet. Try regenerating.",
+      "deleteConfirm": "Delete this task?"
+    },
+    "errors": {
+      "toggleDoneFailed": "An error occurred while updating completion status."
+    }
+  },
+  "calendar": {
+    "heroTitle": "Plan your weekly schedule",
+    "heroDescription": "Drag unscheduled tasks into time slots and organize your schedule at a glance.",
+    "eventsBadge": "{{count}} events",
+    "prevWeek": "Prev week",
+    "nextWeek": "Next week",
+    "todoListButton": "Task List",
+    "durationLabel": "Duration",
+    "durationHours": "{{count}} hours",
+    "removeScheduleHint": "Unschedule",
+    "weekDaysLabel": "Choose a day",
+    "weekDaysLabel": "Choose a day",
+    "unscheduledTitle": "Unscheduled Tasks",
+    "loadingEvents": "Loading events",
+    "allPlaced": "All tasks scheduled",
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    }
+  },
+  "weeklyReview": {
+    "todoListButton": "Task List",
+    "loading": "Loading...",
+    "loadError": "Failed to load data.",
+    "stats": {
+      "completed": "Completed",
+      "created": "Created",
+      "completionRate": "Completion Rate",
+      "overdue": "Overdue"
+    },
+    "priorityBreakdown": "Status by Priority",
+    "overdueList": "Overdue Tasks ({{count}})"
+  },
+  "contextor": {
+    "heroTitle": "Understand technical terms in context",
+    "heroDescription": "Go beyond dictionary definitions. Compare how terms are actually used in ML/DL papers and implementations.",
+    "recentLookups": "Recent lookups {{count}}",
+    "searchPlaceholder": "Enter a word (e.g., trials, interleave)",
+    "recentLookupsLabel": "Recent Lookups",
+    "lookupButton": "Look up",
+    "analyzing": "Analyzing context",
+    "analyzingDesc": "Examining papers and implementation examples.",
+    "lookupFailedTitle": "Failed to look up term",
+    "contextsCount": "{{count}} contexts",
+    "generalUsage": "General usage",
+    "noMlUsage": "No specialized ML usage.",
+    "emptyTitle": "What usage examples are you looking for?",
+    "emptyDescription": "Get started with suggested terms or enter a word in the search box above.",
+    "suggestionsAria": "Suggested terms",
+    "guide": {
+      "implementationTitle": "Implementation Context",
+      "implementationDesc": "Meaning in code and model descriptions",
+      "paperTitle": "Paper Context",
+      "paperDesc": "Common usage patterns in research writing",
+      "comparisonTitle": "Usage Comparison",
+      "comparisonDesc": "Compare English examples with natural Korean translations"
+    },
+    "errors": {
+      "lookupFailed": "Lookup error ({{status}})"
+    }
+  }
+}
