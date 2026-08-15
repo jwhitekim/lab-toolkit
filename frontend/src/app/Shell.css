@@ -152,6 +152,10 @@
   outline-offset: 2px;
 }
 
+.shell-mobile-dock {
+  display: none;
+}
+
 .shell-content {
   flex: 1;
   min-width: 0;
@@ -196,99 +200,145 @@
   }
 
   .shell-content {
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 96px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 104px);
   }
 
-  /* 최신 iOS 26(Liquid Glass) 스타일 — 화면 하단에 떠 있는 알약(capsule) 독.
-     좌우/하단 21pt는 실제 iOS 26 탭바 값을 그대로 재현했다고 밝힌 오픈소스
-     FabBar(github.com/ryanashcraft/FabBar)의 수치를 그대로 따름. border-radius는
-     기기 곡률에 맞춰 미세조정할 필요가 없도록 9999px(진짜 캡슐, 양끝이 항상
-     정확한 반원)를 써서 둥근 정도가 어긋날 여지 자체를 없앤다. */
   .shell-app-nav {
-    position: fixed;
-    left: 21px;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 21px);
-    transform: translateZ(0);
-    will-change: backdrop-filter, transform;
-    z-index: 100;
-    width: calc(100% - 42px);
-    max-width: none;
-    justify-content: space-evenly;
-    padding: 17px 10px;
-    border-radius: var(--radius-pill);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    background: rgba(255, 255, 255, 0.65);
-    isolation: isolate;
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    box-shadow:
-      0 8px 30px rgba(0, 0, 0, 0.12),
-      0 2px 8px rgba(0, 0, 0, 0.06);
-    transition:
-      transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-      left 0.3s ease,
-      width 0.3s ease;
-  }
-
-  .shell-app-nav:has(.shell-app-tab:active) {
-    transform: translateZ(0) scale(0.97);
-    transition: transform 0.08s ease-out;
-  }
-
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .shell-app-nav {
-      background: rgba(255, 255, 255, 0.92);
-    }
-  }
-
-  .shell-app-tab {
-    height: 28px;
-    width: 28px;
-    flex: 0 0 auto;
-    padding: 0;
-    border-radius: 50%;
-    transition:
-      transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-      background-color 0.2s ease,
-      color 0.2s ease;
-  }
-
-  .shell-app-tab:hover {
-    background: transparent;
-  }
-
-  .shell-app-tab:active {
-    transform: scale(0.82);
-    transition: transform 0.08s ease-out;
-  }
-
-  .shell-app-tab span {
     display: none;
   }
 
-  .shell-app-tab svg {
-    width: 21px;
-    height: 21px;
-    transition: fill 0.25s ease, transform 0.25s ease;
+  /* 실제 iOS 26의 떠 있는 탭바 간격에 맞춘 모바일 전용 글래스 독. */
+  .shell-mobile-dock {
+    position: fixed;
+    left: 21px;
+    right: 21px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 21px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
   }
 
-  @keyframes shellTabPop {
-    0%   { transform: scale(0.7); }
-    60%  { transform: scale(1.12); }
-    100% { transform: scale(1); }
+  .shell-mobile-tabs {
+    width: 100%;
+    height: 58px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 9999px;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.56),
+      rgba(242, 242, 247, 0.32)
+    );
+    -webkit-backdrop-filter: blur(24px) saturate(175%);
+    backdrop-filter: blur(24px) saturate(175%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.72),
+      inset 0 -0.5px 0 rgba(0, 0, 0, 0.08),
+      0 5px 20px rgba(0, 0, 0, 0.13);
+    pointer-events: auto;
+    overflow: hidden;
+    touch-action: pan-y;
   }
 
-  .shell-app-tab.is-active {
-    padding: 0;
-    gap: 0;
-    background: var(--bg-additive-hover);
+  .shell-mobile-tabs-track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+  }
+
+  .shell-mobile-tab-indicator {
+    position: absolute;
+    top: 4px;
+    left: 0;
+    height: 50px;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.48);
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.58),
+      rgba(255, 255, 255, 0.24)
+    );
+    -webkit-backdrop-filter: blur(8px) saturate(160%);
+    backdrop-filter: blur(8px) saturate(160%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.72),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+      0 2px 8px rgba(0, 0, 0, 0.14);
+    pointer-events: none;
+    transition:
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .shell-mobile-tabs.is-dragging .shell-mobile-tab-indicator {
+    transition: none;
+  }
+
+  .shell-mobile-tab {
+    position: relative;
+    z-index: 1;
+    width: 25%;
+    height: 50px;
+    flex: 1 1 25%;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 4px;
+    border: 0;
+    border-radius: 9999px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition:
+      color 0.2s ease,
+      transform 0.12s ease;
+  }
+
+  .shell-mobile-tab:active {
+    transform: scale(0.92);
+  }
+
+  .shell-mobile-tab svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.35;
+  }
+
+  .shell-mobile-tab span {
+    max-width: 62px;
+    overflow: hidden;
+    font-size: 10px;
+    font-weight: var(--fw-medium);
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .shell-mobile-tab.is-active {
     color: var(--text-primary);
-    border-color: transparent;
-    box-shadow: none;
-    animation: shellTabPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  .shell-app-tab.is-active svg {
-    transform: scale(1.05);
+  .shell-mobile-tab:focus-visible {
+    outline: 2px solid rgba(0, 0, 0, 0.72);
+    outline-offset: 2px;
+  }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .shell-mobile-tabs {
+      background: rgba(246, 246, 248, 0.94);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shell-mobile-tabs,
+    .shell-mobile-tab-indicator {
+      transition-duration: 0.01ms;
+    }
   }
 }
