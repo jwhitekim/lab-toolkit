@@ -28,6 +28,10 @@ export default function TodoPage() {
 
   const selectedTodo = todos.find(t => t.id === selectedId) ?? null
 
+  useEffect(() => {
+    if (!isMobile && selectedId === null && todos.length > 0) setSelectedId(todos[0].id)
+  }, [isMobile, selectedId, todos])
+
   // 모바일은 목록→상세가 실제로는 같은 화면 안에서 상태만 바뀌는 거라, 브라우저
   // 히스토리에 아무 흔적이 없음 — 스와이프 뒤로가기/하드웨어 뒤로가기가 안 먹힘.
   // 상세를 열 때 history entry를 하나 쌓고, popstate(스와이프 포함)로 닫히게 함.
@@ -205,6 +209,25 @@ export default function TodoPage() {
     <>
     <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
       <div className="flex flex-1 overflow-hidden">
+        {loading && !selectedTodo ? (
+          <div className="flex-1 flex items-center justify-center" style={{ background: 'var(--bg-base)' }}>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>불러오는 중...</span>
+          </div>
+        ) : (
+          <FocusPanel
+            todo={selectedTodo}
+            {...focusPanelProps}
+          />
+        )}
+
+        <div
+          onMouseDown={handleResizerMouseDown}
+          className="w-1 flex-shrink-0 cursor-col-resize transition-colors"
+          style={{ background: 'var(--border-subtle)' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--bg-additive-hover)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--border-subtle)' }}
+        />
+
         <TodoList
           todos={todos}
           filter={filter}
@@ -216,25 +239,6 @@ export default function TodoPage() {
           onAdd={handleAdd}
           width={listWidth}
         />
-
-        <div
-          onMouseDown={handleResizerMouseDown}
-          className="w-1 flex-shrink-0 cursor-col-resize transition-colors"
-          style={{ background: 'var(--border-subtle)' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--bg-additive-hover)' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--border-subtle)' }}
-        />
-
-        {loading && !selectedTodo ? (
-          <div className="flex-1 flex items-center justify-center" style={{ background: 'var(--bg-base)' }}>
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>불러오는 중...</span>
-          </div>
-        ) : (
-          <FocusPanel
-            todo={selectedTodo}
-            {...focusPanelProps}
-          />
-        )}
       </div>
     </div>
     {toast}
