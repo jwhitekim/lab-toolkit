@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FileText } from 'lucide-react'
+import { FileText, Search, X } from 'lucide-react'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { HistoryDropdown } from '@/shared/components/HistoryDropdown'
 import * as api from './api'
 import type { Candidate, PaperResult, PaperHistoryItem } from './api'
+import './PaperAnalyzer.css'
 
 type MainState =
   | { kind: 'idle' }
@@ -34,7 +35,6 @@ export default function PaperAnalyzer() {
   const [query, setQuery] = useState('')
   const [state, setState] = useState<MainState>({ kind: 'idle' })
   const [sidebarData, setSidebarData] = useState<PaperResult | null>(null)
-  const [btnHover, setBtnHover] = useState(false)
   const [history, setHistory] = useState<PaperHistoryItem[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -45,7 +45,6 @@ export default function PaperAnalyzer() {
   const doSearch = async () => {
     const q = query.trim()
     if (!q) return
-    setQuery('')
     setState({ kind: 'loading', msg: '검색 중' })
     setSidebarData(null)
     try {
@@ -91,23 +90,52 @@ export default function PaperAnalyzer() {
   }
 
   const searchBar = (
-    <div style={{ display: 'flex', marginLeft: 'auto', flex: 1, minWidth: 0, maxWidth: isMobile ? undefined : 580 }}>
+    <div className="paper-searchbar">
+      <Search size={16} className="paper-search-icon" />
       <input
         ref={inputRef}
+        className="paper-search-input"
         value={query}
         onChange={e => setQuery(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter') doSearch() }}
         placeholder="논문 제목 또는 URL 입력"
         autoFocus={!isMobile}
-        style={{ flex: 1, background: C.card, border: `1px solid ${C.border}`, borderRight: 'none', borderRadius: '9999px 0 0 9999px', padding: '8px 16px', fontSize: 16, color: C.text, outline: 'none', fontFamily: 'inherit' }}
-        onFocus={e => (e.currentTarget.style.borderColor = '#aaaaaa')}
-        onBlur={e => (e.currentTarget.style.borderColor = C.border)}
+      />
+      {query && (
+        <button
+          className="paper-search-icon-btn"
+          onClick={() => {
+            setQuery('')
+            inputRef.current?.focus()
+          }}
+          title="지우기"
+          aria-label="검색어 지우기"
+          type="button"
+        >
+          <X size={15} />
+        </button>
+      )}
+      <HistoryDropdown
+        items={history}
+        label="최근 검색"
+        triggerClassName="paper-search-icon-btn"
+        onSelect={item => {
+          setQuery(item.title)
+          setSidebarData(item.result)
+          setState({ kind: 'result', data: item.result })
+        }}
+        renderItem={item => (
+          <>
+            <div style={{ fontSize: 13, fontWeight: 600, color: C.text, lineHeight: 1.4, wordBreak: 'keep-all' }}>{item.title}</div>
+            <div style={{ fontSize: 12, color: C.textMuted, marginTop: 3 }}>{new Date(item.created_at).toLocaleDateString('ko-KR')}</div>
+          </>
+        )}
       />
       <button
+        className="paper-analyze-btn"
         onClick={doSearch}
-        onMouseEnter={() => setBtnHover(true)}
-        onMouseLeave={() => setBtnHover(false)}
-        style={{ background: btnHover ? '#333333' : 'var(--selected-bg)', color: 'var(--selected-text)', border: 'none', borderRadius: '0 9999px 9999px 0', padding: '8px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer', transition: 'background 0.15s', flexShrink: 0, fontFamily: 'inherit' }}
+        disabled={!query.trim() || state.kind === 'loading'}
+        type="button"
       >분석</button>
     </div>
   )
@@ -115,19 +143,8 @@ export default function PaperAnalyzer() {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: C.main }}>
       {/* 검색 툴바 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: isMobile ? '8px 12px' : '12px 20px', borderBottom: `1px solid ${C.border}`, flexShrink: 0, background: C.main }}>
+      <div className="paper-search-toolbar">
         {searchBar}
-        <HistoryDropdown
-          items={history}
-          label="최근 검색"
-          onSelect={item => { setSidebarData(item.result); setState({ kind: 'result', data: item.result }) }}
-          renderItem={item => (
-            <>
-              <div style={{ fontSize: 13, fontWeight: 600, color: C.text, lineHeight: 1.4, wordBreak: 'keep-all' }}>{item.title}</div>
-              <div style={{ fontSize: 12, color: C.textMuted, marginTop: 3 }}>{new Date(item.created_at).toLocaleDateString('ko-KR')}</div>
-            </>
-          )}
-        />
       </div>
 
       {/* Body */}
