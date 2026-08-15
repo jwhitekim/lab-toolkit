@@ -67,7 +67,7 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
             onChange={e => setName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSave()}
             placeholder="무엇을 해야 하나요?"
-            className="w-full text-[15px] font-medium placeholder:text-gray-300 bg-transparent outline-none text-gray-900 border-b pb-2 transition-colors focus:border-[var(--selected-bg)]"
+            className="w-full text-[16px] font-medium placeholder:text-gray-300 bg-transparent outline-none text-gray-900 border-b pb-2 transition-colors focus:border-[var(--selected-bg)]"
             style={{ borderColor: 'var(--border)' }}
           />
 
@@ -77,7 +77,7 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
             onChange={e => setMemo(e.target.value)}
             placeholder="맥락이나 배경을 적어두세요 — 피드백, 참고사항, 이전 논의 등"
             rows={3}
-            className="w-full text-[13px] placeholder:text-gray-300 bg-transparent outline-none resize-none text-gray-700 rounded-lg px-3 py-2.5 transition-colors"
+            className="w-full text-[16px] placeholder:text-gray-300 bg-transparent outline-none resize-none text-gray-700 rounded-lg px-3 py-2.5 transition-colors"
             style={{ background: 'var(--list)' }}
           />
 
@@ -107,7 +107,7 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
               type="date"
               value={deadline}
               onChange={e => setDeadline(e.target.value)}
-              className="w-full text-[13px] rounded-lg px-3 py-2 outline-none border bg-transparent text-gray-700 focus:border-[var(--selected-bg)] transition-colors"
+              className="w-full text-[16px] rounded-lg px-3 py-2 outline-none border bg-transparent text-gray-700 focus:border-[var(--selected-bg)] transition-colors"
               style={{ borderColor: 'var(--input-border)' }}
             />
           </div>

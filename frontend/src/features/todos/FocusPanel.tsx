@@ -154,21 +154,21 @@ export default function FocusPanel({
             <input
               value={editName}
               onChange={e => setEditName(e.target.value)}
-              className="w-full text-[15px] font-semibold border-b pb-1 outline-none border-[var(--selected-bg)] bg-transparent text-gray-900"
+              className="w-full text-[16px] font-semibold border-b pb-1 outline-none border-[var(--selected-bg)] bg-transparent text-gray-900"
             />
             <textarea
               value={editMemo}
               onChange={e => setEditMemo(e.target.value)}
               rows={10}
               placeholder="메모 · 맥락"
-              className="w-full border rounded-lg px-3 py-2 text-[13px] outline-none focus:border-[var(--selected-bg)] resize-none bg-transparent text-gray-700"
+              className="w-full border rounded-lg px-3 py-2 text-[16px] outline-none focus:border-[var(--selected-bg)] resize-none bg-transparent text-gray-700"
               style={{ borderColor: 'var(--input-border)'}}
             />
             <div className="flex gap-3">
               <select
                 value={editPriority}
                 onChange={e => setEditPriority(e.target.value as Priority)}
-                className="border rounded px-2 py-1 text-[12px] outline-none bg-transparent text-gray-700"
+                className="border rounded px-2 py-1 text-[16px] outline-none bg-transparent text-gray-700"
                 style={{ borderColor: 'var(--input-border)' }}
               >
                 <option value="urgent">긴급</option>
@@ -179,7 +179,7 @@ export default function FocusPanel({
                 type="date"
                 value={editDeadline}
                 onChange={e => setEditDeadline(e.target.value)}
-                className="border rounded px-2 py-1 text-[12px] outline-none flex-1 bg-transparent text-gray-700"
+                className="border rounded px-2 py-1 text-[16px] outline-none flex-1 bg-transparent text-gray-700"
                 style={{ borderColor: 'var(--input-border)' }}
               />
             </div>
@@ -277,7 +277,7 @@ export default function FocusPanel({
                 onChange={e => setNewStep(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleAddStep()}
                 placeholder="+ 단계 추가"
-                className="flex-1 text-[12px] text-gray-500 px-2 py-1.5 border-b outline-none focus:border-[var(--selected-bg)] bg-transparent transition-colors"
+                className="flex-1 text-[16px] text-gray-500 px-2 py-1.5 border-b outline-none focus:border-[var(--selected-bg)] bg-transparent transition-colors"
                 style={{ borderColor: 'var(--border)' }}
               />
               <button onClick={handleAddStep} disabled={!newStep.trim()} className="text-gray-700 disabled:opacity-30">

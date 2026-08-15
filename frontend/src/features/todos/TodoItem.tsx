@@ -103,7 +103,7 @@ export default function TodoItem({ todo, selected, onSelect, onToggle, onEdit }:
               onKeyDown={handleKeyDown}
               onBlur={commitEdit}
               onClick={e => e.stopPropagation()}
-              style={{ fontSize: 13, marginTop: 2, background: 'transparent', borderBottom: '1px solid var(--selected-bg)', outline: 'none', color: 'var(--text-primary)', width: '100%' }}
+              style={{ fontSize: 16, marginTop: 2, background: 'transparent', borderBottom: '1px solid var(--selected-bg)', outline: 'none', color: 'var(--text-primary)', width: '100%' }}
             />
           ) : (
             <p style={{
@@ -127,7 +127,7 @@ export default function TodoItem({ todo, selected, onSelect, onToggle, onEdit }:
           <button
             onClick={startEdit}
             style={{ color: 'var(--text-disabled)' }}
-            className="flex-shrink-0 mt-0.5 p-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+            className="flex-shrink-0 mt-0.5 p-0.5 rounded opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity"
           >
             <Pencil size={12} />
           </button>

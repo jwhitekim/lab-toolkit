@@ -123,7 +123,7 @@ export default function Login() {
   const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: '10px 14px',
-    fontSize: '0.93rem',
+    fontSize: '16px',
     background: 'var(--bg-base)',
     color: 'var(--text-primary)',
     border: '1px solid var(--border-subtle)',

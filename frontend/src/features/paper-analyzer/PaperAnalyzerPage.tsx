@@ -99,7 +99,7 @@ export default function PaperAnalyzer() {
         onKeyDown={e => { if (e.key === 'Enter') doSearch() }}
         placeholder="논문 제목 또는 URL 입력"
         autoFocus={!isMobile}
-        style={{ flex: 1, background: C.card, border: `1px solid ${C.border}`, borderRight: 'none', borderRadius: '9999px 0 0 9999px', padding: '8px 16px', fontSize: 14, color: C.text, outline: 'none', fontFamily: 'inherit' }}
+        style={{ flex: 1, background: C.card, border: `1px solid ${C.border}`, borderRight: 'none', borderRadius: '9999px 0 0 9999px', padding: '8px 16px', fontSize: 16, color: C.text, outline: 'none', fontFamily: 'inherit' }}
         onFocus={e => (e.currentTarget.style.borderColor = '#aaaaaa')}
         onBlur={e => (e.currentTarget.style.borderColor = C.border)}
       />
