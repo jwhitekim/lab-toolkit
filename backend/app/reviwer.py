@@ -86,7 +86,7 @@ FEEDBACK_PROMPT = """\
 </output_contract>
 
 <schema>
-{
+{{
   "correct": [
     "사용자가 정확히 이해한 내용"
   ],
@@ -97,7 +97,7 @@ FEEDBACK_PROMPT = """\
     "사용자가 잘못 이해한 내용"
   ],
   "suggestion": "사용자 설명을 더 정확하게 고친 문장"
-}
+}}
 </schema>
 
 <constraints>
