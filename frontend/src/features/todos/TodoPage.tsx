@@ -1,8 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { ArrowRight, CheckCircle2, ListTodo, Sparkles, Zap } from 'lucide-react'
 import type { NavFilter, Priority, Todo } from '@/shared/types'
 import { useTodos } from './hooks/useTodos'
 import { useAi } from './hooks/useAi'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
+import { useT } from '@/shared/i18n'
 import TodoList from './TodoList'
 import FocusPanel from './FocusPanel'
 import * as api from '@/shared/api/client'
@@ -10,6 +12,39 @@ import * as api from '@/shared/api/client'
 const LIST_MIN = 280
 const LIST_MAX = 680
 const LIST_DEFAULT = 340
+
+function TodoOverview({ todos, onSelect }: { todos: Todo[]; onSelect: (id: number) => void }) {
+  const t = useT()
+  const active = todos.filter(todo => !todo.done)
+  const urgent = active.filter(todo => todo.priority === 'urgent')
+  const completed = todos.filter(todo => todo.done).length
+  const completionRate = todos.length ? Math.round((completed / todos.length) * 100) : 0
+  const next = active.slice(0, 3)
+
+  return (
+    <section className="todo-overview">
+      <div className="todo-overview-inner">
+        <header className="todo-page-heading">
+          <div>
+            <span className="todo-overview-kicker">Today at a glance</span>
+            <h1>{t('todo.overview.heroTitle')}</h1>
+            <p className="todo-overview-lead">{t('todo.overview.heroDescription')}</p>
+          </div>
+          <span className="todo-ai-badge"><Sparkles size={14} /> {t('todo.overview.aiBadge')}</span>
+        </header>
+        <div className="todo-stat-grid">
+          <article className="todo-stat-card"><div className="todo-stat-label"><ListTodo size={14} />{t('todo.overview.inProgress')}</div><div className="todo-stat-value">{active.length}</div></article>
+          <article className="todo-stat-card"><div className="todo-stat-label"><Zap size={14} />{t('todo.overview.urgentItems')}</div><div className="todo-stat-value">{urgent.length}</div></article>
+          <article className="todo-stat-card"><div className="todo-stat-label"><CheckCircle2 size={14} />{t('todo.overview.completionRate')}</div><div className="todo-stat-value">{completionRate}%</div><div className="todo-progress"><div className="todo-progress-fill" style={{ width: `${completionRate}%` }} /></div></article>
+        </div>
+        <div className="todo-next-card">
+          <div className="todo-next-head"><strong>{t('todo.overview.nextTodo')}</strong><span>{active.length} items</span></div>
+          {next.length > 0 ? next.map(todo => <button key={todo.id} type="button" className="todo-overview-item" onClick={() => onSelect(todo.id)}><span className="todo-overview-dot" /><span>{todo.name}</span><ArrowRight size={14} /></button>) : <div className="todo-overview-empty">{t('todo.overview.emptyActive')}</div>}
+        </div>
+      </div>
+    </section>
+  )
+}
 
 export default function TodoPage() {
   const isMobile = useIsMobile()
@@ -174,6 +209,7 @@ export default function TodoPage() {
   if (isMobile) {
     return (
       <>
+      {selectedId === null && <TodoOverview todos={todos} onSelect={openTodo} />}
       {selectedId !== null ? (
         <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
           {loading && !selectedTodo ? (
@@ -208,6 +244,7 @@ export default function TodoPage() {
   return (
     <>
     <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
+      <TodoOverview todos={todos} onSelect={setSelectedId} />
       <div className="flex flex-1 overflow-hidden">
         {loading && !selectedTodo ? (
           <div className="flex-1 flex items-center justify-center" style={{ background: 'var(--bg-base)' }}>
