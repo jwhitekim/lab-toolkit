@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { Loader2, Search, X } from 'lucide-react'
 import { SessionExpiredMessage } from '@/shared/components/SessionExpiredMessage'
 import { HistoryDropdown } from '@/shared/components/HistoryDropdown'
+import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import * as api from './api'
 import type { ContextorResult, ContextorHistoryItem } from './api'
 import './Contextor.css'
@@ -9,6 +10,7 @@ import './Contextor.css'
 const MAX_CHARS = 60
 
 export default function Contextor() {
+  const isMobile = useIsMobile()
   const [query, setQuery] = useState('')
   const [result, setResult] = useState<ContextorResult | null>(null)
   const [loading, setLoading] = useState(false)
@@ -58,7 +60,8 @@ export default function Contextor() {
             value={query}
             onChange={e => setQuery(e.target.value.slice(0, MAX_CHARS))}
             onKeyDown={e => { if (e.key === 'Enter') doLookup(query) }}
-            placeholder="단어를 입력하세요 (예: trials, interleave)"
+            placeholder="단어를 입력하세요 (예: trials, interleave)" 
+            autoFocus={!isMobile}
           />
           {query && (
             <button className="contextor-icon-btn" onClick={handleClear} title="지우기" type="button">
