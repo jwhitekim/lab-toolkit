@@ -103,11 +103,11 @@ def get_todos(filter: Optional[str] = None, sb: Client = Depends(get_supabase), 
         ]
 
     if filter == "today":
-        today = datetime.now(KST).date().isoformat()
+        today = datetime.now(KST).date()
         todos = [
             t for t in todos
-            if (t.get("created_at") or "")[:10] == today
-            or "오늘" in (t.get("deadline") or "")
+            if (d := _parse_deadline(t.get("deadline") or "")) is not None
+            and d == today
         ]
 
     return todos
