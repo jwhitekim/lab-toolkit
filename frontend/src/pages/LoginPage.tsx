@@ -159,7 +159,7 @@ export default function Login() {
           fontSize: 18, fontWeight: 700, color: 'var(--text-primary)',
           letterSpacing: '-0.01em',
         }}>
-          veloo
+          Veloo
         </span>
       </div>
 
@@ -357,7 +357,7 @@ export default function Login() {
         color: 'var(--text-disabled)',
         flexShrink: 0,
       }}>
-        © 2026 veloo. All rights reserved.
+        © 2026 Veloo. All rights reserved.
       </div>
     </div>
   )
