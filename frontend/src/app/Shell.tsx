@@ -162,6 +162,33 @@ export default function Shell() {
     setActive(key)
   }
 
+  // 데스크톱 상단 탭 — 드래그는 없고, 탭 전환 시 배경 인디케이터가 새 탭
+  // 위치/폭으로 부드럽게 슬라이드한다 (모바일 캡슐과 같은 원리, 제스처만 없음).
+  const desktopNavRef = useRef<HTMLElement>(null)
+  const desktopTabRefs = useRef<Partial<Record<ActiveApp, HTMLButtonElement | null>>>({})
+  const [desktopIndicatorRect, setDesktopIndicatorRect] = useState<{ x: number; width: number } | null>(null)
+
+  const syncDesktopIndicator = () => {
+    const button = desktopTabRefs.current[visibleActive]
+    if (!button) return
+    setDesktopIndicatorRect({ x: button.offsetLeft, width: button.offsetWidth })
+  }
+
+  useLayoutEffect(() => {
+    if (isMobile) return
+    syncDesktopIndicator()
+
+    const nav = desktopNavRef.current
+    const activeButton = desktopTabRefs.current[visibleActive]
+    if (!nav || !activeButton) return
+
+    const observer = new ResizeObserver(syncDesktopIndicator)
+    observer.observe(nav)
+    observer.observe(activeButton)
+    return () => observer.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMobile, visibleActive])
+
   const content = (
     <>
       {active === 'paper'         && <PaperAnalyzerPage />}
@@ -191,12 +218,22 @@ export default function Shell() {
               <span className="shell-brand-text">veloo</span>
             </button>
           </div>
-          <nav className="shell-app-nav" aria-label="Apps">
+          <nav ref={desktopNavRef} className="shell-app-nav" aria-label="Apps">
+          {desktopIndicatorRect != null && (
+            <div
+              className="shell-app-tab-indicator"
+              style={{
+                width: `${desktopIndicatorRect.width}px`,
+                transform: `translateX(${desktopIndicatorRect.x}px)`,
+              }}
+            />
+          )}
           {NAV_ITEMS.map(({ key, label, Icon }) => {
             const isActive = active === key || (key === 'todo' && active === 'weekly-review')
             return (
               <button
                 key={key}
+                ref={el => { desktopTabRefs.current[key] = el }}
                 type="button"
                 onClick={() => setActive(key)}
                 className={`shell-app-tab${isActive ? ' is-active' : ''}`}

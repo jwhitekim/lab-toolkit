@@ -63,12 +63,13 @@
 }
 
 .shell-app-nav {
+  position: relative;
   width: fit-content;
   max-width: min(100%, 720px);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 4px;
   padding: 4px;
   border-radius: 12px;
   overflow-x: auto;
@@ -80,12 +81,14 @@
 }
 
 .shell-app-tab {
+  position: relative;
+  z-index: 1;
   height: 38px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
-  padding: 0 8px;
+  gap: 7px;
+  padding: 0 13px;
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
@@ -96,54 +99,33 @@
   font-weight: var(--fw-medium);
   line-height: 1;
   white-space: nowrap;
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    color 0.2s ease,
-    padding 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    gap 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.shell-app-tab span {
-  display: inline-block;
-  max-width: 0;
-  opacity: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  transition:
-    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .shell-app-tab:hover {
-  background: var(--bg-base);
   color: var(--text-primary);
 }
 
 .shell-app-tab.is-active {
-  gap: 7px;
-  padding: 0 13px;
-  background: var(--bg-base);
-  border-color: rgba(0, 0, 0, 0.08);
   color: var(--text-primary);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   font-weight: var(--fw-semibold);
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    color 0.2s ease,
-    padding 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.3s,
-    gap 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
 }
 
-.shell-app-tab.is-active span {
-  max-width: 160px;
-  opacity: 1;
+/* 활성 배경은 이 탭 자신이 아니라 아래 인디케이터(슬라이드 애니메이션)가 그림 */
+.shell-app-tab-indicator {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  height: 38px;
+  border-radius: 8px;
+  background: var(--bg-base);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  pointer-events: none;
+  z-index: 0;
   transition:
-    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.3s,
-    opacity 0.2s ease 0.3s;
+    transform 0.3s cubic-bezier(0.34, 1.2, 0.64, 1),
+    width 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
 }
 
 .shell-app-tab:focus-visible,
