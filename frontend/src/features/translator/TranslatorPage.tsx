@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Check, Copy, Loader2, X } from 'lucide-react'
+import { Check, Copy, Languages, Loader2, X } from 'lucide-react'
 import { SessionExpiredMessage } from '@/shared/components/SessionExpiredMessage'
 import { HistoryDropdown } from '@/shared/components/HistoryDropdown'
+import PageHeader from '@/shared/components/PageHeader'
+import { useT } from '@/shared/i18n'
 import * as api from './api'
 import type { TranslationHistoryItem } from './api'
 import './Translator.css'
@@ -9,6 +11,7 @@ import './Translator.css'
 const MAX_CHARS = 5000
 
 export default function Translator() {
+  const t = useT()
   const [source, setSource] = useState('')
   const [txHistory, setTxHistory] = useState<TranslationHistoryItem[]>([])
   const [streamedText, setStreamedText] = useState('')
@@ -96,6 +99,14 @@ export default function Translator() {
 
   return (
     <div className="translator-root">
+      <div className="app-page-intro-shell">
+        <PageHeader
+          kicker="Translation workspace"
+          title={t('translator.heroTitle')}
+          description={t('translator.heroDescription')}
+          badge={<><Languages size={14} /> {t('translator.quickStart')}</>}
+        />
+      </div>
       <main className="translator-shell">
         <section className="translator-workspace">
           <div className="translator-panel translator-panel--source">

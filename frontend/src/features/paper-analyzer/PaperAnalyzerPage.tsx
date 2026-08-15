@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { FileText, Search, X } from 'lucide-react'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { HistoryDropdown } from '@/shared/components/HistoryDropdown'
+import PageHeader from '@/shared/components/PageHeader'
+import { useT } from '@/shared/i18n'
 import * as api from './api'
 import type { Candidate, PaperResult, PaperHistoryItem } from './api'
 import './PaperAnalyzer.css'
@@ -31,6 +33,7 @@ const C = {
 }
 
 export default function PaperAnalyzer() {
+  const t = useT()
   const isMobile = useIsMobile()
   const [query, setQuery] = useState('')
   const [state, setState] = useState<MainState>({ kind: 'idle' })
@@ -142,6 +145,14 @@ export default function PaperAnalyzer() {
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: C.main }}>
+      <div className="app-page-intro-shell">
+        <PageHeader
+          kicker="Research workspace"
+          title={t('paper.heroTitle')}
+          description={t('paper.heroDescription')}
+          badge={<><FileText size={14} /> {t('paper.aiBadge')}</>}
+        />
+      </div>
       {/* 검색 툴바 */}
       <div className="paper-search-toolbar">
         {searchBar}

@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Loader2, Search, X } from 'lucide-react'
+import { Braces, Loader2, Search, X } from 'lucide-react'
 import { SessionExpiredMessage } from '@/shared/components/SessionExpiredMessage'
 import { HistoryDropdown } from '@/shared/components/HistoryDropdown'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
+import PageHeader from '@/shared/components/PageHeader'
+import { useT } from '@/shared/i18n'
 import * as api from './api'
 import type { ContextorResult, ContextorHistoryItem } from './api'
 import './Contextor.css'
@@ -10,6 +12,7 @@ import './Contextor.css'
 const MAX_CHARS = 60
 
 export default function Contextor() {
+  const t = useT()
   const isMobile = useIsMobile()
   const [query, setQuery] = useState('')
   const [result, setResult] = useState<ContextorResult | null>(null)
@@ -52,6 +55,14 @@ export default function Contextor() {
 
   return (
     <div className="contextor-root">
+      <div className="app-page-intro-shell">
+        <PageHeader
+          kicker="Model Lab"
+          title={t('contextor.heroTitle')}
+          description={t('contextor.heroDescription')}
+          badge={<><Braces size={14} /> {t('contextor.recentLookups', { count: history.length })}</>}
+        />
+      </div>
       <main className="contextor-shell">
         <div className="contextor-searchbar">
           <Search size={16} className="contextor-search-icon" />

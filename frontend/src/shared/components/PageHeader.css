@@ -6,6 +6,12 @@
   margin-bottom: 20px;
 }
 
+.app-page-intro-shell {
+  flex: 0 0 auto;
+  padding: 24px 28px 0;
+  background: var(--bg-canvas);
+}
+
 .app-page-header-copy { min-width: 0; }
 
 .app-page-kicker {
@@ -48,6 +54,7 @@
 .app-page-badge > svg { width: 14px; height: 14px; }
 
 @media (max-width: 640px) {
+  .app-page-intro-shell { padding: 18px 16px 0; }
   .app-page-header { align-items: flex-start; margin-bottom: 18px; }
   .app-page-header h1 { font-size: 22px; }
   .app-page-badge { display: none; }
