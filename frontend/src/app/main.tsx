@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { registerSW } from 'virtual:pwa-register'
 import '../shared/styles/index.css'
+import { LanguageProvider } from '@/shared/i18n'
 import App from './App'
 
 const canRegisterServiceWorker =
@@ -20,8 +21,10 @@ if (canRegisterServiceWorker) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <LanguageProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </LanguageProvider>
   </StrictMode>,
 )
