@@ -15,13 +15,6 @@ FastAPI + React SPA로 논문 분석, 번역, 모델 리뷰, 할 일 관리를 �
 
 모든 앱은 `veloo.page/:username` 단일 URL에서 사이드바 메뉴로 전환합니다.
 
-## Chrome 익스텐션
-
-| 폴더 | 단축키 | 기능 |
-|------|--------|------|
-| `extensions/paper/` | `Alt+P` | 어느 탭에서든 PDF 팝업 분석 |
-| `extensions/contextor/` | `Alt+C` | 수업·논문 중 단어 즉시 맥락 검색 |
-
 ## 기술 스택
 
 - **Backend** — FastAPI, Python 3.11, Uvicorn
@@ -87,7 +80,7 @@ docker run --env-file .env -p 9000:9000 veloo
 python bump.py patch   # 또는 minor / major
 ```
 
-`frontend/package.json`과 `extensions/paper/manifest.json` 버전을 동시에 올립니다.
+`frontend/package.json` 버전을 올립니다.
 
 ## 브랜치 전략
 

@@ -54,7 +54,7 @@ FastAPI 루트(backend/main.py)가 5개 서브앱을 마운트하는 SPA 구조.
 
 ## 버전 관리
 - 버전 범프: python bump.py [major|minor|patch]
-- 앱(frontend/package.json)과 익스텐션(extensions/paper/manifest.json) 동시 업데이트
+- frontend/package.json 버전 업데이트
 - 버전 범프는 main 브랜치에서 직접 실행
 
 ## 스키마
@@ -90,7 +90,7 @@ ML/DL/CV/NLP 논문 문장·구·용어를 자연스러운 한국어로 번역�
 - 마감일은 달력 UI로 지정(텍스트 입력 아님). `frontend/src/features/calendar/`(타임블로킹 캘린더·주간 리뷰)는 현재 `Shell.tsx`에서 네비게이션이 주석 처리되어 임시 비활성 상태이나 라우팅은 남아 있음
 
 ### contextor (`/contextor`)
-영어 단어/짧은 구를 ML/DL 논문 맥락별 의미로 구조화된 JSON으로 설명. `extensions/contextor/` 크롬 익스텐션(Alt+C)에서도 호출됨. `backend/app/contextor_api.py` 단일 파일 (폴더 없음).
+영어 단어/짧은 구를 ML/DL 논문 맥락별 의미로 구조화된 JSON으로 설명. `backend/app/contextor_api.py` 단일 파일 (폴더 없음).
 - 엔드포인트: `POST /api/lookup`(Supabase `contextor_history` 캐시), `GET /api/history`
 - 응답 스키마(`hasMlUsage`, `cases[]`, `note`)는 few-shot 프롬프트로 강제, `_extract_json`이 코드펜스 유무와 무관하게 JSON만 추출
 - 다른 서브앱과 달리 `CLAUDE_MODEL_FAST`(기본 `claude-haiku-4-5-20251001`)가 기본 — 응답 속도 우선
