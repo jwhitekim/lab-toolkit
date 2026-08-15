@@ -28,6 +28,26 @@ export default function TodoPage() {
 
   const selectedTodo = todos.find(t => t.id === selectedId) ?? null
 
+  // 모바일은 목록→상세가 실제로는 같은 화면 안에서 상태만 바뀌는 거라, 브라우저
+  // 히스토리에 아무 흔적이 없음 — 스와이프 뒤로가기/하드웨어 뒤로가기가 안 먹힘.
+  // 상세를 열 때 history entry를 하나 쌓고, popstate(스와이프 포함)로 닫히게 함.
+  const openTodo = useCallback((id: number) => {
+    if (isMobile) window.history.pushState({ velooTodoDetail: true }, '')
+    setSelectedId(id)
+  }, [isMobile])
+
+  const closeTodo = useCallback(() => {
+    if (isMobile) window.history.back()
+    else setSelectedId(null)
+  }, [isMobile])
+
+  useEffect(() => {
+    if (!isMobile) return
+    const onPopState = () => setSelectedId(null)
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [isMobile])
+
   const dragRef = useRef<{ startX: number; startW: number } | null>(null)
 
   const handleResizerMouseDown = useCallback((e: React.MouseEvent) => {
@@ -54,7 +74,7 @@ export default function TodoPage() {
 
   const handleAdd = async (data: { name: string; memo: string; priority: Priority; deadline: string }) => {
     const todo = await addTodo(data)
-    setSelectedId(todo.id)
+    openTodo(todo.id)
     await reload()
     // 백그라운드에서 AI 단계 생성 요청 후 steps 생길 때까지 폴링
     api.generateStepsAsync({
@@ -116,8 +136,8 @@ export default function TodoPage() {
 
   const handleDelete = useCallback(async (id: number) => {
     await removeTodo(id)
-    setSelectedId(null)
-  }, [removeTodo])
+    closeTodo()
+  }, [removeTodo, closeTodo])
 
   const handleToggleDone = useCallback(async (id: number) => {
     await toggleDone(id)
@@ -160,7 +180,7 @@ export default function TodoPage() {
             <FocusPanel
               todo={selectedTodo}
               {...focusPanelProps}
-              onBack={() => setSelectedId(null)}
+              onBack={closeTodo}
             />
           )}
         </div>
@@ -170,7 +190,7 @@ export default function TodoPage() {
           filter={filter}
           onFilter={setFilter}
           selectedId={selectedId}
-          onSelect={setSelectedId}
+          onSelect={openTodo}
           onToggle={handleToggleDone}
           onEdit={(id, name) => handleUpdate(id, { name })}
           onAdd={handleAdd}
