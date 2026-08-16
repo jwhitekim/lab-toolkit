@@ -276,7 +276,6 @@
     "durationHours": "{{count}}시간",
     "removeScheduleHint": "시간 배정 해제",
     "weekDaysLabel": "요일 선택",
-    "weekDaysLabel": "요일 선택",
     "unscheduledTitle": "미배치 할 일",
     "loadingEvents": "일정 불러오는 중",
     "allPlaced": "모두 배치했습니다",
