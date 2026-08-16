@@ -40,6 +40,15 @@
 
 @keyframes app-state-spin { to { transform: rotate(360deg); } }
 
+@media (max-width: 640px) {
+  .app-state-panel { min-height: 190px; padding: 26px 18px; }
+  .app-state-icon { width: 46px; height: 46px; margin-bottom: 12px; border-radius: 15px; }
+  .app-state-icon svg { width: 21px; height: 21px; }
+  .app-state-panel strong { font-size: 14px; }
+  .app-state-panel p { margin-top: 5px; font-size: 11.5px; line-height: 1.5; }
+  .app-state-action { margin-top: 12px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .app-state-panel.is-loading .app-state-icon svg { animation-duration: 1.8s; }
 }

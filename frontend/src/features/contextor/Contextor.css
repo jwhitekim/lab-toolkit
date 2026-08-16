@@ -240,17 +240,27 @@
 /* ── Responsive ───────────────────────────── */
 @media (max-width: 640px) {
   .contextor-shell {
-    padding: 16px;
-    gap: 16px;
+    padding: 12px;
+    gap: 12px;
   }
 
+  .contextor-searchbar { height: 46px; padding: 0 11px; }
+  .contextor-input { font-size: 14px; }
   .contextor-query {
-    font-size: 22px;
+    font-size: 19px;
   }
 
   .contextor-cases {
     grid-template-columns: 1fr;
   }
-  .contextor-empty { justify-content: flex-start; gap: 22px; }
+  .contextor-empty { justify-content: flex-start; gap: 16px; }
+  .contextor-empty-heading > span { width: 42px; height: 42px; margin-bottom: 12px; border-radius: 13px; }
+  .contextor-empty-heading > span svg { width: 20px; height: 20px; }
+  .contextor-empty-heading h2 { font-size: 19px; }
+  .contextor-empty-heading p { margin-top: 6px; font-size: 11.5px; line-height: 1.55; }
+  .contextor-suggestions { margin-top: 12px; }
   .contextor-guide { grid-template-columns: 1fr; }
+  .contextor-guide article { min-height: 106px; padding: 15px; }
+  .contextor-guide strong { margin-top: 12px; font-size: 13px; }
+  .contextor-guide p { font-size: 11px; }
 }

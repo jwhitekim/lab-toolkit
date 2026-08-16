@@ -278,11 +278,18 @@
 .todo-completed-toggle svg.is-open { transform: rotate(180deg); }
 
 @media (max-width: 840px) {
-  .todo-overview { padding: 22px 16px 48px; }
-  .todo-page-heading { align-items: flex-start; margin-bottom: 18px; }
-  .todo-page-heading h1 { font-size: 22px; }
-  .todo-overview-lead { line-height: 1.55; }
+  .todo-overview { padding: 16px 12px 40px; }
+  .todo-page-heading { align-items: flex-start; margin-bottom: 14px; }
+  .todo-page-heading h1 { margin: 5px 0 4px; font-size: 19px; }
+  .todo-overview-kicker { font-size: 9px; }
+  .todo-overview-lead { font-size: 11.5px; line-height: 1.5; }
   .todo-ai-badge { display: none; }
   .todo-stat-grid { grid-template-columns: 1fr; }
+  .todo-stat-card { padding: 12px; }
+  .todo-stat-value { margin-top: 8px; font-size: 21px; }
+  .todo-progress { margin-top: 10px; }
+  .todo-next-card { margin-top: 9px; padding: 13px; }
+  .todo-next-head { margin-bottom: 7px; }
+  .todo-overview-item { padding: 9px 0; }
   .todo-list-panel { border-left: 0; }
 }
