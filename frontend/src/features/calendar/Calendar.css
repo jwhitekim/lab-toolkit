@@ -1,5 +1,5 @@
 .cal-root { height: 100%; overflow: auto; background: var(--bg-canvas); }
-.cal-shell { width: min(100%, 1440px); min-height: 100%; margin: 0 auto; padding: 28px 28px 40px; }
+.cal-shell { width: min(100%, 1440px); min-height: 100%; margin: 0 auto; padding: 0 28px 40px; }
 .cal-workspace { min-height: 650px; overflow: hidden; border: 1px solid var(--border-subtle); border-radius: 18px; background: var(--bg-base); box-shadow: var(--shadow-card, 0 10px 30px rgba(24,25,48,.05)); }
 .cal-toolbar { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 7px 11px; border-bottom: 1px solid var(--border-subtle); }
 .cal-week-nav { display: flex; align-items: center; gap: 8px; }
@@ -24,7 +24,7 @@
 .cal-unscheduled-item { display: flex; align-items: center; gap: 6px; min-height: 34px; padding: 6px 8px; overflow: hidden; border: 1px solid var(--border-subtle); border-radius: 9px; background: var(--bg-base); cursor: grab; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; user-select: none; }
 .cal-drop-hint { position: sticky; bottom: 8px; margin: 12px 4px 0; padding: 9px; border-radius: 9px; background: var(--accent); color: var(--selected-text); font-size: 11px; font-weight: 700; text-align: center; pointer-events: none; }
 @media (max-width: 800px) {
-  .cal-shell { padding: 12px 9px 26px; }
+  .cal-shell { padding: 0 9px 26px; }
   .cal-workspace { min-height: 0; border-radius: 11px; }
   .cal-toolbar { min-height: 42px; gap: 10px; padding: 6px 8px; }
   .cal-day-strip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; padding: 6px 7px; border-bottom: 1px solid var(--border-subtle); background: color-mix(in srgb, var(--bg-base) 94%, var(--accent-soft)); }
