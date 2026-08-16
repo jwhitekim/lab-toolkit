@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Braces, Loader2, Search, X } from 'lucide-react'
+import { BookOpenText, Braces, Code2, Columns3, Loader2, Search, X } from 'lucide-react'
 import { SessionExpiredMessage } from '@/shared/components/SessionExpiredMessage'
 import { HistoryDropdown } from '@/shared/components/HistoryDropdown'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
@@ -22,6 +22,7 @@ export default function Contextor() {
   const [history, setHistory] = useState<ContextorHistoryItem[]>([])
 
   const abortRef = useRef<AbortController | null>(null)
+  const suggestions = ['ablation', 'interleave', 'embedding']
 
   const doLookup = useCallback(async (text: string) => {
     const word = text.trim()
@@ -142,7 +143,21 @@ export default function Contextor() {
           )}
 
           {!sessionExpired && !loading && !error && !result && (
-            <div className="contextor-muted">단어를 입력하면 ML/DL 맥락별로 펼쳐 보여줍니다.</div>
+            <div className="contextor-empty">
+              <div className="contextor-empty-heading">
+                <span><Braces aria-hidden="true" /></span>
+                <h2>{t('contextor.emptyTitle')}</h2>
+                <p>{t('contextor.emptyDescription')}</p>
+                <div className="contextor-suggestions" aria-label={t('contextor.suggestionsAria')}>
+                  {suggestions.map(term => <button key={term} type="button" onClick={() => { setQuery(term); doLookup(term) }}>{term}</button>)}
+                </div>
+              </div>
+              <section className="contextor-guide">
+                <article><Code2 /><strong>{t('contextor.guide.implementationTitle')}</strong><p>{t('contextor.guide.implementationDesc')}</p></article>
+                <article><BookOpenText /><strong>{t('contextor.guide.paperTitle')}</strong><p>{t('contextor.guide.paperDesc')}</p></article>
+                <article><Columns3 /><strong>{t('contextor.guide.comparisonTitle')}</strong><p>{t('contextor.guide.comparisonDesc')}</p></article>
+              </section>
+            </div>
           )}
         </div>
       </main>

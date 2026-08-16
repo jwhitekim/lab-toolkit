@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Check, Copy, Languages, Loader2, X } from 'lucide-react'
+import { Check, Copy, History as HistoryIcon, Languages, Loader2, Radio, ScanText, X } from 'lucide-react'
 import { SessionExpiredMessage } from '@/shared/components/SessionExpiredMessage'
 import { HistoryDropdown } from '@/shared/components/HistoryDropdown'
 import PageHeader from '@/shared/components/PageHeader'
@@ -195,11 +195,22 @@ export default function Translator() {
               )}
 
               {!sessionExpired && !translating && !error && !streamedText && (
-                <div className="translator-muted">번역 결과</div>
+                <div className="translator-empty-output">
+                  <span><Languages aria-hidden="true" /></span>
+                  <strong>{t('translator.resultEmptyTitle')}</strong>
+                  <p>{t('translator.resultEmptyDesc')}</p>
+                </div>
               )}
             </div>
           </div>
         </section>
+        {!source && !streamedText && !error && (
+          <section className="translator-feature-grid" aria-label={t('translator.quickStart')}>
+            <article><ScanText /><strong>{t('translator.feature.autoDetectTitle')}</strong><p>{t('translator.feature.autoDetectDesc')}</p></article>
+            <article><Radio /><strong>{t('translator.feature.streamingTitle')}</strong><p>{t('translator.feature.streamingDesc')}</p></article>
+            <article><HistoryIcon /><strong>{t('translator.feature.historyTitle')}</strong><p>{t('translator.feature.historyDesc')}</p></article>
+          </section>
+        )}
       </main>
     </div>
   )

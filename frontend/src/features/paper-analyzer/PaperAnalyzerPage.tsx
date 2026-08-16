@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FileText, Search, X } from 'lucide-react'
+import { BadgeCheck, BrainCircuit, FileSearch, FileText, Search, X } from 'lucide-react'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { HistoryDropdown } from '@/shared/components/HistoryDropdown'
 import PageHeader from '@/shared/components/PageHeader'
@@ -175,15 +175,11 @@ export default function PaperAnalyzer() {
           )}
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', flex: 1, overflow: 'hidden' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: sidebarData ? '300px 1fr' : '1fr', flex: 1, overflow: 'hidden' }}>
           {/* Sidebar */}
-          <aside style={{ background: C.sidebar, color: C.text, padding: '32px 24px', overflowY: 'auto', height: '100%', borderRight: `1px solid ${C.border}` }}>
-            {!sidebarData ? (
-              <p style={{ color: C.textSub, fontSize: 14, lineHeight: 1.8, margin: 0 }}>논문을 검색하면<br />기본 정보와 저널 품질이<br />여기에 표시됩니다.</p>
-            ) : (
-              <SidebarContent data={sidebarData} />
-            )}
-          </aside>
+          {sidebarData && <aside style={{ background: C.sidebar, color: C.text, padding: '32px 24px', overflowY: 'auto', height: '100%', borderRight: `1px solid ${C.border}` }}>
+            <SidebarContent data={sidebarData} />
+          </aside>}
 
           {/* Main */}
           <main style={{ padding: '40px 44px 80px', overflowY: 'auto', background: C.main, minWidth: 0 }}>
@@ -201,14 +197,27 @@ export default function PaperAnalyzer() {
 
 // ── Empty State ────────────────────────────────────────────────────
 function EmptyState() {
+  const t = useT()
+  const workflow = [
+    { Icon: FileSearch, title: t('paper.workflow.identifyTitle'), description: t('paper.workflow.identifyDesc') },
+    { Icon: BrainCircuit, title: t('paper.workflow.analyzeTitle'), description: t('paper.workflow.analyzeDesc') },
+    { Icon: BadgeCheck, title: t('paper.workflow.qualityTitle'), description: t('paper.workflow.qualityDesc') },
+  ]
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '48px 40px', background: 'var(--bg-additive)', border: '1.5px dashed var(--border-subtle)', borderRadius: 'var(--radius-lg)', maxWidth: 320, width: '100%' }}>
-        <FileText size={48} color="var(--text-disabled)" strokeWidth={1.25} />
-        <p style={{ fontSize: 14, color: 'var(--text-secondary)', textAlign: 'center', lineHeight: 1.8, margin: 0 }}>
-          PDF 파일을 이곳에 드래그 앤 드롭하거나,<br />상단에서 논문을 검색하세요
-        </p>
+    <div className="paper-empty">
+      <div className="paper-empty-heading">
+        <span className="paper-empty-icon"><FileText /></span>
+        <h2>{t('paper.emptyTitle')}</h2>
+        <p>{t('paper.emptyDescription')}</p>
       </div>
+      <section className="paper-workflow" aria-label={t('paper.workflowAria')}>
+        {workflow.map(({ Icon, title, description }, index) => <article key={title}>
+          <span className="paper-workflow-number">0{index + 1}</span>
+          <Icon aria-hidden="true" />
+          <strong>{title}</strong>
+          <p>{description}</p>
+        </article>)}
+      </section>
     </div>
   )
 }

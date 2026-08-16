@@ -10,6 +10,7 @@
 .translator-shell {
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-content: start;
@@ -145,6 +146,27 @@
 .translator-error {
   color: var(--c-error);
 }
+
+.translator-empty-output {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+.translator-empty-output > span { width: 50px; height: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; border-radius: 16px; background: var(--accent-soft); color: var(--accent); }
+.translator-empty-output svg { width: 23px; height: 23px; }
+.translator-empty-output strong { color: var(--text-primary); font-size: 15px; }
+.translator-empty-output p { max-width: 280px; margin: 7px 0 0; font-size: 12px; line-height: 1.6; }
+
+.translator-feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.translator-feature-grid article { min-height: 112px; padding: 17px; border: 1px solid var(--border-subtle); border-radius: 14px; background: color-mix(in srgb, var(--bg-base) 88%, var(--accent-soft)); }
+.translator-feature-grid article > svg { width: 18px; height: 18px; color: var(--accent); }
+.translator-feature-grid strong { display: block; margin-top: 12px; color: var(--text-primary); font-size: 13px; }
+.translator-feature-grid p { margin: 5px 0 0; color: var(--text-secondary); font-size: 11px; line-height: 1.5; }
 
 .translator-spin {
   animation: translator-spin 0.9s linear infinite;
@@ -475,4 +497,5 @@
   .translator-result-text {
     font-size: 16px;
   }
+  .translator-feature-grid { grid-template-columns: 1fr; }
 }
