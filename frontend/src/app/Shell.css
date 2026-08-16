@@ -23,6 +23,13 @@
   min-width: 0;
 }
 
+.shell-topbar-end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  justify-self: stretch;
+}
+
 .shell-brand {
   height: 40px;
   display: inline-flex;
@@ -149,8 +156,13 @@
   flex: 1;
   min-width: 0;
   min-height: 0;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
+
+.shell-view { flex: 1; min-width: 0; min-height: 0; overflow: auto; }
+.shell-plan-switcher { display: none; }
 
 @media (max-width: 980px) {
   .shell-topbar {
@@ -170,26 +182,50 @@
 
 @media (max-width: 640px) {
   .shell-topbar {
-    min-height: 52px;
-    gap: 10px;
-    padding: 0 12px;
+    min-height: 44px;
+    gap: 8px;
+    padding: 0 10px;
     /* 독이 하단으로 빠지면서 이 줄엔 브랜드만 남으므로, 왼쪽에 붙이지 않고
        바 전체 폭 기준 가운데로 둔다 */
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr auto 1fr;
     justify-items: center;
   }
+
+  .shell-brand-wrap { grid-column: 2; }
+
+  .shell-topbar-end {
+    grid-column: 3;
+    display: flex;
+    justify-self: end;
+  }
+
+  .shell-topbar-end > div > button {
+    width: 30px;
+    height: 30px !important;
+    justify-content: center;
+    padding: 0 !important;
+  }
+
+  .shell-topbar-end .lang-switcher-label { display: none; }
 
   .shell-brand {
     gap: 8px;
     padding: 0;
   }
 
-  .shell-brand-text {
-    font-size: 20px;
+  .shell-brand-mark,
+  .shell-brand-mark img {
+    width: 28px;
+    height: 28px;
   }
 
-  .shell-content {
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 104px);
+  .shell-brand-text {
+    font-size: 17px;
+  }
+
+  .shell-view {
+    padding-bottom: 0;
+    scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 104px);
   }
 
   .shell-app-nav {
@@ -231,10 +267,11 @@
 
   .shell-mobile-tabs-track {
     position: relative;
-    width: 100%;
-    height: 100%;
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
     display: flex;
     align-items: center;
+    margin: -1px;
     padding: 4px;
   }
 
@@ -269,9 +306,9 @@
   .shell-mobile-tab {
     position: relative;
     z-index: 1;
-    width: 25%;
+    width: 20%;
     height: 50px;
-    flex: 1 1 25%;
+    flex: 1 1 20%;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -310,14 +347,41 @@
   }
 
   .shell-mobile-tab.is-active {
-    color: var(--text-primary);
+    color: var(--accent);
   }
 
-  .shell-mobile-workspace-group { position: relative; z-index: 1; height: 50px; min-width: 0; flex: 2 1 0; display: flex; align-items: center; gap: 2px; padding: 3px; }
-  .shell-mobile-workspace-group button { height: 44px; min-width: 0; flex: 1; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0 2px; border: 0; border-radius: 9999px; background: transparent; color: var(--text-secondary); cursor: pointer; font: inherit; }
-  .shell-mobile-workspace-group button.is-active { background: var(--accent-soft); color: var(--accent); }
-  .shell-mobile-workspace-group svg { width: 18px; height: 18px; stroke-width: 2.3; }
-  .shell-mobile-workspace-group span { max-width: 64px; overflow: hidden; font-size: 9px; font-weight: 650; line-height: 1; text-overflow: ellipsis; white-space: nowrap; }
+  .shell-plan-switcher {
+    min-height: 40px;
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    padding: 5px 12px;
+    border-bottom: 1px solid var(--border-subtle);
+    background: color-mix(in srgb, var(--bg-base) 94%, var(--accent-soft));
+  }
+
+  .shell-plan-switcher button {
+    min-width: 0;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 650;
+  }
+
+  .shell-plan-switcher button.is-active { background: var(--bg-base); color: var(--accent); box-shadow: 0 1px 4px rgba(24, 25, 48, 0.08); }
+  .shell-plan-switcher button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .shell-plan-switcher svg { width: 14px; height: 14px; }
 
   .shell-mobile-tab:focus-visible {
     outline: 2px solid rgba(0, 0, 0, 0.72);
