@@ -7,9 +7,9 @@ backend/app/ai_provider.py(AI_PROVIDER env로 선택된 프로바이더)로 일�
 새 문자열을 추가한 뒤 다시 실행하면 전체를 재번역한다(부분 갱신 아님).
 
 사용법 (레포 루트에서):
-    python generate_i18n.py            # en, zh 둘 다 생성
-    python generate_i18n.py en         # en만 생성
-    python generate_i18n.py zh         # zh만 생성
+    python scripts/generate_i18n.py            # en, zh 둘 다 생성
+    python scripts/generate_i18n.py en         # en만 생성
+    python scripts/generate_i18n.py zh         # zh만 생성
 
 AI_PROVIDER에 맞는 API 키(ANTHROPIC_API_KEY 또는 GEMINI_API_KEY)가 .env 또는
 환경변수에 있어야 한다.
@@ -21,7 +21,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))  # backend.app.ai_provider import를 레포 루트 기준으로 찾기 위함
 load_dotenv(ROOT / ".env")
 
 # .env의 AI_PROVIDER를 그대로 따른다(현재 프로젝트 설정: gemini). ClaudeProvider로
