@@ -99,7 +99,7 @@ export default function Translator() {
 
   return (
     <div className="translator-root">
-      <div className="app-page-intro-shell">
+      <div className="app-page-intro-shell app-page-intro-shell--workspace">
         <PageHeader
           kicker="Translation workspace"
           title={t('translator.heroTitle')}

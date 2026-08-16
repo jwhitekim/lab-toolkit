@@ -6,39 +6,44 @@
 
 - 워드마크: 소문자 `veloo`, `Space Grotesk` 700 사용 (`Shell.css` `.shell-brand-text`)
 - 아이콘 마크: `favicon.svg` — 곡선 없이 각진 직선 획으로만 구성된 "V"
-- **포인트 컬러 없음.** 흑백+그레이 모노톤이 원칙. 새 기능 추가 시 임의의 브랜드 컬러(파랑, 초록 등)를 넣지 말 것 — Todo 앱에 청록색이 섞여 있던 걸 흑백으로 통일한 전례 있음(2026-08-12 커밋 `25f7248`).
+- **포인트 컬러: 그린 (`#2f6f5e`).** 2026-08-16부로 흑백 모노톤에서 그린 액센트로 전환됨 — 아래 색상 토큰 표는 이 시점 기준. 앞으로 액센트를 또 바꾸게 되면 `--accent`/`--selected-bg`만 고치면 되도록 설계돼 있으니, 하드코딩된 hex 대신 반드시 이 토큰을 참조할 것.
 - 워드마크(`Space Grotesk`)는 각진 아이콘 마크와 어울리게 고른 선택. 본문 폰트로 확장하지 말 것 — 헤더 로고 전용.
 
 ## 색상 토큰
 
 ```css
---bg-base:            #ffffff;  /* 기본 배경 */
---bg-additive:         #f2f2f2;  /* 살짝 얹는 배경 — 카드, 웰(well) */
---bg-additive-hover:   #e5e5e5;  /* hover/active 배경 */
---text-primary:        #0f0f0f;
---text-secondary:      #606060;
---text-disabled:       #909090;
---selected-bg:          #0f0f0f;  /* 채워진 버튼/체크박스/뱃지 */
+--bg-canvas:          #f6f7f4;  /* 페이지 캔버스(헤더 바깥 여백) */
+--bg-base:            #ffffff;  /* 작업 패널·카드 배경 */
+--bg-additive:         #f0f2ee;  /* 살짝 얹는 배경 — 웰(well) */
+--bg-additive-hover:   #e5e9e3;  /* hover/active 배경 */
+--text-primary:        #1d2421;
+--text-secondary:      #626b66;
+--text-disabled:       #929a95;
+--accent:              #2f6f5e;  /* 브랜드 액센트(그린) */
+--accent-hover:        #275b4e;
+--accent-soft:         #e6f0ec;
+--selected-bg:          #2f6f5e;  /* 채워진 버튼/체크박스/뱃지 — --accent와 동일 */
 --selected-text:        #ffffff;
 --border-subtle:       #e5e5e5;
---c-error:             #c0392b;  /* 삭제/에러 전용 — 유일하게 허용된 유채색 */
+--c-error:             #c0392b;  /* 삭제/에러 전용 */
 --c-error-dim:         rgba(192, 57, 43, 0.08);
 ```
 
 **규칙**
 - 새 UI에 색을 추가할 때는 항상 위 토큰에서 골라 쓴다. 새 hex 값을 직접 박아넣지 않는다.
-- 빨강(`--c-error`)은 삭제·에러 등 파괴적/경고 동작에만 쓴다. 강조·브랜드 목적으로 쓰지 않는다.
-- `--bg-additive`는 "패널 전체"가 아니라 "작은 웰(필터 탭 트랙 등)"에만 쓴다 — Todo 리스트 패널 전체를 회색으로 칠했다가 흰색으로 되돌린 전례 있음(`465bb06` 이전 작업, `frontend/src/features/todos/TodoList.tsx`).
+- 빨강(`--c-error`)은 삭제·에러 등 파괴적/경고 동작에만 쓴다. 액센트(`--accent`)와 혼동하지 않는다.
+- `--bg-canvas`는 페이지 바깥(헤더 등), `--bg-base`는 실제 작업 패널/카드에 쓴다 — 이 둘을 같은 색으로 섞어 쓰지 않는다.
+- `--bg-additive`는 "패널 전체"가 아니라 "작은 웰(필터 탭 트랙 등)"에만 쓴다 — Todo 리스트 패널 전체를 회색으로 칠했다가 흰색으로 되돌린 전례 있음(`465bb06` 이전 작업, `frontend/src/features/todos/TodoList.tsx`). 지금은 그 위에 그린 액센트가 얹힌 구조이니 재적용 시 참고.
 - 레거시 별칭(`--c-card`, `--c-sidebar`, `--c-accent` 등)이 `index.css`에 남아있음 — Todo/Login 하위호환용. 새 코드에서는 위 1차 토큰만 쓸 것.
 
 ## 타이포그래피
 
 ```css
 --font-sans: "Roboto", "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif;
---fs-meta:    12px;
---fs-body:    14px;
---fs-title:   16px;
---fs-section: 20px;
+--fs-meta:    11px;
+--fs-body:    13px;
+--fs-title:   15px;
+--fs-section: 18px;
 --fw-regular:  400;
 --fw-medium:   500;
 --fw-semibold: 600;
@@ -60,6 +65,27 @@
 --radius-lg:  12px;
 --radius-pill: 9999px;
 ```
+
+## 페이지 레이아웃
+
+리서치 도구(Papers, Translate, Models, Concepts)는 아래의 공통 레일을 사용한다.
+
+```css
+--page-gutter:      24px;   /* 모바일 12px */
+--page-section-gap: 20px;   /* 모바일 12px */
+--page-control-h:   44px;   /* 검색·입력 컨트롤 */
+--page-reading-max: 960px;  /* 읽기·검색형 화면 */
+--page-content-max: 1440px; /* 편집·분석형 작업 화면 */
+```
+
+**규칙**
+- Papers·Concepts는 `--page-reading-max`, Translate·Models는 `--page-content-max` 레일을 사용하고 레일 자체를 `margin-inline: auto`로 중앙 배치한다.
+- 헤더, 검색/입력, 초기 안내와 결과 본문은 같은 레일을 사용해 왼쪽 시작선과 오른쪽 끝선을 맞춘다.
+- 중앙 정렬은 콘텐츠 블록의 배치에만 적용한다. 제목, 설명, 입력값, 카드 내부 문장은 좌측 정렬을 유지한다.
+- 페이지 헤더의 아래 간격이 이미 `--page-section-gap`을 담당하므로 본문에 별도 상단 패딩을 중복하지 않는다.
+- 검색창과 검색 전 초기 안내는 같은 `--page-reading-max` 폭을 사용한다. 초기 안내를 남은 화면의 세로 중앙에 놓지 않고 검색창 바로 아래에서 시작한다.
+- 페이지 캔버스는 `--bg-canvas`, 실제 작업 패널과 카드는 `--bg-base`를 사용한다. 헤더와 본문의 캔버스 색을 다르게 나누지 않는다.
+- 표, 카드 묶음, 업로드 영역, 번역 작업 패널은 해당 레일 안에서 중앙 배치하되 내부 텍스트 정렬은 바꾸지 않는다.
 
 ## 아이콘
 

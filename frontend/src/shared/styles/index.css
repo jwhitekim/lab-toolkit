@@ -48,6 +48,11 @@
   --header-h:       56px;
   --sidebar-w:      240px;
   --sidebar-w-mini: 72px;
+  --page-gutter:         24px;
+  --page-section-gap:    20px;
+  --page-control-h:      44px;
+  --page-reading-max:    960px;
+  --page-content-max:    1440px;
 
   /* ── Legacy aliases (Todo, Login 하위 호환) ── */
   --bg:           #ffffff;
@@ -89,6 +94,13 @@ body {
   font-size: var(--fs-body);
   background: var(--bg-canvas);
   color: var(--text-primary);
+}
+
+@media (max-width: 640px) {
+  :root {
+    --page-gutter: 12px;
+    --page-section-gap: 12px;
+  }
 }
 
 input, textarea, select {

@@ -1,21 +1,17 @@
 .arch-root {
   min-height: 100%;
   overflow-y: auto;
-  background:
-    radial-gradient(circle at 94% 5%, rgba(47, 111, 94, 0.1), transparent 27%),
-    var(--bg-canvas);
+  background: var(--bg-canvas);
 }
 
 .arch-shell {
-  width: min(100%, 1040px);
+  width: min(100%, calc(var(--page-content-max) + var(--page-gutter) + var(--page-gutter)));
   margin: 0 auto;
-  padding: 34px 32px 64px;
+  padding: 0 var(--page-gutter) 64px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
-
-.arch-shell > .app-page-header { margin-bottom: 8px; }
 
 .arch-upload-icon {
   width: 54px;
@@ -27,6 +23,61 @@
   border-radius: 17px;
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+.arch-card-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 16px;
+  font-family: var(--font-sans);
+}
+
+.arch-step-number {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--selected-text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.arch-card-title-text {
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--fs-title);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.arch-upload-hint {
+  margin: 0;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: 1.55;
+}
+
+.arch-upload-hint strong {
+  color: var(--text-primary);
+  font-weight: var(--fw-semibold);
+}
+
+.arch-upload-formats {
+  margin: 6px 0 0;
+  color: var(--text-disabled);
+  font-family: var(--font-sans);
+  font-size: var(--fs-meta);
+  line-height: 1.45;
 }
 
 .arch-guide {
@@ -46,13 +97,14 @@
 }
 
 .arch-guide article > svg { color: var(--accent); }
-.arch-guide article > span { position: absolute; top: 18px; right: 18px; color: var(--text-disabled); font-size: 11px; font-weight: 700; }
+.arch-guide article > span { position: absolute; top: 18px; right: 18px; color: var(--text-disabled); font-family: var(--font-sans); font-size: var(--fs-meta); font-weight: var(--fw-bold); font-variant-numeric: tabular-nums; line-height: 1; }
 .arch-guide strong { display: block; margin-top: 18px; color: var(--text-primary); font-size: 14px; }
 .arch-guide p { margin: 7px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.55; }
 
 .arch-shell button,
 .arch-shell textarea,
 .arch-shell [role='button'] {
+  font-family: var(--font-sans);
   transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
 }
 
@@ -65,7 +117,7 @@
 }
 
 @media (max-width: 640px) {
-  .arch-shell { gap: 12px; padding: 16px 12px 34px; }
+  .arch-shell { gap: var(--page-section-gap); padding: 0 var(--page-gutter) 34px; }
   .arch-upload-icon { width: 46px; height: 46px; margin-bottom: 9px; border-radius: 14px; }
   .arch-guide { grid-template-columns: 1fr; }
   .arch-guide article { min-height: 112px; padding: 15px; }

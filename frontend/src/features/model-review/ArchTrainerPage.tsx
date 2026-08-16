@@ -135,13 +135,15 @@ export default function ArchTrainer() {
         textarea::placeholder { color: var(--text-secondary); }
       `}</style>
 
-      <div className="arch-shell">
+      <div className="app-page-intro-shell app-page-intro-shell--workspace">
         <PageHeader
           kicker="Model learning lab"
           title={t('reviewer.heroTitle')}
           description={t('reviewer.heroDescription')}
           badge={<><BrainCircuit size={14} /> {t('reviewer.historyBadge', { count: archHistory.length })}</>}
         />
+      </div>
+      <div className="arch-shell">
         {error && (
           <StatePanel compact kind="error" title={t('reviewer.requestFailedTitle')} description={error} />
         )}
@@ -201,10 +203,10 @@ export default function ArchTrainer() {
             >
               <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { if (e.target.files?.[0]) setFile(e.target.files[0]) }} />
               <div className="arch-upload-icon"><ImagePlus size={26} /></div>
-              <p style={{ color: C.textSub, fontSize: 14, margin: 0 }}>
-                <strong style={{ color: C.text }}>{t('reviewer.uploadHintBold')}</strong>{t('reviewer.uploadHintSuffix')}
+              <p className="arch-upload-hint">
+                <strong>{t('reviewer.uploadHintBold')}</strong>{t('reviewer.uploadHintSuffix')}
               </p>
-              <p style={{ marginTop: 6, fontSize: 12, color: C.textMuted }}>{t('reviewer.uploadFormats')}</p>
+              <p className="arch-upload-formats">{t('reviewer.uploadFormats')}</p>
             </div>
           ) : (
             <div style={{ position: 'relative' }}>
@@ -319,14 +321,9 @@ function Card({ children, compact }: { children: React.ReactNode; compact?: bool
 
 function CardTitle({ step, children }: { step: number; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-      <span style={{
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        width: 22, height: 22, borderRadius: '50%',
-        background: 'var(--accent)', color: 'var(--selected-text)',
-        fontSize: 11, fontWeight: 700, marginRight: 8,
-      }}>{step}</span>
-      <span style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-primary)' }}>{children}</span>
+    <div className="arch-card-title">
+      <span className="arch-step-number">{step}</span>
+      <span className="arch-card-title-text">{children}</span>
     </div>
   )
 }

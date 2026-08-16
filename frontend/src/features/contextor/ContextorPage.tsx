@@ -56,7 +56,7 @@ export default function Contextor() {
 
   return (
     <div className="contextor-root">
-      <div className="app-page-intro-shell">
+      <div className="app-page-intro-shell app-page-intro-shell--reading">
         <PageHeader
           kicker="Model Lab"
           title={t('contextor.heroTitle')}

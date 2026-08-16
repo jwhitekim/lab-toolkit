@@ -22,7 +22,7 @@ const C = {
   accentDim:  'var(--bg-additive)',
   accentText: 'var(--text-primary)',
   sidebar:    'var(--bg-additive)',
-  main:       'var(--bg-base)',
+  main:       'var(--bg-canvas)',
   card:       'var(--bg-additive)',
   border:     'var(--border-subtle)',
   borderMid:  'var(--border-subtle)',
@@ -146,7 +146,7 @@ export default function PaperAnalyzer() {
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: C.main }}>
-      <div className="app-page-intro-shell">
+      <div className="app-page-intro-shell app-page-intro-shell--reading">
         <PageHeader
           kicker="Research workspace"
           title={t('paper.heroTitle')}
@@ -162,7 +162,7 @@ export default function PaperAnalyzer() {
       {/* Body */}
       {isMobile ? (
         <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-          <main style={{ padding: '24px 16px 40px', background: C.main, minWidth: 0 }}>
+          <main className="paper-main paper-main--mobile">
             {state.kind === 'idle' && <EmptyState />}
             {state.kind === 'loading' && <Loader msg={state.msg} />}
             {state.kind === 'error' && <ErrorBox msg={state.msg} />}
@@ -183,7 +183,7 @@ export default function PaperAnalyzer() {
           </aside>}
 
           {/* Main */}
-          <main style={{ padding: '40px 44px 80px', overflowY: 'auto', background: C.main, minWidth: 0 }}>
+          <main className="paper-main paper-main--desktop">
             {state.kind === 'idle' && <EmptyState />}
             {state.kind === 'loading' && <Loader msg={state.msg} />}
             {state.kind === 'error' && <ErrorBox msg={state.msg} />}

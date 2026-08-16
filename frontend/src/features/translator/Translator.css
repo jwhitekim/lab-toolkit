@@ -3,20 +3,22 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--bg-base);
+  background: var(--bg-canvas);
   color: var(--text-primary);
 }
 
 .translator-shell {
   flex: 1;
   min-height: 0;
+  width: min(100%, calc(var(--page-content-max) + var(--page-gutter) + var(--page-gutter)));
+  margin-inline: auto;
   overflow-y: auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-content: start;
-  gap: 18px;
-  padding: 24px;
-  background: var(--bg-base);
+  gap: var(--page-section-gap);
+  padding: 0 var(--page-gutter) 40px;
+  background: var(--bg-canvas);
 }
 
 .translator-shell.has-dict {
@@ -456,7 +458,7 @@
   .translator-shell.has-dict {
     grid-template-columns: 1fr;
     margin-right: 0;
-    padding: 16px;
+    padding: 0 var(--page-gutter) 32px;
   }
 
   .translator-workspace {
@@ -486,7 +488,7 @@
 @media (max-width: 640px) {
   .translator-shell,
   .translator-shell.has-dict {
-    padding: 10px;
+    padding: 0 var(--page-gutter) 24px;
   }
 
   .translator-workspace {
