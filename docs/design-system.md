@@ -89,8 +89,8 @@
 
 ## 아이콘
 
-- [lucide-react](https://lucide.dev) 사용. `strokeWidth={2.1}`이 기본값 (기본 2보다 살짝 두껍게 — 각진 브랜드 마크와 톤 맞춤).
-- 데스크톱 탭 아이콘: 16px. 모바일 하단 독 아이콘: 20px.
+- [lucide-react](https://lucide.dev) 사용, 기본 `strokeWidth`(2) 그대로 씀 — 이전엔 `2.1`로 살짝 두껍게 쓰던 규칙이 있었으나 지금은 안 씀.
+- 데스크톱 탭 아이콘: 15px. 모바일 하단 독 아이콘: 20px, `stroke-width: 2.35`(`Shell.css` `.shell-mobile-tab svg`).
 
 ## 컴포넌트 패턴
 
@@ -106,6 +106,11 @@
 
 ### 터치 대상 (모바일)
 - `:hover`로만 나타나는 요소(예: `opacity-0 group-hover:opacity-100`)를 클릭 가능한 요소 위에 두지 않는다. iOS Safari에서 첫 탭이 호버 진입으로 소비되고 두 번째 탭에서야 클릭이 발생하는 버그를 유발한다(`TodoItem.tsx` 연필 아이콘, `6d3674c`에서 수정). 꼭 필요하면 `@media (hover: hover)`로 감싸서 터치 기기에서는 상시 노출한다.
+
+### 다국어 (i18n)
+- `frontend/src/shared/i18n/` — `LanguageContext.tsx`(provider) + `locales/{ko,en,zh}.json` + `index.ts`의 `useT()` 훅.
+- 화면에 보이는 문자열은 하드코딩하지 않고 `t('네임스페이스.키')`로 가져온다 (예: `t('shell.nav.todo')`). 새 문자열 추가 시 `ko.json`을 기준으로 세 언어 파일에 전부 키를 넣을 것 — 하나만 빠뜨리면 그 언어에서 키가 그대로 노출된다.
+- 언어 전환 UI는 `LanguageSwitcher` 컴포넌트, 데스크톱 헤더 우측(`shell-topbar-end`)에 위치.
 
 ## 다크 모드
 
