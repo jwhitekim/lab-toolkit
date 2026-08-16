@@ -151,7 +151,7 @@ export default function Shell() {
   return <ShellNavContext.Provider value={{ active, setActive: selectApp }}>
     <div className="shell-desktop">
       <header className="shell-topbar">
-        <div className="shell-brand-wrap"><button type="button" className="shell-brand" onClick={() => selectWorkspace('plan')} aria-label={t('shell.home')}><span className="shell-brand-mark"><img src="/favicon.svg" alt="" width={20} height={20} /></span><span className="shell-brand-text">Veloo</span></button></div>
+        <div className="shell-brand-wrap"><button type="button" className="shell-brand" onClick={() => selectWorkspace('plan')} aria-label={t('shell.home')}><span className="shell-brand-mark"><img src="/favicon.svg?v=2" alt="" width={20} height={20} /></span><span className="shell-brand-text">Veloo</span></button></div>
         <nav ref={desktopNavRef} className="shell-app-nav" aria-label={t('shell.workspaceAria')}>
           {desktopIndicatorRect && <div className="shell-app-tab-indicator" style={{ width: desktopIndicatorRect.width, transform: `translateX(${desktopIndicatorRect.x}px)` }} />}
           {WORKSPACES.map(({ key, Icon }) => {
