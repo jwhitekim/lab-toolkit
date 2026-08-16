@@ -224,7 +224,7 @@
 .todo-item.is-selected {
   border-color: color-mix(in srgb, var(--accent) 24%, var(--border-subtle));
   background: var(--accent-soft);
-  box-shadow: 0 3px 12px rgba(47, 111, 94, 0.09);
+  box-shadow: 0 3px 12px rgba(18, 135, 106, 0.09);
 }
 .todo-item.is-selected::after {
   position: absolute;

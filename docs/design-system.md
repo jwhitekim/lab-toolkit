@@ -6,7 +6,7 @@
 
 - 워드마크: 소문자 `veloo`, `Space Grotesk` 700 사용 (`Shell.css` `.shell-brand-text`)
 - 아이콘 마크: `favicon.svg` — 곡선 없이 각진 직선 획으로만 구성된 "V"
-- **포인트 컬러: 그린 (`#2f6f5e`).** 2026-08-16부로 흑백 모노톤에서 그린 액센트로 전환됨 — 아래 색상 토큰 표는 이 시점 기준. 앞으로 액센트를 또 바꾸게 되면 `--accent`/`--selected-bg`만 고치면 되도록 설계돼 있으니, 하드코딩된 hex 대신 반드시 이 토큰을 참조할 것.
+- **포인트 컬러: 그린 (`#12876a`).** 2026-08-16 흑백 모노톤 → 그린 액센트 전환 직후, 같은 날 내로 초기 그린(`#2f6f5e`, S41 L31)이 아이콘·UI 모두에서 채도가 낮아 밋밋하다는 판단으로 더 쨍한 값(`#12876a`, S76 L30 — 같은 색상각 유지, 채도만 올림)으로 재조정. 앱 아이콘(`favicon.svg`/`icon-512.svg`/`icon-192.png`/`apple-touch-icon.png`)도 같은 값으로 동기화됨. 앞으로 액센트를 또 바꾸게 되면 `--accent`/`--accent-hover`/`--accent-soft`/`--selected-bg`(+ 레거시 `--c-accent*`/`--c-login-btn*`) 토큰만 고치면 되도록 설계돼 있으니, 하드코딩된 hex 대신 반드시 이 토큰을 참조할 것. 아이콘 파일은 토큰 연동이 안 되므로 수동 동기화 필요.
 - 워드마크(`Space Grotesk`)는 각진 아이콘 마크와 어울리게 고른 선택. 본문 폰트로 확장하지 말 것 — 헤더 로고 전용.
 
 ## 색상 토큰
@@ -19,12 +19,13 @@
 --text-primary:        #1d2421;
 --text-secondary:      #626b66;
 --text-disabled:       #929a95;
---accent:              #2f6f5e;  /* 브랜드 액센트(그린) */
---accent-hover:        #275b4e;
---accent-soft:         #e6f0ec;
---selected-bg:          #2f6f5e;  /* 채워진 버튼/체크박스/뱃지 — --accent와 동일 */
+--accent:              #12876a;  /* 브랜드 액센트(그린) */
+--accent-hover:        #0f6f58;
+--accent-soft:         #cfe6da;
+--selected-bg:          #12876a;  /* 채워진 버튼/체크박스/뱃지 — --accent와 동일 */
 --selected-text:        #ffffff;
---border-subtle:       #e5e5e5;
+--border-subtle:       #cfd3cd;
+--shadow-card:         0 2px 8px rgba(24, 25, 48, .07), 0 1px 2px rgba(24, 25, 48, .05);
 --c-error:             #c0392b;  /* 삭제/에러 전용 */
 --c-error-dim:         rgba(192, 57, 43, 0.08);
 ```
@@ -35,6 +36,8 @@
 - `--bg-canvas`는 페이지 바깥(헤더 등), `--bg-base`는 실제 작업 패널/카드에 쓴다 — 이 둘을 같은 색으로 섞어 쓰지 않는다.
 - `--bg-additive`는 "패널 전체"가 아니라 "작은 웰(필터 탭 트랙 등)"에만 쓴다 — Todo 리스트 패널 전체를 회색으로 칠했다가 흰색으로 되돌린 전례 있음(`465bb06` 이전 작업, `frontend/src/features/todos/TodoList.tsx`). 지금은 그 위에 그린 액센트가 얹힌 구조이니 재적용 시 참고.
 - 레거시 별칭(`--c-card`, `--c-sidebar`, `--c-accent` 등)이 `index.css`에 남아있음 — Todo/Login 하위호환용. 새 코드에서는 위 1차 토큰만 쓸 것.
+- `--border-subtle`은 원래 `#e5e5e5`로 `--bg-canvas`/`--bg-base` 대비 1.17~1.26:1(사실상 안 보임)이었음 — `#cfd3cd`(1.41~1.52:1)로 조정. `--accent-soft`도 같은 이유로 `#e6f0ec`(1.08~1.16:1) → `#cfe6da`(1.22~1.31:1)로 조정.
+- `--shadow-card`는 원래 `index.css`에 정의가 없어 `Todo.css`/`ArchTrainerPage.tsx`의 `var(--shadow-card)` 참조가 조용히 무효화(그림자 없음)되던 버그였음 — 이제 정의됨. 카드/패널에 그림자를 줄 땐 값을 새로 만들지 말고 이 토큰을 쓸 것.
 
 ## 타이포그래피
 
