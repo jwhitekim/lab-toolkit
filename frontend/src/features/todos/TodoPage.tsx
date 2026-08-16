@@ -8,6 +8,7 @@ import { useT } from '@/shared/i18n'
 import TodoList from './TodoList'
 import FocusPanel from './FocusPanel'
 import * as api from '@/shared/api/client'
+import './Todo.css'
 
 const LIST_MIN = 280
 const LIST_MAX = 680
@@ -92,8 +93,10 @@ export default function TodoPage() {
 
     const onMove = (ev: MouseEvent) => {
       if (!dragRef.current) return
+      // The list is docked on the right, so moving its left edge to the left
+      // increases the panel width (and moving it right decreases it).
       const delta = ev.clientX - dragRef.current.startX
-      setListWidth(Math.max(LIST_MIN, Math.min(LIST_MAX, dragRef.current.startW + delta)))
+      setListWidth(Math.max(LIST_MIN, Math.min(LIST_MAX, dragRef.current.startW - delta)))
     }
 
     const onUp = () => {
@@ -239,7 +242,7 @@ export default function TodoPage() {
   return (
     <>
     <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
-      <div className="flex flex-1 overflow-hidden">
+      <div className="todo-desktop-layout flex flex-1 overflow-hidden">
         {loading && todos.length === 0 ? (
           <div className="flex-1 flex items-center justify-center" style={{ background: 'var(--bg-base)' }}>
             <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>불러오는 중...</span>

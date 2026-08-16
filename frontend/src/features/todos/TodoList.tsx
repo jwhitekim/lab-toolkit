@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { ChevronDown, Plus } from 'lucide-react'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ko'
 import type { Todo, NavFilter, Priority } from '@/shared/types'
 import TodoItem from './TodoItem'
 import AddTodoModal from './AddTodoModal'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
+import { useT } from '@/shared/i18n'
 
 dayjs.locale('ko')
 
@@ -29,7 +30,9 @@ const filterTabs: { label: string; key: NavFilter }[] = [
 ]
 
 export default function TodoList({ todos, filter, onFilter, selectedId, onSelect, onToggle, onEdit, onAdd, width }: Props) {
+  const t = useT()
   const [showModal, setShowModal] = useState(false)
+  const [showCompleted, setShowCompleted] = useState(false)
   const isMobile = useIsMobile()
 
   const active = todos.filter(t => !t.done)
@@ -38,9 +41,9 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
   const filterSubtitle = filter === 'today' ? dayjs().format('YYYY년 M월 D일') : null
 
   return (
-    <div
-      className={`flex flex-col border-r${isMobile ? '' : ' h-full'}`}
-      style={{ width: width ?? '100%', flexShrink: width !== undefined ? 0 : undefined, borderRight: '1px solid var(--border-subtle)', background: 'var(--bg-base)' }}
+    <aside
+      className={`todo-list-panel flex flex-col${isMobile ? '' : ' h-full'}`}
+      style={{ width: width ?? '100%', flexShrink: width !== undefined ? 0 : undefined, background: 'var(--bg-base)' }}
     >
       <div
         className="px-3 pt-4 pb-3"
@@ -120,8 +123,17 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
 
         {done.length > 0 && (
           <>
-            <div className="px-3 pt-3 pb-1 text-[11px] text-gray-400">완료됨 ({done.length})</div>
-            {done.map(todo => (
+            <button
+              type="button"
+              className="todo-completed-toggle"
+              aria-expanded={showCompleted}
+              onClick={() => setShowCompleted(open => !open)}
+            >
+              <span>{t('todo.completedToggle')}</span>
+              <span className="todo-completed-count">{done.length}</span>
+              <ChevronDown className={showCompleted ? 'is-open' : ''} size={14} />
+            </button>
+            {showCompleted && done.map(todo => (
               <TodoItem
                 key={todo.id}
                 todo={todo}
@@ -135,8 +147,11 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
         )}
 
         {todos.length === 0 && (
-          <div className="px-3 py-8 text-center text-[12px] text-gray-400">
-            할 일이 없습니다
+          <div className="todo-list-empty">
+            <span className="todo-list-empty-mark"><Plus size={18} /></span>
+            <strong>{t('todo.noTodos')}</strong>
+            <p>{t('todo.overview.emptyActive')}</p>
+            <button type="button" onClick={() => setShowModal(true)}>{t('todo.addButton')}</button>
           </div>
         )}
       </div>
@@ -160,6 +175,6 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
           onSave={async data => { await onAdd(data) }}
         />
       )}
-    </div>
+    </aside>
   )
 }
