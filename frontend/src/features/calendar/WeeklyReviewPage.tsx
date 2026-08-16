@@ -3,6 +3,7 @@ import { useShellNav } from '@/shared/hooks/useShellNav'
 import { useT, useDateLocale } from '@/shared/i18n'
 import * as api from '@/shared/api/client'
 import type { WeeklyReview } from '@/shared/types'
+import { priorityAccent, priorityLabels } from '@/features/todos/priority'
 
 function getMonday(date: Date): Date {
   const d = new Date(date)
@@ -13,16 +14,10 @@ function getMonday(date: Date): Date {
   return d
 }
 
-const PRIORITY_COLOR: Record<string, string> = { urgent: '#a32d2d', mid: '#854f0b', normal: '#0f6e56' }
-
 export default function WeeklyReview() {
   const t = useT()
   const dateLocale = useDateLocale()
-  const PRIORITY_LABEL: Record<string, string> = {
-    urgent: t('todo.priority.urgent'),
-    mid:    t('todo.priority.mid'),
-    normal: t('todo.priority.normal'),
-  }
+  const PRIORITY_LABEL = priorityLabels(t)
   const fmtDate = (iso: string): string =>
     new Date(iso).toLocaleDateString(dateLocale, { month: 'long', day: 'numeric' })
   const { setActive } = useShellNav()
@@ -91,11 +86,11 @@ export default function WeeklyReview() {
                 return (
                   <div key={p} style={{ marginBottom: 10 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
-                      <span style={{ color: PRIORITY_COLOR[p], fontWeight: 600 }}>{PRIORITY_LABEL[p]}</span>
+                      <span style={{ color: priorityAccent[p], fontWeight: 600 }}>{PRIORITY_LABEL[p]}</span>
                       <span style={{ color: 'var(--text-disabled)' }}>{done}/{total}</span>
                     </div>
                     <div style={{ height: 6, background: 'var(--border-subtle)', borderRadius: 3, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${pct}%`, background: PRIORITY_COLOR[p], borderRadius: 3, transition: 'width 0.4s' }} />
+                      <div style={{ height: '100%', width: `${pct}%`, background: priorityAccent[p], borderRadius: 3, transition: 'width 0.4s' }} />
                     </div>
                   </div>
                 )
@@ -115,7 +110,7 @@ export default function WeeklyReview() {
                       onClick={() => setActive('todo')}
                       style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'var(--bg-additive)', border: 'none', borderRadius: 8, cursor: 'pointer', textAlign: 'left', fontSize: 13, color: 'var(--text-primary)' }}
                     >
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: PRIORITY_COLOR[item.priority], flexShrink: 0 }} />
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: priorityAccent[item.priority], flexShrink: 0 }} />
                       {item.name}
                     </button>
                   ))}

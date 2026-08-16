@@ -9,6 +9,7 @@ import StatePanel from '@/shared/components/StatePanel'
 import WeekGrid from './WeekGrid'
 import * as api from '@/shared/api/client'
 import type { Todo } from '@/shared/types'
+import { priorityAccent } from '@/features/todos/priority'
 import './Calendar.css'
 
 function getWeekStart(date: Date): Date {
@@ -19,8 +20,7 @@ function fmtWeek(ws: Date): string { const we = new Date(ws); we.setDate(we.getD
 
 function UnscheduledItem({ todo }: { todo: Todo }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: `unscheduled-${todo.id}`, data: { type: 'unscheduled', todo } })
-  const colors: Record<string, string> = { urgent: 'var(--c-urgent-text, #a32d2d)', mid: 'var(--c-mid-text, #854f0b)', normal: 'var(--text-secondary)' }
-  return <div ref={setNodeRef} {...listeners} {...attributes} className="cal-unscheduled-item" style={{ opacity: isDragging ? 0.4 : 1, color: colors[todo.priority] }}><GripVertical size={14} aria-hidden="true" />{todo.name}</div>
+  return <div ref={setNodeRef} {...listeners} {...attributes} className="cal-unscheduled-item" style={{ opacity: isDragging ? 0.4 : 1, color: priorityAccent[todo.priority] }}><GripVertical size={14} aria-hidden="true" />{todo.name}</div>
 }
 
 function UnscheduledDropZone({ children, hint }: { children: ReactNode; hint: string }) {

@@ -15,3 +15,12 @@ export function priorityLabels(t: (key: string) => string): Record<string, strin
     normal: t('todo.priority.normal'),
   }
 }
+
+// Calendar처럼 배지(배경+글자 쌍)가 아니라 점/텍스트/막대 하나로만 우선순위를
+// 나타낼 때 쓰는 대표 스와치 색. priorityStyle과 별도로 두는 이유는 priorityStyle의
+// mid(옅은 회색 배경)·normal(투명)이 단독 색상표시용으로 쓰면 거의 안 보이기 때문.
+export const priorityAccent: Record<string, string> = {
+  urgent: '#a32d2d',
+  mid:    '#854f0b',
+  normal: 'var(--accent)',
+}

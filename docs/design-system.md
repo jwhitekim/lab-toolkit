@@ -99,10 +99,17 @@
 - 규칙: 최근 기록을 페이지 본문에 상시 노출하지 않는다. 헤더의 아이콘 버튼(시계 아이콘) 클릭 시에만 드롭다운으로 펼친다. 항목이 0개면 버튼 자체를 숨긴다.
 - 배경 클릭 시 자동으로 닫힘.
 
-### 우선순위 배지 (Todo)
-- `frontend/src/features/todos/priority.ts`에 `priorityStyle`/`priorityLabel`로 단일화.
-- `urgent` = `--selected-bg` 채움, `mid` = `--bg-additive` 채움, `normal` = 투명+테두리. **컬러풀한 배지(빨강/주황/초록) 금지** — 전체 모노톤 규칙을 따른다.
-- `TodoItem.tsx`와 `FocusPanel.tsx`가 서로 다른 색을 쓰던 버그가 있었음 — 반드시 이 공유 모듈을 import해서 쓸 것, 컴포넌트마다 새로 정의하지 말 것.
+### 우선순위 표시 (Todo / Calendar)
+공유 모듈은 `frontend/src/features/todos/priority.ts` 하나. 용도별로 export가 나뉜다 — **컴포넌트마다 새로 정의하지 말고 반드시 여기서 import할 것.**
+
+| export | 용도 | 값 |
+|---|---|---|
+| `priorityStyle` | 배지(배경+글자 쌍) — Todo 리스트/상세 | `urgent`=`--selected-bg` 채움, `mid`=`--bg-additive` 채움, `normal`=투명+테두리 (모노톤) |
+| `priorityLabels(t)` | 라벨 텍스트 | i18n 함수 — `t()`를 받아 언어별 라벨 반환. 상수 아님 |
+| `priorityAccent` | 점·텍스트·막대 등 단독 색상표시 — Calendar | `urgent`=`#a32d2d`, `mid`=`#854f0b`, `normal`=`var(--accent)` |
+
+- `priorityStyle`이 아니라 `priorityAccent`가 따로 있는 이유: `priorityStyle`의 `mid`(옅은 회색 배경)·`normal`(투명)은 배지 형태(배경+글자)로 쓸 땐 괜찮지만, 점이나 텍스트처럼 색 하나로만 우선순위를 나타내면 거의 안 보인다. Calendar는 빽빽한 주간 그리드에서 한눈에 구분돼야 해서 빨강/주황/초록을 그대로 유지하기로 함(모노톤 강제 안 함) — 대신 값을 한 곳에만 정의.
+- 과거 `TodoItem.tsx`/`FocusPanel.tsx`가 서로 다른 배지 색을 썼고, `CalendarPage.tsx`/`WeekGrid.tsx`/`WeeklyReviewPage.tsx` 3곳이 각자 다른 빨강/주황 hex를 하드코딩했던 버그가 있었음 — 전부 위 표의 공유 export로 통일함.
 
 ### 터치 대상 (모바일)
 - `:hover`로만 나타나는 요소(예: `opacity-0 group-hover:opacity-100`)를 클릭 가능한 요소 위에 두지 않는다. iOS Safari에서 첫 탭이 호버 진입으로 소비되고 두 번째 탭에서야 클릭이 발생하는 버그를 유발한다(`TodoItem.tsx` 연필 아이콘, `6d3674c`에서 수정). 꼭 필요하면 `@media (hover: hover)`로 감싸서 터치 기기에서는 상시 노출한다.

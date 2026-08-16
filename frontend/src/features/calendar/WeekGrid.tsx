@@ -1,6 +1,7 @@
 import { useDndMonitor, useDroppable, useDraggable } from '@dnd-kit/core'
 import type { Todo } from '@/shared/types'
 import { useT } from '@/shared/i18n'
+import { priorityAccent } from '@/features/todos/priority'
 
 const HOURS = Array.from({ length: 18 }, (_, i) => i + 6)
 const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const
@@ -13,8 +14,7 @@ function EventBlock({ todo, dayIndex }: { todo: Todo; dayIndex: number }) {
   if (!todo.start_time) return null
   const start = isoToLocal(todo.start_time); const end = todo.end_time ? isoToLocal(todo.end_time) : new Date(start.getTime() + 3600000)
   const startH = start.getHours() + start.getMinutes() / 60; const endH = end.getHours() + end.getMinutes() / 60
-  const priorityColor: Record<string, string> = { urgent: '#b42318', mid: '#9a5b00', normal: 'var(--accent)' }
-  return <div ref={setNodeRef} {...listeners} {...attributes} style={{ position: 'absolute', top: (startH - 6) * SLOT_H, height: Math.max((endH - startH) * SLOT_H, 20), left: 2, right: 2, background: priorityColor[todo.priority] ?? 'var(--accent)', color: '#fff', borderRadius: 4, fontSize: 10, padding: '2px 4px', overflow: 'hidden', cursor: 'grab', opacity: isDragging ? 0.4 : 1, zIndex: 1, lineHeight: 1.3, userSelect: 'none' }} title={todo.name}>{todo.name}</div>
+  return <div ref={setNodeRef} {...listeners} {...attributes} style={{ position: 'absolute', top: (startH - 6) * SLOT_H, height: Math.max((endH - startH) * SLOT_H, 20), left: 2, right: 2, background: priorityAccent[todo.priority] ?? 'var(--accent)', color: 'var(--selected-text)', borderRadius: 4, fontSize: 10, padding: '2px 4px', overflow: 'hidden', cursor: 'grab', opacity: isDragging ? 0.4 : 1, zIndex: 1, lineHeight: 1.3, userSelect: 'none' }} title={todo.name}>{todo.name}</div>
 }
 function DroppableCell({ id }: { id: string }) { const { setNodeRef, isOver } = useDroppable({ id }); return <div ref={setNodeRef} style={{ height: SLOT_H, borderBottom: '1px solid var(--border-subtle)', background: isOver ? 'color-mix(in srgb, var(--bg-additive) 60%, transparent)' : undefined, position: 'relative' }} /> }
 
