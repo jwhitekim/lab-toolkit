@@ -1,9 +1,9 @@
 {
   "common": {
-    "loading": "正在加载...",
+    "loading": "加载中...",
     "cancel": "取消",
     "save": "保存",
-    "saving": "正在保存...",
+    "saving": "保存中...",
     "delete": "删除",
     "clear": "清除",
     "recentHistory": "最近记录",
@@ -21,18 +21,18 @@
       "model-review": "架构"
     },
     "workspace": {
-      "plan": "规划",
+      "plan": "计划",
       "research": "研究",
       "model-lab": "模型实验室"
     },
     "workspaceMobile": {
-      "plan": "规划",
+      "plan": "计划",
       "research": "研究",
       "model-lab": "模型实验室"
     },
-    "workspaceAria": "工作空间",
+    "workspaceAria": "工作区",
     "navMobile": {
-      "todo": "待办",
+      "todo": "任务",
       "calendar": "日历",
       "paper": "论文",
       "translate": "翻译",
@@ -43,17 +43,17 @@
     "weeklyReview": "每周回顾"
   },
   "login": {
-    "tagline": "Enter with intent",
+    "tagline": "带着目标开启",
     "enter": "进入",
     "tabLogin": "登录",
-    "tabRegister": "创建账号",
+    "tabRegister": "注册账号",
     "registeredMessage": "已收到注册申请。",
     "registeredNote": "管理员批准后即可登录。",
     "backToLogin": "返回登录",
     "usernamePlaceholder": "用户名",
     "passwordPlaceholder": "密码",
     "checking": "正在检查...",
-    "processing": "正在处理...",
+    "processing": "处理中...",
     "loginButton": "登录",
     "registerButton": "注册",
     "noAccount": "还没有账号？",
@@ -61,46 +61,46 @@
     "haveAccount": "已有账号？",
     "loginLink": "登录",
     "errors": {
-      "pendingApproval": "正在等待管理员批准。",
+      "pendingApproval": "等待管理员批准。",
       "loginFailed": "登录失败。",
       "registerFailed": "注册失败。",
-      "serverError": "服务器发生错误。"
+      "serverError": "发生服务器错误。"
     }
   },
   "paper": {
-    "searching": "正在搜索",
-    "unsupportedUrl": "未能在 URL 中找到 DOI / arXiv ID。请使用论文标题进行搜索。",
+    "searching": "搜索中",
+    "unsupportedUrl": "无法从 URL 中找到 DOI 或 arXiv ID。请通过论文标题搜索。",
     "unknownError": "未知错误",
-    "analyzing": "正在分析（约需 10~20 秒）",
+    "analyzing": "分析中（约需 10~20 秒）",
     "searchPlaceholder": "输入论文标题或 URL",
     "clearQueryAria": "清除搜索词",
     "recentSearch": "最近搜索",
     "analyzeButton": "分析",
     "heroTitle": "寻找论文，快速掌握核心内容",
-    "heroDescription": "仅凭标题、DOI 或 arXiv URL，即可获取理论摘要并确认期刊质量。",
+    "heroDescription": "只需输入标题、DOI 或 arXiv URL，即可查看从理论摘要到期刊质量的一切信息。",
     "aiBadge": "AI 理论分析",
     "emptyTitle": "搜索要分析的论文",
-    "emptyDescription": "在从头阅读长篇论文之前，您可以先查看研究问题、方法、结论以及期刊可信度。",
+    "emptyDescription": "在从头开始阅读长篇论文之前，您可以先查看研究问题、方法、结论以及期刊可信度。",
     "workflowAria": "分析过程",
     "workflow": {
-      "identifyTitle": "识别论文",
-      "identifyDesc": "根据标题或 URL 寻找精确的论文。",
+      "identifyTitle": "论文识别",
+      "identifyDesc": "通过标题或 URL 找到准确的论文。",
       "analyzeTitle": "核心分析",
-      "analyzeDesc": "将问题、方法和结论总结为易读的结构。",
-      "qualityTitle": "质量确认",
-      "qualityDesc": "对比期刊等级与引用信息。"
+      "analyzeDesc": "将问题、方法、结论总结为易读的结构。",
+      "qualityTitle": "质量检查",
+      "qualityDesc": "对比期刊分区和引用信息。"
     },
     "sidebar": {
-      "cited": "引用 {{count}} 次",
-      "noOriginalLink": "无原文链接",
-      "noData": "暂无数据",
+      "cited": "被引 {{count}} 次",
+      "noOriginalLink": "无原始链接",
+      "noData": "无数据",
       "noQuartile": "无 Q 分区"
     },
     "candidates": {
       "header": "🔍 搜索结果 — 请选择要分析的论文",
       "untitled": "(无标题)",
-      "unknownVenue": "未知会议/期刊",
-      "meta": "{{year}}年 · {{venue}} · 引用 {{count}}次"
+      "unknownVenue": "未知期刊/会议",
+      "meta": "{{year}}年 · {{venue}} · 被引 {{count}} 次"
     },
     "result": {
       "theoryAnalysis": "🧠 理论分析",
@@ -109,33 +109,33 @@
       "method": "方法",
       "conclusion": "结论",
       "authorInfo": "👤 作者信息",
-      "noAuthorInfo": "暂无作者信息",
+      "noAuthorInfo": "无作者信息",
       "profile": "个人主页 ↗",
-      "cited": "引用 {{count}}次"
+      "cited": "被引 {{count}} 次"
     },
-    "loaderDescription": "请稍候，正在整理分析结果。",
-    "errorTitle": "未能完成分析",
+    "loaderDescription": "请稍候。正在整理分析结果。",
+    "errorTitle": "无法完成 analysis",
     "errors": {
       "sessionExpired": "会话已过期。请重新登录。",
-      "searchFailed": "搜索失败",
-      "analyzeFailed": "分析失败",
-      "pdfAnalyzeFailed": "PDF 分析失败"
+      "searchFailed": "搜索错误",
+      "analyzeFailed": "分析错误",
+      "pdfAnalyzeFailed": "PDF 分析错误"
     }
   },
   "translator": {
-    "heroTitle": "保持阅读流畅的翻译",
-    "heroDescription": "实时将英文论文和技术文档翻译成流畅的中文。",
-    "sourceLabel": "Source",
+    "heroTitle": "保持阅读连贯性的翻译",
+    "heroDescription": "将英文论文和技术文档实时翻译为自然的中文。",
+    "sourceLabel": "原文",
     "sourceLanguage": "English",
-    "resultLabel": "Translation",
-    "resultLanguage": "Chinese",
+    "resultLabel": "译文",
+    "resultLanguage": "中文",
     "textPlaceholder": "输入文本",
-    "autoTranslate": "Auto translate",
+    "autoTranslate": "自动翻译",
     "recentTranslation": "最近翻译",
     "copied": "已复制",
     "copy": "复制",
-    "translating": "正在翻译",
-    "translatingDesc": "正在保持句子通顺进行翻译。",
+    "translating": "翻译中",
+    "translatingDesc": "正在保持语句通顺并进行翻译。",
     "errorTitle": "翻译失败",
     "resultEmptyTitle": "翻译结果",
     "resultEmptyDesc": "在左侧输入英文，系统将自动开始翻译。",
@@ -144,10 +144,10 @@
     "feature": {
       "autoDetectTitle": "自动检测",
       "autoDetectDesc": "停止输入后将立即开始翻译。",
-      "streamingTitle": "流式结果",
-      "streamingDesc": "无需等待，即可实时阅读长句。",
+      "streamingTitle": "流式输出",
+      "streamingDesc": "长句也无需等待即可阅读。",
       "historyTitle": "翻译历史",
-      "historyDesc": "可以重新载入并对比最近的翻译结果。"
+      "historyDesc": "可以重新载入最近的结果并进行对比。"
     },
     "errors": {
       "translateFailed": "翻译错误 ({{status}})",
@@ -158,22 +158,22 @@
   "reviewer": {
     "sections": {
       "overview": "整体流程",
-      "modules": "各个模块",
+      "modules": "各模块",
       "data_flow": "数据流",
       "contribution": "核心贡献"
     },
     "feedback": {
       "correct": "理解正确的部分",
       "missing": "错误或遗漏的部分",
-      "suggestion": "更准确的表达"
+      "suggestion": "更准确的表述"
     },
-    "enterDescriptionError": "请输入描述。",
-    "heroTitle": "通过口述模型架构来巩固学习",
-    "heroDescription": "分析架构图并亲自进行描述，然后通过 AI 反馈检验您的理解程度。",
-    "historyBadge": "{{count}} 个分析记录",
-    "requestFailedTitle": "未能完成请求",
+    "enterDescriptionError": "请输入说明。",
+    "heroTitle": "通过阐述模型结构来进行学习",
+    "heroDescription": "分析架构图并尝试自行阐述，然后通过 AI 反馈来检验您的理解程度。",
+    "historyBadge": "{{count}} 条分析记录",
+    "requestFailedTitle": "无法完成请求",
     "recentAnalysis": "最近分析",
-    "untitledImage": "图像",
+    "untitledImage": "图片",
     "uploadTitle": "上传架构图",
     "uploadHintBold": "点击或拖拽图片",
     "uploadHintSuffix": "至此处上传",
@@ -181,30 +181,30 @@
     "previewAlt": "预览",
     "reselect": "重新选择",
     "analyzingButton": "AI 正在分析...",
-    "getExplanationButton": "获取 AI 解析",
+    "getExplanationButton": "获取 AI 说明",
     "guideAria": "学习过程",
     "guide": {
-      "analyzeTitle": "架构分析",
+      "analyzeTitle": "结构分析",
       "analyzeDesc": "识别架构图中的模块与数据流。",
-      "explainTitle": "亲自阐述",
-      "explainDesc": "用自己的语言整理所理解的内容，查漏补缺。",
+      "explainTitle": "自行阐述",
+      "explainDesc": "用自己的话整理理解的内容并查漏补缺。",
       "feedbackTitle": "查看反馈",
-      "feedbackDesc": "通过 AI 反馈对比理解正确的部分与遗漏的概念。"
+      "feedbackDesc": "对照 AI 反馈，对比正确的部分与遗漏的概念。"
     },
     "errors": {
-      "explainFailed": "解析错误 ({{status}})",
+      "explainFailed": "阐述错误 ({{status}})",
       "feedbackFailed": "反馈错误 ({{status}})"
     },
-    "explainYourselfTitle": "尝试口述阐述",
-    "readyPrompt": "已准备就绪。请先尝试自己描述一下。",
-    "textareaPlaceholder": "该模型... 整体上... 每个模块...",
+    "explainYourselfTitle": "尝试自行阐述",
+    "readyPrompt": "准备就绪。请先尝试自行阐述。",
+    "textareaPlaceholder": "该模型... 整体上... 各模块...",
     "generatingFeedback": "正在生成反馈...",
-    "getFeedbackButton": "获取 feedback",
+    "getFeedbackButton": "获取反馈",
     "resultTitle": "分析结果",
-    "aiExplanationLabel": "AI 解析",
+    "aiExplanationLabel": "AI 说明",
     "feedbackLabel": "反馈",
-    "tryAgainHint": "如果您觉得可以描述得更好，请再次尝试。",
-    "explainAgain": "重新描述",
+    "tryAgainHint": "如果觉得可以阐述得更好，不妨再试一次。",
+    "explainAgain": "重新阐述",
     "newUpload": "上传新论文"
   },
   "todo": {
@@ -219,33 +219,34 @@
       "all": "全部",
       "memo": "备注"
     },
-    "filterAriaLabel": "待办筛选",
+    "filterAriaLabel": "待办过滤器",
     "addButton": "添加",
-    "addTodoFooter": "添加待办事项",
+    "addTodoFooter": "添加待办任务",
     "activeCount": "{{count}} 个进行中",
-    "noTodos": "暂无待办事项",
+    "noTodos": "暂无待办任务",
     "completedToggle": "已完成",
-    "loading": "正在加载待办",
+    "loading": "正在加载待办事项",
     "modal": {
-      "title": "添加待办事项",
+      "title": "添加待办任务",
       "namePlaceholder": "需要做什么？",
-      "memoPlaceholder": "记录上下文或背景 — 反馈、参考事项、先前的讨论等",
+      "memoPlaceholder": "记录背景或上下文 — 如反馈、参考、先前的讨论等",
       "priorityLabel": "优先级",
       "deadlineLabel": "截止日期",
       "save": "保存"
     },
     "overview": {
-      "heroTitle": "今日流程，一目了然",
-      "heroDescription": "选择待办事项，即可查看详细步骤 and AI 执行策略。",
+      "heroTitle": "今日流程一目了然",
+      "heroDescription": "选择待办任务即可查看详细步骤及 AI 执行策略。",
       "aiBadge": "AI 执行计划",
       "inProgress": "进行中",
       "urgentItems": "紧急项目",
       "completionRate": "完成率",
-      "nextTodo": "下一项待办",
+      "nextTodo": "下一步待办",
       "selectFromList": "从列表中选择以查看详情",
-      "emptyActive": "暂无进行中的待办事项。尝试添加一个新的吧。"
+      "emptyActive": "暂无进行中的待办任务。尝试添加新任务吧。"
     },
     "detail": {
+      "selectTodo": "请选择待办任务",
       "backToList": "← 返回列表",
       "memoPlaceholder": "备注 · 上下文",
       "memoContext": "备注 · 上下文",
@@ -259,25 +260,26 @@
       "aiStrategy": "AI 策略",
       "regenerate": "重新生成",
       "noStrategy": "暂无策略。请尝试点击重新生成。",
-      "deleteConfirm": "确定要删除此待办事项吗？"
+      "deleteConfirm": "确认删除此待办吗？"
     },
     "errors": {
       "toggleDoneFailed": "标记完成时发生错误。"
     }
   },
   "calendar": {
-    "heroTitle": "规划您一周的时间",
-    "heroDescription": "将未安排的待办事项拖拽到所需时间段，轻松调整日程。",
+    "heroTitle": "规划你的一周时间",
+    "heroDescription": "将未分配的待办任务拖拽到所需时间段，轻松调整日程。",
     "eventsBadge": "{{count}} 个日程",
     "prevWeek": "上一周",
     "nextWeek": "下一周",
-    "todoListButton": "待办列表",
+    "todoListButton": "待办任务列表",
     "durationLabel": "分配时长",
     "durationHours": "{{count}} 小时",
     "removeScheduleHint": "取消时间分配",
-    "unscheduledTitle": "未安排的待办",
+    "weekDaysLabel": "选择星期",
+    "unscheduledTitle": "未分配待办",
     "loadingEvents": "正在加载日程",
-    "allPlaced": "已全部安排完毕",
+    "allPlaced": "已全部分配",
     "days": {
       "mon": "周一",
       "tue": "周二",
@@ -289,41 +291,41 @@
     }
   },
   "weeklyReview": {
-    "todoListButton": "待办列表",
-    "loading": "正在加载...",
+    "todoListButton": "待办任务列表",
+    "loading": "加载中...",
     "loadError": "无法加载数据。",
     "stats": {
       "completed": "已完成",
       "created": "已创建",
       "completionRate": "完成率",
-      "overdue": "逾期任务"
+      "overdue": "延期任务"
     },
-    "priorityBreakdown": "各优先级状态",
-    "overdueList": "逾期任务 ({{count}} 个)"
+    "priorityBreakdown": "按优先级细分",
+    "overdueList": "延期任务 ({{count}} 个)"
   },
   "contextor": {
-    "heroTitle": "结合上下文理解技术术语",
-    "heroDescription": "超越字典释义，对比其在 ML/DL 论文与实际实现中的应用方式。",
+    "heroTitle": "透彻理解技术术语的上下文",
+    "heroDescription": "不仅看词典定义，还对比其在机器学习（ML）与深度学习（DL）论文和实际实现中的具体应用。",
     "recentLookups": "最近查询 {{count}}",
     "searchPlaceholder": "请输入单词（例如：trials, interleave）",
     "recentLookupsLabel": "最近查询",
     "lookupButton": "查询",
     "analyzing": "正在分析上下文",
-    "analyzingDesc": "正在对比查看论文与实现用例。",
-    "lookupFailedTitle": "无法查询该术语",
+    "analyzingDesc": "正在结合论文与实现用例进行 analysis。",
+    "lookupFailedTitle": "无法查询术语",
     "contextsCount": "{{count}} 个上下文",
-    "generalUsage": "通用用法",
-    "noMlUsage": "无 ML 特定用法。",
-    "emptyTitle": "您在寻找什么样的用例？",
-    "emptyDescription": "您可以从推荐的搜索词开始，或者在上方搜索框中输入您好奇的术语。",
+    "generalUsage": "常规用法",
+    "noMlUsage": "无机器学习（ML）特定用法。",
+    "emptyTitle": "想了解哪些用例？",
+    "emptyDescription": "可以从推荐搜索词开始，或在上方搜索框中输入感兴趣的术语。",
     "suggestionsAria": "推荐搜索词",
     "guide": {
       "implementationTitle": "实现上下文",
-      "implementationDesc": "在代码和模型描述中所表达的含义",
+      "implementationDesc": "在代码和模型说明中所代表的含义",
       "paperTitle": "论文上下文",
-      "paperDesc": "学术论文句子中常用的用法",
+      "paperDesc": "研究文献中常出现的具体用法",
       "comparisonTitle": "用例对比",
-      "comparisonDesc": "英文例句与流畅的中文翻译"
+      "comparisonDesc": "英文例句与自然的中文字义对比"
     },
     "errors": {
       "lookupFailed": "查询错误 ({{status}})"

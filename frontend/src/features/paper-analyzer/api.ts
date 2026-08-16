@@ -1,3 +1,5 @@
+import { translate } from '@/shared/i18n'
+
 const BASE = '/paper'
 
 export interface Candidate {
@@ -24,7 +26,7 @@ async function checkRes(res: Response, label: string): Promise<void> {
   if (res.ok) return
   if (res.status === 401) {
     window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`
-    throw new Error('세션이 만료됐습니다. 다시 로그인해주세요.')
+    throw new Error(translate('paper.errors.sessionExpired'))
   }
   let detail = ''
   try {
@@ -40,7 +42,7 @@ export async function search(query: string): Promise<{ type: string; query?: str
   const fd = new FormData()
   fd.append('query', query)
   const res = await fetch(`${BASE}/search`, { method: 'POST', body: fd })
-  await checkRes(res, '검색 오류')
+  await checkRes(res, translate('paper.errors.searchFailed'))
   return res.json()
 }
 
@@ -48,7 +50,7 @@ export async function analyzeById(paperId: string): Promise<PaperResult> {
   const fd = new FormData()
   fd.append('paper_id', paperId)
   const res = await fetch(`${BASE}/analyze`, { method: 'POST', body: fd })
-  await checkRes(res, '분석 오류')
+  await checkRes(res, translate('paper.errors.analyzeFailed'))
   return res.json()
 }
 
@@ -56,7 +58,7 @@ export async function analyzeByUrl(url: string): Promise<PaperResult> {
   const fd = new FormData()
   fd.append('url', url)
   const res = await fetch(`${BASE}/analyze`, { method: 'POST', body: fd })
-  await checkRes(res, '분석 오류')
+  await checkRes(res, translate('paper.errors.analyzeFailed'))
   return res.json()
 }
 
@@ -64,7 +66,7 @@ export async function analyzePdf(file: File): Promise<PaperResult & { figures: u
   const fd = new FormData()
   fd.append('file', file)
   const res = await fetch(`${BASE}/analyze-pdf`, { method: 'POST', body: fd })
-  await checkRes(res, 'PDF 분석 오류')
+  await checkRes(res, translate('paper.errors.pdfAnalyzeFailed'))
   return res.json()
 }
 

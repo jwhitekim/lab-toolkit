@@ -1,19 +1,20 @@
 import { useState } from 'react'
 import { X, Sparkles } from 'lucide-react'
 import type { Priority } from '@/shared/types'
+import { useT } from '@/shared/i18n'
 
 interface Props {
   onClose: () => void
   onSave: (data: { name: string; memo: string; priority: Priority; deadline: string }) => Promise<void>
 }
 
-const priorities: { value: Priority; label: string }[] = [
-  { value: 'urgent', label: '긴급' },
-  { value: 'mid',    label: '보통' },
-  { value: 'normal', label: '낮음' },
-]
-
 export default function AddTodoModal({ onClose, onSave }: Props) {
+  const t = useT()
+  const priorities: { value: Priority; label: string }[] = [
+    { value: 'urgent', label: t('todo.priority.urgent') },
+    { value: 'mid',    label: t('todo.priority.mid') },
+    { value: 'normal', label: t('todo.priority.normal') },
+  ]
   const [name, setName] = useState('')
   const [memo, setMemo] = useState('')
   const [priority, setPriority] = useState<Priority>('normal')
@@ -50,7 +51,7 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
       >
         {/* Modal header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-0">
-          <h2 className="text-[14px] font-semibold text-gray-800">할 일 추가</h2>
+          <h2 className="text-[14px] font-semibold text-gray-800">{t('todo.modal.title')}</h2>
           <button
             onClick={onClose}
             className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-black/5 transition-colors"
@@ -66,7 +67,7 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
             value={name}
             onChange={e => setName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSave()}
-            placeholder="무엇을 해야 하나요?"
+            placeholder={t('todo.modal.namePlaceholder')}
             className="w-full text-[16px] font-medium placeholder:text-gray-300 bg-transparent outline-none text-gray-900 border-b pb-2 transition-colors focus:border-[var(--selected-bg)]"
             style={{ borderColor: 'var(--border)' }}
           />
@@ -75,7 +76,7 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
           <textarea
             value={memo}
             onChange={e => setMemo(e.target.value)}
-            placeholder="맥락이나 배경을 적어두세요 — 피드백, 참고사항, 이전 논의 등"
+            placeholder={t('todo.modal.memoPlaceholder')}
             rows={3}
             className="w-full text-[16px] placeholder:text-gray-300 bg-transparent outline-none resize-none text-gray-700 rounded-lg px-3 py-2.5 transition-colors"
             style={{ background: 'var(--list)' }}
@@ -83,7 +84,7 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
 
           {/* Priority pills */}
           <div>
-            <div className="text-[11px] text-gray-400 mb-2">우선순위</div>
+            <div className="text-[11px] text-gray-400 mb-2">{t('todo.modal.priorityLabel')}</div>
             <div className="flex gap-2">
               {priorities.map(p => (
                 <button
@@ -102,7 +103,7 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
 
           {/* Deadline */}
           <div>
-            <div className="text-[11px] text-gray-400 mb-2">마감</div>
+            <div className="text-[11px] text-gray-400 mb-2">{t('todo.modal.deadlineLabel')}</div>
             <input
               type="date"
               value={deadline}
@@ -122,7 +123,7 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
             onClick={onClose}
             className="px-4 py-2 text-[13px] text-gray-500 hover:bg-black/5 rounded-lg transition-colors"
           >
-            취소
+            {t('common.cancel')}
           </button>
           <button
             onClick={handleSave}
@@ -132,12 +133,12 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
             {saving ? (
               <>
                 <span className="w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                저장 중...
+                {t('common.saving')}
               </>
             ) : (
               <>
                 <Sparkles size={13} />
-                저장하기
+                {t('todo.modal.save')}
               </>
             )}
           </button>

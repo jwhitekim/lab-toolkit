@@ -72,23 +72,23 @@ export default function Contextor() {
             value={query}
             onChange={e => setQuery(e.target.value.slice(0, MAX_CHARS))}
             onKeyDown={e => { if (e.key === 'Enter') doLookup(query) }}
-            placeholder="단어를 입력하세요 (예: trials, interleave)" 
+            placeholder={t('contextor.searchPlaceholder')}
             autoFocus={!isMobile}
           />
           {query && (
-            <button className="contextor-icon-btn" onClick={handleClear} title="지우기" type="button">
+            <button className="contextor-icon-btn" onClick={handleClear} title={t('common.clear')} type="button">
               <X size={15} />
             </button>
           )}
           <HistoryDropdown
             items={history}
-            label="최근 조회"
+            label={t('contextor.recentLookupsLabel')}
             triggerClassName="contextor-icon-btn"
             onSelect={item => { setQuery(item.query); setResult(item.result) }}
             renderItem={item => (
               <>
                 <div style={{ fontSize: 13, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.query}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-disabled)', marginTop: 3 }}>{item.result.hasMlUsage ? `${item.result.cases.length}개 맥락` : '일반 용법'}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-disabled)', marginTop: 3 }}>{item.result.hasMlUsage ? t('contextor.contextsCount', { count: item.result.cases.length }) : t('contextor.generalUsage')}</div>
               </>
             )}
           />
@@ -98,7 +98,7 @@ export default function Contextor() {
             disabled={!query.trim() || loading}
             type="button"
           >
-            조회
+            {t('contextor.lookupButton')}
           </button>
         </div>
 
@@ -108,7 +108,7 @@ export default function Contextor() {
           {!sessionExpired && loading && (
             <div className="contextor-status">
               <Loader2 size={16} className="contextor-spin" />
-              <span>맥락 분석 중</span>
+              <span>{t('contextor.analyzing')}</span>
             </div>
           )}
 
@@ -121,7 +121,7 @@ export default function Contextor() {
               <h2 className="contextor-query">{result.query}</h2>
 
               {!result.hasMlUsage ? (
-                <p className="contextor-note">{result.note || 'ML 특수 용법이 없습니다.'}</p>
+                <p className="contextor-note">{result.note || t('contextor.noMlUsage')}</p>
               ) : (
                 <div className="contextor-cases">
                   {result.cases.map((c, i) => (

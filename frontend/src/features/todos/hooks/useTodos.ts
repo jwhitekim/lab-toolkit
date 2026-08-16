@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Todo, NavFilter } from '@/shared/types'
 import * as api from '@/shared/api/client'
+import { useT } from '@/shared/i18n'
 
 export function useTodos(filter: NavFilter) {
+  const t = useT()
   const [todos, setTodos] = useState<Todo[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -55,7 +57,7 @@ export function useTodos(filter: NavFilter) {
       return updated
     } catch {
       setTodos(prev => prev.map(t => t.id === id ? { ...t, done: original.done } : t))
-      setToastError('완료 처리 중 오류가 발생했습니다.')
+      setToastError(t('todo.errors.toggleDoneFailed'))
     }
   }
 

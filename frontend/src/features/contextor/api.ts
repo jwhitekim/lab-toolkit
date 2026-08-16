@@ -1,3 +1,5 @@
+import { translate } from '@/shared/i18n'
+
 const BASE = '/contextor'
 
 export interface ContextCase {
@@ -30,7 +32,7 @@ export async function lookup(text: string): Promise<ContextorResult> {
   })
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
-    throw new Error(data.error ?? `조회 오류 (${res.status})`)
+    throw new Error(data.error ?? translate('contextor.errors.lookupFailed', { status: res.status }))
   }
   return res.json()
 }

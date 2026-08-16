@@ -44,8 +44,8 @@ export default function Translator() {
         setTranslating(false)
         return
       }
-      if (!res.ok) throw new Error(`번역 오류 (${res.status})`)
-      if (!res.body) throw new Error('스트리밍을 지원하지 않는 환경입니다.')
+      if (!res.ok) throw new Error(t('translator.errors.translateFailed', { status: res.status }))
+      if (!res.body) throw new Error(t('translator.errors.noStreaming'))
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
       while (true) {
@@ -59,7 +59,7 @@ export default function Translator() {
       setError((e as Error).message)
       setTranslating(false)
     }
-  }, [])
+  }, [t])
 
   const handleCopy = async () => {
     if (!streamedText) return
@@ -112,11 +112,11 @@ export default function Translator() {
           <div className="translator-panel translator-panel--source">
             <div className="translator-panel-header">
               <div>
-                <span className="translator-label">Source</span>
-                <span className="translator-language">English</span>
+                <span className="translator-label">{t('translator.sourceLabel')}</span>
+                <span className="translator-language">{t('translator.sourceLanguage')}</span>
               </div>
               {source && (
-                <button className="translator-icon-btn" onClick={handleClear} title="지우기" type="button">
+                <button className="translator-icon-btn" onClick={handleClear} title={t('common.clear')} type="button">
                   <X size={15} />
                 </button>
               )}
@@ -133,25 +133,25 @@ export default function Translator() {
                   doTranslate(source.trim())
                 }
               }}
-              placeholder="텍스트 입력"
+              placeholder={t('translator.textPlaceholder')}
             />
 
             <div className="translator-panel-footer">
               <span>{source.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}</span>
-              <span>Auto translate</span>
+              <span>{t('translator.autoTranslate')}</span>
             </div>
           </div>
 
           <div className="translator-panel translator-panel--result">
             <div className="translator-panel-header">
               <div>
-                <span className="translator-label">Translation</span>
-                <span className="translator-language">Korean</span>
+                <span className="translator-label">{t('translator.resultLabel')}</span>
+                <span className="translator-language">{t('translator.resultLanguage')}</span>
               </div>
               <div style={{ display: 'flex', gap: 6 }}>
                 <HistoryDropdown
                   items={txHistory}
-                  label="최근 번역"
+                  label={t('translator.recentTranslation')}
                   triggerClassName="translator-icon-btn"
                   onSelect={item => { setSource(item.source_text); setStreamedText(item.translated_text) }}
                   renderItem={item => (
@@ -165,7 +165,7 @@ export default function Translator() {
                   className="translator-icon-btn"
                   onClick={handleCopy}
                   disabled={!streamedText || translating}
-                  title={copied ? '복사됨' : '복사'}
+                  title={copied ? t('translator.copied') : t('translator.copy')}
                   type="button"
                 >
                   {copied ? <Check size={15} /> : <Copy size={15} />}
@@ -179,7 +179,7 @@ export default function Translator() {
               {!sessionExpired && translating && !streamedText && (
                 <div className="translator-status">
                   <Loader2 size={15} className="translator-spin" />
-                  <span>번역 중</span>
+                  <span>{t('translator.translating')}</span>
                 </div>
               )}
 

@@ -7,4 +7,11 @@ export const priorityStyle: Record<string, CSSProperties> = {
   normal: { background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)' },
 }
 
-export const priorityLabel: Record<string, string> = { urgent: '긴급', mid: '보통', normal: '낮음' }
+// 라벨은 언어별로 달라지므로 상수가 아니라 t()를 받아 만드는 함수로 제공.
+export function priorityLabels(t: (key: string) => string): Record<string, string> {
+  return {
+    urgent: t('todo.priority.urgent'),
+    mid:    t('todo.priority.mid'),
+    normal: t('todo.priority.normal'),
+  }
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useShellNav } from '@/shared/hooks/useShellNav'
+import { useT, useDateLocale } from '@/shared/i18n'
 import * as api from '@/shared/api/client'
 import type { WeeklyReview } from '@/shared/types'
 
@@ -12,14 +13,18 @@ function getMonday(date: Date): Date {
   return d
 }
 
-function fmtDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })
-}
-
-const PRIORITY_LABEL: Record<string, string> = { urgent: '긴급', mid: '보통', normal: '낮음' }
 const PRIORITY_COLOR: Record<string, string> = { urgent: '#a32d2d', mid: '#854f0b', normal: '#0f6e56' }
 
 export default function WeeklyReview() {
+  const t = useT()
+  const dateLocale = useDateLocale()
+  const PRIORITY_LABEL: Record<string, string> = {
+    urgent: t('todo.priority.urgent'),
+    mid:    t('todo.priority.mid'),
+    normal: t('todo.priority.normal'),
+  }
+  const fmtDate = (iso: string): string =>
+    new Date(iso).toLocaleDateString(dateLocale, { month: 'long', day: 'numeric' })
   const { setActive } = useShellNav()
   const [weekStart, setWeekStart] = useState(() => getMonday(new Date()))
   const [data, setData] = useState<WeeklyReview | null>(null)
@@ -31,9 +36,9 @@ export default function WeeklyReview() {
     setError('')
     api.getWeeklyReview(weekStart.toISOString())
       .then(setData)
-      .catch(() => setError('데이터를 불러오지 못했습니다.'))
+      .catch(() => setError(t('weeklyReview.loadError')))
       .finally(() => setLoading(false))
-  }, [weekStart])
+  }, [weekStart, t])
 
   const prevWeek = () => setWeekStart(ws => { const d = new Date(ws); d.setDate(d.getDate() - 7); return d })
   const nextWeek = () => setWeekStart(ws => { const d = new Date(ws); d.setDate(d.getDate() + 7); return d })
@@ -58,27 +63,27 @@ export default function WeeklyReview() {
           onClick={() => setActive('todo')}
           style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-secondary)', background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}
         >
-          할일 목록
+          {t('weeklyReview.todoListButton')}
         </button>
       </div>
 
       <div style={{ flex: 1, overflow: 'auto', padding: '20px 24px' }}>
-        {loading && <p style={{ fontSize: 13, color: 'var(--text-disabled)' }}>불러오는 중...</p>}
+        {loading && <p style={{ fontSize: 13, color: 'var(--text-disabled)' }}>{t('weeklyReview.loading')}</p>}
         {error && <p style={{ fontSize: 13, color: 'var(--c-error)' }}>{error}</p>}
 
         {data && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 680 }}>
             {/* 통계 카드 */}
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              {statCard('완료', data.completed)}
-              {statCard('생성', data.created)}
-              {statCard('완료율', `${Math.round(data.completion_rate * 100)}%`)}
-              {statCard('밀린 할일', data.overdue.length)}
+              {statCard(t('weeklyReview.stats.completed'), data.completed)}
+              {statCard(t('weeklyReview.stats.created'), data.created)}
+              {statCard(t('weeklyReview.stats.completionRate'), `${Math.round(data.completion_rate * 100)}%`)}
+              {statCard(t('weeklyReview.stats.overdue'), data.overdue.length)}
             </div>
 
             {/* 우선순위별 분포 */}
             <div style={{ background: 'var(--bg-additive)', borderRadius: 10, padding: '16px' }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 12 }}>우선순위별 현황</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 12 }}>{t('weeklyReview.priorityBreakdown')}</div>
               {(['urgent', 'mid', 'normal'] as const).map(p => {
                 const { done, todo } = data.by_priority[p] ?? { done: 0, todo: 0 }
                 const total = done + todo
@@ -101,17 +106,17 @@ export default function WeeklyReview() {
             {data.overdue.length > 0 && (
               <div>
                 <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>
-                  밀린 할일 ({data.overdue.length}개)
+                  {t('weeklyReview.overdueList', { count: data.overdue.length })}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {data.overdue.map(t => (
+                  {data.overdue.map(item => (
                     <button
-                      key={t.id}
+                      key={item.id}
                       onClick={() => setActive('todo')}
                       style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'var(--bg-additive)', border: 'none', borderRadius: 8, cursor: 'pointer', textAlign: 'left', fontSize: 13, color: 'var(--text-primary)' }}
                     >
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: PRIORITY_COLOR[t.priority], flexShrink: 0 }} />
-                      {t.name}
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: PRIORITY_COLOR[item.priority], flexShrink: 0 }} />
+                      {item.name}
                     </button>
                   ))}
                 </div>

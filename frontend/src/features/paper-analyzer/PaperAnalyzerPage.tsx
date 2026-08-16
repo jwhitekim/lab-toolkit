@@ -4,7 +4,7 @@ import { BadgeCheck, BrainCircuit, FileSearch, FileText, Search, X } from 'lucid
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { HistoryDropdown } from '@/shared/components/HistoryDropdown'
 import PageHeader from '@/shared/components/PageHeader'
-import { useT } from '@/shared/i18n'
+import { useT, useDateLocale } from '@/shared/i18n'
 import * as api from './api'
 import type { Candidate, PaperResult, PaperHistoryItem } from './api'
 import './PaperAnalyzer.css'
@@ -34,6 +34,7 @@ const C = {
 
 export default function PaperAnalyzer() {
   const t = useT()
+  const dateLocale = useDateLocale()
   const isMobile = useIsMobile()
   const [query, setQuery] = useState('')
   const [state, setState] = useState<MainState>({ kind: 'idle' })
@@ -48,18 +49,18 @@ export default function PaperAnalyzer() {
   const doSearch = async () => {
     const q = query.trim()
     if (!q) return
-    setState({ kind: 'loading', msg: '검색 중' })
+    setState({ kind: 'loading', msg: t('paper.searching') })
     setSidebarData(null)
     try {
       const data = await api.search(q)
       if (data.type === 'url') {
         await doAnalyzeUrl(data.query!)
       } else if (data.type === 'unsupported_url') {
-        setState({ kind: 'error', msg: 'URL에서 DOI / arXiv ID를 찾을 수 없습니다. 논문 제목으로 검색해주세요.' })
+        setState({ kind: 'error', msg: t('paper.unsupportedUrl') })
       } else if (data.type === 'candidates' && data.data) {
         setState({ kind: 'candidates', items: data.data })
       } else {
-        setState({ kind: 'error', msg: (data as any).error || '알 수 없는 오류' })
+        setState({ kind: 'error', msg: (data as any).error || t('paper.unknownError') })
       }
     } catch (e) {
       setState({ kind: 'error', msg: (e as Error).message })
@@ -73,7 +74,7 @@ export default function PaperAnalyzer() {
   }
 
   const doAnalyzeById = async (paperId: string) => {
-    setState({ kind: 'loading', msg: '분석 중 (약 10~20초 소요)' })
+    setState({ kind: 'loading', msg: t('paper.analyzing') })
     try {
       const data = await api.analyzeById(paperId)
       loadResult(data)
@@ -83,7 +84,7 @@ export default function PaperAnalyzer() {
   }
 
   const doAnalyzeUrl = async (url: string) => {
-    setState({ kind: 'loading', msg: '분석 중 (약 10~20초 소요)' })
+    setState({ kind: 'loading', msg: t('paper.analyzing') })
     try {
       const data = await api.analyzeByUrl(url)
       loadResult(data)
@@ -101,7 +102,7 @@ export default function PaperAnalyzer() {
         value={query}
         onChange={e => setQuery(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter') doSearch() }}
-        placeholder="논문 제목 또는 URL 입력"
+        placeholder={t('paper.searchPlaceholder')}
         autoFocus={!isMobile}
       />
       {query && (
@@ -111,8 +112,8 @@ export default function PaperAnalyzer() {
             setQuery('')
             inputRef.current?.focus()
           }}
-          title="지우기"
-          aria-label="검색어 지우기"
+          title={t('common.clear')}
+          aria-label={t('paper.clearQueryAria')}
           type="button"
         >
           <X size={15} />
@@ -120,7 +121,7 @@ export default function PaperAnalyzer() {
       )}
       <HistoryDropdown
         items={history}
-        label="최근 검색"
+        label={t('paper.recentSearch')}
         triggerClassName="paper-search-icon-btn"
         onSelect={item => {
           setQuery(item.title)
@@ -130,7 +131,7 @@ export default function PaperAnalyzer() {
         renderItem={item => (
           <>
             <div style={{ fontSize: 13, fontWeight: 600, color: C.text, lineHeight: 1.4, wordBreak: 'keep-all' }}>{item.title}</div>
-            <div style={{ fontSize: 12, color: C.textMuted, marginTop: 3 }}>{new Date(item.created_at).toLocaleDateString('ko-KR')}</div>
+            <div style={{ fontSize: 12, color: C.textMuted, marginTop: 3 }}>{new Date(item.created_at).toLocaleDateString(dateLocale)}</div>
           </>
         )}
       />
@@ -139,7 +140,7 @@ export default function PaperAnalyzer() {
         onClick={doSearch}
         disabled={!query.trim() || state.kind === 'loading'}
         type="button"
-      >분석</button>
+      >{t('paper.analyzeButton')}</button>
     </div>
   )
 
@@ -224,6 +225,7 @@ function EmptyState() {
 
 // ── Sidebar ────────────────────────────────────────────────────────
 function SidebarContent({ data }: { data: PaperResult }) {
+  const t = useT()
   const { basic, quality } = data
   const divider = `1px solid ${C.border}`
 
@@ -235,12 +237,12 @@ function SidebarContent({ data }: { data: PaperResult }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <MetaRow k="Year"  v={String(basic.year || '—')} />
           <MetaRow k="Venue" v={basic.venue || '—'} />
-          <MetaRow k="Cited" v={`${basic.citationCount ?? '—'}회`} />
+          <MetaRow k="Cited" v={t('paper.sidebar.cited', { count: basic.citationCount ?? '—' })} />
         </div>
         <div style={{ marginTop: 18, paddingTop: 18, borderTop: divider, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {basic.doi    && <a href={`https://doi.org/${basic.doi}`}            target="_blank" rel="noreferrer" style={linkStyle}>DOI ↗</a>}
           {basic.arxivId && <a href={`https://arxiv.org/abs/${basic.arxivId}`} target="_blank" rel="noreferrer" style={linkStyle}>arXiv ↗</a>}
-          {!basic.doi && !basic.arxivId && <span style={{ color: C.textMuted, fontSize: '0.8rem' }}>원본 링크 없음</span>}
+          {!basic.doi && !basic.arxivId && <span style={{ color: C.textMuted, fontSize: '0.8rem' }}>{t('paper.sidebar.noOriginalLink')}</span>}
         </div>
       </section>
       <section style={{ marginTop: 28, paddingTop: 28, borderTop: divider }}>
@@ -271,8 +273,9 @@ const linkStyle: React.CSSProperties = {
 }
 
 function QualityBlock({ quality }: { quality: PaperResult['quality'] }) {
-  if (!quality) return <span style={{ color: C.textMuted, fontSize: '0.82rem', lineHeight: 1.7 }}>데이터 없음</span>
-  if (!quality.quartile) return <span style={{ color: C.textMuted, fontSize: '0.82rem', lineHeight: 1.7 }}>Q 등급 없음<br /><strong style={{ color: C.textSub }}>{quality.matched_title}</strong></span>
+  const t = useT()
+  if (!quality) return <span style={{ color: C.textMuted, fontSize: '0.82rem', lineHeight: 1.7 }}>{t('paper.sidebar.noData')}</span>
+  if (!quality.quartile) return <span style={{ color: C.textMuted, fontSize: '0.82rem', lineHeight: 1.7 }}>{t('paper.sidebar.noQuartile')}<br /><strong style={{ color: C.textSub }}>{quality.matched_title}</strong></span>
 
   const qKey = String(quality.quartile).trim().toLowerCase()
   const qColors: Record<string, string> = { q1: '#0f0f0f', q2: '#404040', q3: '#606060', q4: '#909090' }
@@ -296,10 +299,11 @@ function QualityBlock({ quality }: { quality: PaperResult['quality'] }) {
 
 // ── Main: Candidates ───────────────────────────────────────────────
 function CandidateList({ items, onSelect }: { items: Candidate[]; onSelect: (id: string) => void }) {
+  const t = useT()
   return (
     <div style={{ marginBottom: 32, background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
       <div style={{ padding: '14px 20px', fontSize: '0.85rem', color: C.textSub, borderBottom: `1px solid ${C.border}`, fontWeight: 600 }}>
-        🔍 검색 결과 — 분석할 논문을 선택하세요
+        {t('paper.candidates.header')}
       </div>
       {items.map(p => (
         <div key={p.paperId} onClick={() => onSelect(p.paperId)}
@@ -307,9 +311,13 @@ function CandidateList({ items, onSelect }: { items: Candidate[]; onSelect: (id:
           onMouseEnter={e => (e.currentTarget.style.background = C.accentDim)}
           onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
         >
-          <div style={{ fontWeight: 600, fontSize: '0.92rem', color: C.text, lineHeight: 1.4 }}>{p.title || '(제목 없음)'}</div>
+          <div style={{ fontWeight: 600, fontSize: '0.92rem', color: C.text, lineHeight: 1.4 }}>{p.title || t('paper.candidates.untitled')}</div>
           <div style={{ fontSize: '0.8rem', color: C.textMuted, marginTop: 4 }}>
-            {p.year || '?'}년 · {p.venue || 'venue 미상'} · 인용 {p.citationCount ?? '?'}회
+            {t('paper.candidates.meta', {
+              year: p.year || '?',
+              venue: p.venue || t('paper.candidates.unknownVenue'),
+              count: p.citationCount ?? '?',
+            })}
           </div>
         </div>
       ))}
@@ -319,6 +327,7 @@ function CandidateList({ items, onSelect }: { items: Candidate[]; onSelect: (id:
 
 // ── Main: Result ───────────────────────────────────────────────────
 function ResultView({ data }: { data: PaperResult }) {
+  const t = useT()
   const { analysis, authors, basic } = data
   const relClass = analysis.relevance === '높음' ? 'high' : analysis.relevance === '낮음' ? 'low' : 'mid'
   const relColors = {
@@ -332,7 +341,7 @@ function ResultView({ data }: { data: PaperResult }) {
     <>
       <section>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 24 }}>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: C.text }}>🧠 이론 분석</h2>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: C.text }}>{t('paper.result.theoryAnalysis')}</h2>
           <span style={{ fontSize: '0.75rem', color: C.textMuted }}>via Claude</span>
         </div>
 
@@ -346,24 +355,24 @@ function ResultView({ data }: { data: PaperResult }) {
 
         {analysis.relevance && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 16px', borderRadius: 8, marginBottom: 20, fontSize: '0.87rem', background: rel.bg, color: rel.color }}>
-            <span style={{ fontWeight: 800, whiteSpace: 'nowrap' }}>관련성 {analysis.relevance}</span>
+            <span style={{ fontWeight: 800, whiteSpace: 'nowrap' }}>{t('paper.result.relevance', { value: analysis.relevance })}</span>
             <span>{analysis.relevance_reason}</span>
           </div>
         )}
 
-        <AnalysisItem label="문제" short="" detail={analysis.problem} />
-        <AnalysisItem label="방법" short="" detail={analysis.method} />
-        <AnalysisItem label="결론" short="" detail={analysis.conclusion} />
+        <AnalysisItem label={t('paper.result.problem')} short="" detail={analysis.problem} />
+        <AnalysisItem label={t('paper.result.method')} short="" detail={analysis.method} />
+        <AnalysisItem label={t('paper.result.conclusion')} short="" detail={analysis.conclusion} />
       </section>
 
       <section style={{ marginTop: 52, paddingTop: 52, borderTop: `1px solid ${C.border}` }}>
-        <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: C.text, marginBottom: 24 }}>👤 저자 정보</h2>
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: C.text, marginBottom: 24 }}>{t('paper.result.authorInfo')}</h2>
         {authors?.length > 0 ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px 28px' }}>
             {authors.map(a => <AuthorCard key={a.authorId || a.name} author={a} currentTitle={basic.title} />)}
           </div>
         ) : (
-          <span style={{ color: C.textMuted, fontSize: '0.88rem' }}>저자 정보 없음</span>
+          <span style={{ color: C.textMuted, fontSize: '0.88rem' }}>{t('paper.result.noAuthorInfo')}</span>
         )}
       </section>
     </>
@@ -384,9 +393,10 @@ function AnalysisItem({ label, detail }: { label: string; short: string; detail:
 }
 
 function AuthorCard({ author, currentTitle }: { author: PaperResult['authors'][0]; currentTitle: string }) {
+  const t = useT()
   const metaParts: string[] = []
   if (author.hIndex != null)        metaParts.push(`h-index ${author.hIndex}`)
-  if (author.citationCount != null) metaParts.push(`인용 ${author.citationCount.toLocaleString()}회`)
+  if (author.citationCount != null) metaParts.push(t('paper.result.cited', { count: author.citationCount.toLocaleString() }))
   const curTitleLower = currentTitle.toLowerCase()
 
   return (
@@ -396,7 +406,7 @@ function AuthorCard({ author, currentTitle }: { author: PaperResult['authors'][0
         {author.authorId && (
           <a href={`https://www.semanticscholar.org/author/${author.authorId}`} target="_blank" rel="noreferrer"
             style={{ fontSize: '0.78rem', color: C.accentText, textDecoration: 'none', flexShrink: 0, whiteSpace: 'nowrap' }}>
-            프로필 ↗
+            {t('paper.result.profile')}
           </a>
         )}
       </div>
@@ -408,7 +418,7 @@ function AuthorCard({ author, currentTitle }: { author: PaperResult['authors'][0
             return (
               <li key={i} style={{ fontSize: '0.8rem', lineHeight: 1.5, padding: '6px 0', color: C.textSub, borderTop: i > 0 ? `1px dashed ${C.border}` : 'none' }}>
                 {isCurrent ? <strong style={{ color: C.accentText }}>{p.title} ★</strong> : p.title}
-                {' '}<span style={{ color: C.textMuted, fontSize: '0.75rem' }}>· 인용 {p.citationCount ?? '?'}회</span>
+                {' '}<span style={{ color: C.textMuted, fontSize: '0.75rem' }}>· {t('paper.result.cited', { count: p.citationCount ?? '?' })}</span>
               </li>
             )
           })}

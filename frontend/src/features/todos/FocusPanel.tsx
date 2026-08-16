@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Plus, RefreshCw, Edit2, Trash2 } from 'lucide-react'
 import type { Todo, Step, Priority } from '@/shared/types'
-import { priorityStyle, priorityLabel } from './priority'
+import { useT } from '@/shared/i18n'
+import { priorityStyle, priorityLabels } from './priority'
 
 interface Props {
   todo: Todo | null
@@ -62,6 +63,8 @@ export default function FocusPanel({
   generatingStrategy,
   onBack,
 }: Props) {
+  const t = useT()
+  const priorityLabel = priorityLabels(t)
   const [editMode, setEditMode] = useState(false)
   const [editName, setEditName] = useState('')
   const [editMemo, setEditMemo] = useState('')
@@ -74,7 +77,7 @@ export default function FocusPanel({
   if (!todo) {
     return (
       <div className="flex-1 flex items-center justify-center" style={{ background: 'var(--panel)' }}>
-        <p className="text-[13px] text-gray-400">할 일을 선택하세요</p>
+        <p className="text-[13px] text-gray-400">{t('todo.detail.selectTodo')}</p>
       </div>
     )
   }
@@ -143,7 +146,7 @@ export default function FocusPanel({
             onClick={onBack}
             style={{ fontSize: 13, color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-sans)', display: 'flex', alignItems: 'center', gap: 4 }}
           >
-            ← 목록으로
+            {t('todo.detail.backToList')}
           </button>
         </div>
       )}
@@ -160,7 +163,7 @@ export default function FocusPanel({
               value={editMemo}
               onChange={e => setEditMemo(e.target.value)}
               rows={10}
-              placeholder="메모 · 맥락"
+              placeholder={t('todo.detail.memoPlaceholder')}
               className="w-full border rounded-lg px-3 py-2 text-[16px] outline-none focus:border-[var(--selected-bg)] resize-none bg-transparent text-gray-700"
               style={{ borderColor: 'var(--input-border)'}}
             />
@@ -171,9 +174,9 @@ export default function FocusPanel({
                 className="border rounded px-2 py-1 text-[16px] outline-none bg-transparent text-gray-700"
                 style={{ borderColor: 'var(--input-border)' }}
               >
-                <option value="urgent">긴급</option>
-                <option value="mid">보통</option>
-                <option value="normal">낮음</option>
+                <option value="urgent">{t('todo.priority.urgent')}</option>
+                <option value="mid">{t('todo.priority.mid')}</option>
+                <option value="normal">{t('todo.priority.normal')}</option>
               </select>
               <input
                 type="date"
@@ -184,8 +187,8 @@ export default function FocusPanel({
               />
             </div>
             <div className="flex gap-2">
-              <button onClick={saveEdit} className="px-3 py-1.5 text-[12px] bg-[var(--selected-bg)] text-[var(--selected-text)] rounded-lg">저장</button>
-              <button onClick={() => setEditMode(false)} className="px-3 py-1.5 text-[12px] text-gray-500 hover:bg-black/5 rounded-lg">취소</button>
+              <button onClick={saveEdit} className="px-3 py-1.5 text-[12px] bg-[var(--selected-bg)] text-[var(--selected-text)] rounded-lg">{t('common.save')}</button>
+              <button onClick={() => setEditMode(false)} className="px-3 py-1.5 text-[12px] text-gray-500 hover:bg-black/5 rounded-lg">{t('common.cancel')}</button>
             </div>
           </div>
         ) : (
@@ -197,7 +200,7 @@ export default function FocusPanel({
                 </span>
                 {todo.deadline && <span className="text-[11px] text-gray-400">{todo.deadline}</span>}
                 {steps.length > 0 && (
-                  <span className="text-[11px] text-gray-400">단계 {completedSteps}/{steps.length} 완료</span>
+                  <span className="text-[11px] text-gray-400">{t('todo.detail.stepsCompleted', { done: completedSteps, total: steps.length })}</span>
                 )}
               </div>
               <h2 className="text-[15px] font-semibold leading-snug text-gray-900">{todo.name}</h2>
@@ -224,7 +227,7 @@ export default function FocusPanel({
         {/* Memo */}
         {todo.memo ? (
           <div>
-            <SectionHeader label="메모 · 맥락" />
+            <SectionHeader label={t('todo.detail.memoContext')} />
             <p
               className="text-[13px] text-gray-700 leading-relaxed rounded-lg px-3 py-2.5"
               style={{ background: 'var(--list)', whiteSpace: 'pre-wrap' }}
@@ -237,11 +240,11 @@ export default function FocusPanel({
         {/* Steps */}
         <div style={{ opacity: regeneratingSteps ? 0.5 : 1, transition: 'opacity 0.2s' }}>
           <SectionHeader
-            label="AI 실행 단계"
+            label={t('todo.detail.aiSteps')}
             action={regeneratingSteps ? (
               <span className="text-[10px] text-gray-500 flex items-center gap-1">
                 <RefreshCw size={10} className="animate-spin" />
-                재생성 중...
+                {t('todo.detail.regenerating')}
               </span>
             ) :
               <button
@@ -250,7 +253,7 @@ export default function FocusPanel({
                 className="flex items-center gap-1 text-[10px] text-gray-500 hover:text-gray-800 disabled:opacity-50 font-normal normal-case"
               >
                 <RefreshCw size={10} className={generatingSteps ? 'animate-spin' : ''} />
-                {generatingSteps ? '생성 중...' : 'AI 재생성'}
+                {generatingSteps ? t('todo.detail.generating') : t('todo.detail.aiRegenerate')}
               </button>
             }
           />
@@ -276,7 +279,7 @@ export default function FocusPanel({
                 value={newStep}
                 onChange={e => setNewStep(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleAddStep()}
-                placeholder="+ 단계 추가"
+                placeholder={t('todo.detail.addStepPlaceholder')}
                 className="flex-1 text-[16px] text-gray-500 px-2 py-1.5 border-b outline-none focus:border-[var(--selected-bg)] bg-transparent transition-colors"
                 style={{ borderColor: 'var(--border)' }}
               />
@@ -293,7 +296,7 @@ export default function FocusPanel({
               className="mt-2 w-full py-2 text-[12px] text-gray-600 border border-dashed rounded-lg hover:bg-[var(--bg-additive)] transition-colors"
               style={{ borderColor: 'var(--border-subtle)' }}
             >
-              AI로 단계 자동 생성
+              {t('todo.detail.autoGenerateSteps')}
             </button>
           )}
         </div>
@@ -301,7 +304,7 @@ export default function FocusPanel({
         {/* Strategy */}
         <div>
           <SectionHeader
-            label="AI 전략"
+            label={t('todo.detail.aiStrategy')}
             action={
               <button
                 onClick={() => onGenerateStrategy(todo)}
@@ -309,7 +312,7 @@ export default function FocusPanel({
                 className="flex items-center gap-1 text-[10px] text-gray-500 hover:text-gray-800 disabled:opacity-50 font-normal normal-case"
               >
                 <RefreshCw size={10} className={generatingStrategy ? 'animate-spin' : ''} />
-                {generatingStrategy ? '생성 중...' : '재생성'}
+                {generatingStrategy ? t('todo.detail.generating') : t('todo.detail.regenerate')}
               </button>
             }
           />
@@ -324,7 +327,7 @@ export default function FocusPanel({
               {todo.ai_strategy}
             </p>
           ) : (
-            <p className="text-[12px] text-gray-400 italic">전략이 아직 없습니다. 재생성을 눌러보세요.</p>
+            <p className="text-[12px] text-gray-400 italic">{t('todo.detail.noStrategy')}</p>
           )}
         </div>
       </div>
@@ -333,19 +336,19 @@ export default function FocusPanel({
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-[2px]">
           <div className="rounded-xl shadow-xl p-6 w-80" style={{ background: 'var(--panel)' }}>
-            <p className="text-[14px] text-gray-700 mb-4">이 할 일을 삭제할까요?</p>
+            <p className="text-[14px] text-gray-700 mb-4">{t('todo.detail.deleteConfirm')}</p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 className="px-3 py-1.5 text-[13px] text-gray-500 hover:bg-black/5 rounded-lg"
               >
-                취소
+                {t('common.cancel')}
               </button>
               <button
                 onClick={async () => { await onDelete(todo.id); setShowDeleteConfirm(false) }}
                 className="px-3 py-1.5 text-[13px] text-[var(--selected-text)] bg-[var(--c-error)] hover:opacity-90 rounded-lg"
               >
-                삭제
+                {t('common.delete')}
               </button>
             </div>
           </div>

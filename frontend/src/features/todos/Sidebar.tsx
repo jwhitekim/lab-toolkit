@@ -1,5 +1,6 @@
 import type { NavFilter, Todo } from '@/shared/types'
 import dayjs from 'dayjs'
+import { useT } from '@/shared/i18n'
 
 interface Props {
   filter: NavFilter
@@ -7,14 +8,14 @@ interface Props {
   todos: Todo[]
 }
 
-const navItems: { label: string; key: NavFilter }[] = [
-  { label: '오늘', key: 'today' },
-  { label: '이번주', key: 'week' },
-  { label: '전체', key: 'all' },
-  { label: '메모', key: 'memo' },
-]
-
 export default function Sidebar({ filter, onFilter, todos }: Props) {
+  const t = useT()
+  const navItems: { label: string; key: NavFilter }[] = [
+    { label: t('todo.filters.today'), key: 'today' },
+    { label: t('todo.filters.week'),  key: 'week' },
+    { label: t('todo.filters.all'),   key: 'all' },
+    { label: t('todo.filters.memo'),  key: 'memo' },
+  ]
   const count = (key: NavFilter) => {
     if (key === 'today') {
       const today = dayjs().format('YYYY-MM-DD')

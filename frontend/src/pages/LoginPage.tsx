@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useT } from '@/shared/i18n'
 
 type Screen = 'landing' | 'login' | 'register'
 
 export default function Login() {
+  const t = useT()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [username, setUsername] = useState('')
@@ -79,10 +81,10 @@ export default function Login() {
         navigate(dest)
       } else {
         const data = await res.json()
-        setError(res.status === 403 ? '관리자 승인 대기 중입니다.' : (data.error ?? '로그인에 실패했습니다.'))
+        setError(res.status === 403 ? t('login.errors.pendingApproval') : (data.error ?? t('login.errors.loginFailed')))
       }
     } catch {
-      setError('서버 오류가 발생했습니다.')
+      setError(t('login.errors.serverError'))
     } finally {
       setLoading(false)
     }
@@ -103,10 +105,10 @@ export default function Login() {
         setRegistered(true)
       } else {
         const data = await res.json()
-        setError(data.error ?? '회원가입에 실패했습니다.')
+        setError(data.error ?? t('login.errors.registerFailed'))
       }
     } catch {
-      setError('서버 오류가 발생했습니다.')
+      setError(t('login.errors.serverError'))
     } finally {
       setLoading(false)
     }
@@ -207,7 +209,7 @@ export default function Login() {
                 lineHeight: 1.15,
                 letterSpacing: '-0.025em',
               }}>
-                Enter with intent
+                {t('login.tagline')}
               </div>
             </div>
 
@@ -230,7 +232,7 @@ export default function Login() {
               onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
               onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
             >
-              Enter
+              {t('login.enter')}
             </button>
           </div>
         ) : (
@@ -242,14 +244,14 @@ export default function Login() {
             transition: formTransition,
           }}>
             <div style={{ marginBottom: 10, fontSize: 13, color: 'var(--text-secondary)' }}>
-              {screen === 'login' ? '로그인' : '계정 만들기'}
+              {screen === 'login' ? t('login.tabLogin') : t('login.tabRegister')}
             </div>
 
             {registered ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-primary)', lineHeight: 1.7 }}>
-                  가입 요청이 접수됐습니다.<br />
-                  관리자 승인 후 로그인할 수 있습니다.
+                  {t('login.registeredMessage')}<br />
+                  {t('login.registeredNote')}
                 </p>
                 <button
                   type="button"
@@ -267,7 +269,7 @@ export default function Login() {
                     transition: 'background 0.15s',
                   }}
                 >
-                  로그인으로 돌아가기
+                  {t('login.backToLogin')}
                 </button>
               </div>
             ) : (
@@ -278,7 +280,7 @@ export default function Login() {
                 <input
                   type="text"
                   name="username"
-                  placeholder="사용자명"
+                  placeholder={t('login.usernamePlaceholder')}
                   autoComplete="username"
                   value={username}
                   onChange={e => setUsername(e.target.value)}
@@ -290,7 +292,7 @@ export default function Login() {
                 <input
                   type="password"
                   name="password"
-                  placeholder="비밀번호"
+                  placeholder={t('login.passwordPlaceholder')}
                   autoComplete={screen === 'login' ? 'current-password' : 'new-password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
@@ -322,23 +324,23 @@ export default function Login() {
                   }}
                 >
                   {loading
-                    ? (screen === 'login' ? '확인 중...' : '처리 중...')
-                    : (screen === 'login' ? '로그인' : '가입하기')}
+                    ? (screen === 'login' ? t('login.checking') : t('login.processing'))
+                    : (screen === 'login' ? t('login.loginButton') : t('login.registerButton'))}
                 </button>
 
                 <div style={{ textAlign: 'center', marginTop: 4, fontSize: 13, color: 'var(--text-secondary)' }}>
                   {screen === 'login' ? (
                     <>
-                      계정이 없으신가요?{' '}
+                      {t('login.noAccount')}{' '}
                       <button type="button" onClick={() => switchForm('register')} style={linkBtnStyle}>
-                        회원가입
+                        {t('login.signUp')}
                       </button>
                     </>
                   ) : (
                     <>
-                      이미 계정이 있으신가요?{' '}
+                      {t('login.haveAccount')}{' '}
                       <button type="button" onClick={() => switchForm('login')} style={linkBtnStyle}>
-                        로그인
+                        {t('login.loginLink')}
                       </button>
                     </>
                   )}

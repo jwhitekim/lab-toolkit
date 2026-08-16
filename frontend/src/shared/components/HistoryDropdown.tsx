@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, type ReactNode } from 'react'
 import { History } from 'lucide-react'
+import { useT } from '@/shared/i18n'
 
 interface Props<T> {
   items: T[]
@@ -11,7 +12,9 @@ interface Props<T> {
 
 // 헤더에 붙는 아이콘 버튼 → 클릭 시 최근 기록을 드롭다운으로 펼침.
 // 도구를 열자마자 기록이 결과 영역을 채우는 대신, 필요할 때만 펼쳐보도록 함.
-export function HistoryDropdown<T>({ items, renderItem, onSelect, triggerClassName, label = '최근 기록' }: Props<T>) {
+export function HistoryDropdown<T>({ items, renderItem, onSelect, triggerClassName, label }: Props<T>) {
+  const t = useT()
+  const resolvedLabel = label ?? t('common.recentHistory')
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -31,7 +34,7 @@ export function HistoryDropdown<T>({ items, renderItem, onSelect, triggerClassNa
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        aria-label={label}
+        aria-label={resolvedLabel}
         aria-expanded={open}
         className={triggerClassName}
         style={triggerClassName ? undefined : {
@@ -55,7 +58,7 @@ export function HistoryDropdown<T>({ items, renderItem, onSelect, triggerClassNa
           }}
         >
           <div style={{ padding: '6px 8px 8px', fontSize: 11, fontWeight: 600, color: 'var(--text-disabled)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            {label}
+            {resolvedLabel}
           </div>
           {items.map((item, i) => (
             <button

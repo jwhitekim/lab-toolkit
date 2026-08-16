@@ -1,10 +1,14 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { ArrowRight, CheckCircle2, ListTodo, Sparkles, Zap } from 'lucide-react'
+import dayjs from 'dayjs'
+import 'dayjs/locale/ko'
+import 'dayjs/locale/en'
+import 'dayjs/locale/zh-cn'
 import type { NavFilter, Priority, Todo } from '@/shared/types'
 import { useTodos } from './hooks/useTodos'
 import { useAi } from './hooks/useAi'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
-import { useT } from '@/shared/i18n'
+import { useT, useLanguage } from '@/shared/i18n'
 import TodoList from './TodoList'
 import FocusPanel from './FocusPanel'
 import * as api from '@/shared/api/client'
@@ -13,6 +17,10 @@ import './Todo.css'
 const LIST_MIN = 280
 const LIST_MAX = 680
 const LIST_DEFAULT = 340
+
+// dayjs 'LL' 같은 로케일 포맷에 쓰는 태그. i18n의 BCP-47 태그(ko-KR 등)와는
+// 형식이 달라 별도로 매핑한다.
+const DAYJS_LOCALE: Record<string, string> = { ko: 'ko', en: 'en', zh: 'zh-cn' }
 
 function TodoOverview({ todos, onSelect }: { todos: Todo[]; onSelect: (id: number) => void }) {
   const t = useT()
@@ -48,6 +56,9 @@ function TodoOverview({ todos, onSelect }: { todos: Todo[]; onSelect: (id: numbe
 }
 
 export default function TodoPage() {
+  const t = useT()
+  const { language } = useLanguage()
+  dayjs.locale(DAYJS_LOCALE[language])
   const isMobile = useIsMobile()
   const [filter, setFilter] = useState<NavFilter>('all')
   const [selectedId, setSelectedId] = useState<number | null>(null)
@@ -212,7 +223,7 @@ export default function TodoPage() {
         <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
           {loading && !selectedTodo ? (
             <div className="flex-1 flex items-center justify-center">
-              <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>불러오는 중...</span>
+              <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{t('todo.loading')}</span>
             </div>
           ) : (
             <FocusPanel
@@ -245,7 +256,7 @@ export default function TodoPage() {
       <div className="todo-desktop-layout flex flex-1 overflow-hidden">
         {loading && todos.length === 0 ? (
           <div className="flex-1 flex items-center justify-center" style={{ background: 'var(--bg-base)' }}>
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>불러오는 중...</span>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{t('todo.loading')}</span>
           </div>
         ) : selectedTodo ? (
           <FocusPanel

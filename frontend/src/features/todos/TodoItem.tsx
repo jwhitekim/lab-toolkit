@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 import { Pencil } from 'lucide-react'
 import dayjs from 'dayjs'
 import type { Todo } from '@/shared/types'
-import { priorityStyle, priorityLabel } from './priority'
+import { priorityStyle, priorityLabels } from './priority'
+import { useT } from '@/shared/i18n'
 
 interface Props {
   todo: Todo
@@ -13,6 +14,8 @@ interface Props {
 }
 
 export default function TodoItem({ todo, selected, onSelect, onToggle, onEdit }: Props) {
+  const t = useT()
+  const priorityLabel = priorityLabels(t)
   const [animating, setAnimating] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(todo.name)
@@ -118,7 +121,7 @@ export default function TodoItem({ todo, selected, onSelect, onToggle, onEdit }:
 
           {totalSteps > 0 && (
             <p style={{ fontSize: 11, color: 'var(--text-disabled)', marginTop: 2 }}>
-              단계 {completedSteps}/{totalSteps} 완료
+              {t('todo.detail.stepsCompleted', { done: completedSteps, total: totalSteps })}
             </p>
           )}
         </div>

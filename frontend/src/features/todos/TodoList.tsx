@@ -1,14 +1,11 @@
 import { useState } from 'react'
 import { ChevronDown, Plus } from 'lucide-react'
 import dayjs from 'dayjs'
-import 'dayjs/locale/ko'
 import type { Todo, NavFilter, Priority } from '@/shared/types'
 import TodoItem from './TodoItem'
 import AddTodoModal from './AddTodoModal'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useT } from '@/shared/i18n'
-
-dayjs.locale('ko')
 
 interface Props {
   todos: Todo[]
@@ -22,23 +19,22 @@ interface Props {
   width?: number
 }
 
-const filterTabs: { label: string; key: NavFilter }[] = [
-  { label: '오늘', key: 'today' },
-  { label: '이번주', key: 'week' },
-  { label: '전체', key: 'all' },
-  { label: '메모', key: 'memo' },
-]
-
 export default function TodoList({ todos, filter, onFilter, selectedId, onSelect, onToggle, onEdit, onAdd, width }: Props) {
   const t = useT()
+  const filterTabs: { label: string; key: NavFilter }[] = [
+    { label: t('todo.filters.today'), key: 'today' },
+    { label: t('todo.filters.week'),  key: 'week' },
+    { label: t('todo.filters.all'),   key: 'all' },
+    { label: t('todo.filters.memo'),  key: 'memo' },
+  ]
   const [showModal, setShowModal] = useState(false)
   const [showCompleted, setShowCompleted] = useState(false)
   const isMobile = useIsMobile()
 
-  const active = todos.filter(t => !t.done)
-  const done = todos.filter(t => t.done)
+  const active = todos.filter(todo => !todo.done)
+  const done = todos.filter(todo => todo.done)
 
-  const filterSubtitle = filter === 'today' ? dayjs().format('YYYY년 M월 D일') : null
+  const filterSubtitle = filter === 'today' ? dayjs().format('LL') : null
 
   return (
     <aside
@@ -54,7 +50,7 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
       >
         <div className="flex items-start justify-between gap-3">
           <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
-            {active.length}개 진행 중{filterSubtitle ? ` · ${filterSubtitle}` : ''}
+            {t('todo.activeCount', { count: active.length })}{filterSubtitle ? ` · ${filterSubtitle}` : ''}
           </div>
           {isMobile && (
             <button
@@ -69,14 +65,14 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
               }}
             >
               <Plus size={14} />
-              추가
+              {t('todo.addButton')}
             </button>
           )}
         </div>
 
         <div
           role="tablist"
-          aria-label="Todo 필터"
+          aria-label={t('todo.filterAriaLabel')}
           className="mt-3 grid grid-cols-4 gap-1"
           style={{ borderRadius: 'var(--radius-md)', background: 'var(--bg-additive)', padding: 3 }}
         >
@@ -164,7 +160,7 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
             style={{ color: 'var(--text-secondary)', fontWeight: 500, gap: 6 }}
           >
             <Plus size={14} />
-            할 일 추가
+            {t('todo.addTodoFooter')}
           </button>
         </div>
       )}

@@ -1,3 +1,5 @@
+import { translate } from '@/shared/i18n'
+
 const BASE = '/translate'
 
 export interface DictDefinition {
@@ -25,7 +27,7 @@ export interface DictResult {
 
 export async function naverDict(query: string): Promise<DictResult> {
   const res = await fetch(`${BASE}/api/naver-dict?query=${encodeURIComponent(query)}`)
-  if (!res.ok) throw new Error('사전 오류')
+  if (!res.ok) throw new Error(translate('translator.errors.dictionaryFailed'))
   return res.json()
 }
 
