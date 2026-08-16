@@ -32,7 +32,7 @@ const MOBILE_APPS: MobileItem[] = [
   { key: 'plan', Icon: LayoutDashboard, label: 'Plan' },
   { key: 'paper', Icon: FileSearch, label: 'Paper' },
   { key: 'translate', Icon: Languages, label: 'Trans' },
-  { key: 'model-review', Icon: Network, label: 'Arch' },
+  { key: 'model-review', Icon: Network, label: 'Models' },
   { key: 'contextor', Icon: Braces, label: 'Concepts' },
 ]
 
