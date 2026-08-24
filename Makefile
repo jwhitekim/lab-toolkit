@@ -1,6 +1,6 @@
 ENV_NAME := veloo
 
-.PHONY: help conda-env install run dev frontend-install frontend-dev frontend-build build docker-build docker-run bump
+.PHONY: help conda-env install run dev frontend-install frontend-dev frontend-build build docker-build docker-run
 
 help:
 	@echo "make conda-env         - conda 환경 생성 ($(ENV_NAME), python=3.11)"
@@ -12,7 +12,6 @@ help:
 	@echo "make build             - 프론트엔드 빌드 후 백엔드 실행 (운영 빌드 확인)"
 	@echo "make docker-build      - Docker 이미지 빌드"
 	@echo "make docker-run        - Docker 컨테이너 실행"
-	@echo "make bump ARGS=patch   - 버전 범프 (patch/minor/major)"
 
 conda-env:
 	conda create -n $(ENV_NAME) python=3.11 -y
@@ -40,6 +39,3 @@ docker-build:
 
 docker-run:
 	docker run --env-file .env -p 9000:9000 veloo
-
-bump:
-	conda run -n $(ENV_NAME) python bump.py $(ARGS)

@@ -128,5 +128,4 @@
 
 ## 알려진 부채
 
-- `python bump.py`가 `README.md`/`.claude/CLAUDE.md`에 문서화돼 있지만 저장소에 `bump.py` 파일 자체가 없음. 버전 범프 스크립트를 새로 만들거나 문서에서 지울 것.
 - Chrome 익스텐션(`extensions/paper`, `extensions/contextor`)은 안 쓰여서 삭제됨(`84e28b5`) — 관련 배포 워크플로우도 함께 삭제.
