@@ -53,9 +53,9 @@ FastAPI 루트(backend/main.py)가 5개 서브앱을 마운트하는 SPA 구조.
   - GeminiProvider의 스트리밍/이미지 입력 경로는 실제 google-genai SDK로 검증되지 않음 — AI_PROVIDER=gemini로 전환 시 반드시 동작 확인 필요
 
 ## 버전 관리
-- 버전 범프: python bump.py [major|minor|patch]
-- frontend/package.json 버전 업데이트
-- 버전 범프는 main 브랜치에서 직접 실행
+- 버전 소스는 `frontend/package.json`의 `version` 필드 하나뿐 (백엔드에는 버전 문자열 없음)
+- "릴리즈해줘"/"배포해줘" 요청은 `release-pipeline` 하네스가 범프→빌드검증→커밋→푸시→배포확인까지 처리 (아래 하네스 섹션 참고)
+- 버전 범프는 main 브랜치에서 직접 실행 (별도 브랜치 없음)
 
 ## 스키마
 - 단일 스키마 파일: backend/schema.sql
@@ -101,8 +101,22 @@ ML/DL/CV/NLP 논문 문장·구·용어를 자연스러운 한국어로 번역�
 - dev 브랜치는 사용하지 않음 (과거 운영되다 방치되어 폐기됨).
 
 ## 작업 흐름
-1. main에서 작업 후 /push
-2. 푸시 시 GitHub Actions 자동 배포
+1. main에서 작업 후 commit-and-push 스킬로 커밋/푸시
+2. 버전을 올려 배포까지 할 때는 아래 "하네스: 릴리즈/배포 파이프라인" 참고
+3. 푸시 시 GitHub Actions 자동 배포
+
+## 하네스: 릴리즈/배포 파이프라인
+
+**목표:** 버전 범프 → 프론트엔드 빌드 검증 → 커밋 → 사람 승인 후 main 푸시 → GitHub Actions 배포 감시 → 프로덕션 스모크 테스트까지 한 흐름으로 자동화.
+
+**트리거:** "릴리즈해줘", "배포해줘", "버전 올리고 배포" 등 릴리즈 요청 시 `release-pipeline` 스킬을 사용하라 (에이전트: `release-preparer`, `deploy-monitor`). 단순 커밋/푸시만 필요하면 `commit-and-push` 스킬을 직접 쓴다.
+
+**변경 이력:**
+| 날짜 | 변경 내용 | 대상 | 사유 |
+|------|----------|------|------|
+| 2026-08-24 | 초기 구성 (release-preparer, deploy-monitor, release-pipeline) | 전체 | 릴리즈/배포 과정 자동화 요청 |
+| 2026-08-24 | commit-and-push 검증 명령을 pytest/mypy/ruff → npm run build로 수정 | .claude/skills/commit-and-push | 이 프로젝트에 없는 도구를 참조하고 있어 실제 실행 불가 상태였음 |
+| 2026-08-24 | Makefile의 `make bump` 타깃 제거 | Makefile | 참조하던 bump.py가 이미 삭제되어 죽은 타깃이었음 |
 
 ## 자기 갱신 규칙
 - 레포 루트의 이 CLAUDE.md 하나만 맥락 문서로 참고함 — 서브앱별 CLAUDE.md는 만들지 않음
