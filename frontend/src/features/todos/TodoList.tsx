@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, Plus } from 'lucide-react'
+import { ChevronDown, Plus, Sparkles } from 'lucide-react'
 import dayjs from 'dayjs'
 import type { Todo, NavFilter, Priority } from '@/shared/types'
 import TodoItem from './TodoItem'
@@ -12,14 +12,15 @@ interface Props {
   filter: NavFilter
   onFilter: (f: NavFilter) => void
   selectedId: number | null
+  featuredId: number | null
   onSelect: (id: number) => void
+  onFeature: (id: number) => void
   onToggle: (id: number) => void
   onEdit: (id: number, name: string) => void
   onAdd: (data: { name: string; memo: string; priority: Priority; deadline: string }) => Promise<void>
-  width?: number
 }
 
-export default function TodoList({ todos, filter, onFilter, selectedId, onSelect, onToggle, onEdit, onAdd, width }: Props) {
+export default function TodoList({ todos, filter, onFilter, selectedId, featuredId, onSelect, onFeature, onToggle, onEdit, onAdd }: Props) {
   const t = useT()
   const filterTabs: { label: string; key: NavFilter }[] = [
     { label: t('todo.filters.today'), key: 'today' },
@@ -33,89 +34,113 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
 
   const active = todos.filter(todo => !todo.done)
   const done = todos.filter(todo => todo.done)
-
-  const filterSubtitle = filter === 'today' ? dayjs().format('LL') : null
+  const completionRate = todos.length ? Math.round((done.length / todos.length) * 100) : 0
+  const resolvedFeaturedId = active.some(todo => todo.id === featuredId)
+    ? featuredId
+    : (active[0]?.id ?? null)
+  const featuredTodo = active.find(todo => todo.id === resolvedFeaturedId)
+  const insightTodo = featuredTodo?.ai_strategy.trim() ? featuredTodo : undefined
 
   return (
-    <aside
+    <section
       className={`todo-list-panel flex flex-col${isMobile ? '' : ' h-full'}`}
-      style={{ width: width ?? '100%', flexShrink: width !== undefined ? 0 : undefined, background: 'var(--bg-base)' }}
+      style={{ width: '100%', background: 'var(--bg-base)' }}
     >
-      <div
-        className="px-3 pt-4 pb-3"
-        style={{
-          borderBottom: '1px solid var(--border-subtle)',
-          ...(isMobile ? { position: 'sticky' as const, top: 0, zIndex: 1, background: 'var(--bg-base)' } : {}),
-        }}
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
-            {t('todo.activeCount', { count: active.length })}{filterSubtitle ? ` · ${filterSubtitle}` : ''}
+      <div className={`todo-list-header${isMobile ? ' is-mobile' : ''}`}>
+        <div className="todo-list-title-row">
+          <div>
+            <span className="todo-list-kicker">{t('todo.todayPlan')}</span>
+            <strong>{t('todo.researchFlow')}</strong>
           </div>
-          {isMobile && (
+          {isMobile ? (
             <button
               onClick={() => setShowModal(true)}
               type="button"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                height: 32, padding: '0 11px', borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-subtle)', background: 'var(--bg-base)',
-                color: 'var(--text-primary)', fontSize: 13, fontWeight: 600,
-                fontFamily: 'var(--font-sans)', flexShrink: 0,
-              }}
+              className="todo-list-add-mobile"
             >
               <Plus size={14} />
               {t('todo.addButton')}
             </button>
+          ) : (
+            <div className="todo-list-header-actions">
+              <button
+                type="button"
+                className="todo-list-add-compact"
+                onClick={() => setShowModal(true)}
+              >
+                <Plus aria-hidden="true" />
+                {t('todo.addButton')}
+              </button>
+              <label className="todo-list-filter-select">
+                <select
+                  value={filter}
+                  onChange={event => onFilter(event.target.value as NavFilter)}
+                  aria-label={t('todo.filterAriaLabel')}
+                >
+                  {filterTabs.map(item => <option key={item.key} value={item.key}>{item.label}</option>)}
+                </select>
+                <ChevronDown aria-hidden="true" />
+              </label>
+              <span className="todo-list-date">{dayjs().locale('en').format('MMM DD').toUpperCase()}</span>
+            </div>
           )}
         </div>
 
-        <div
-          role="tablist"
-          aria-label={t('todo.filterAriaLabel')}
-          className="mt-3 grid grid-cols-4 gap-1"
-          style={{ borderRadius: 'var(--radius-md)', background: 'var(--bg-additive)', padding: 3 }}
-        >
-          {filterTabs.map(item => {
-            const isActive = filter === item.key
-            return (
-              <button
-                key={item.key}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => onFilter(item.key)}
-                style={{
-                  minWidth: 0,
-                  height: 32,
-                  border: 'none',
-                  borderRadius: 'var(--radius-sm)',
-                  background: isActive ? 'var(--selected-bg)' : 'transparent',
-                  color: isActive ? 'var(--selected-text)' : 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: 13,
-                  fontWeight: isActive ? 600 : 500,
-                }}
-              >
-                {item.label}
-              </button>
-            )
-          })}
-        </div>
+        {isMobile && (
+          <div className="todo-list-progress-row">
+            <div className="todo-list-progress"><span style={{ width: `${completionRate}%` }} /></div>
+            <small>{done.length} / {todos.length}</small>
+          </div>
+        )}
+
+        {isMobile && (
+          <div
+            role="tablist"
+            aria-label={t('todo.filterAriaLabel')}
+            className="todo-filter-tabs"
+          >
+            {filterTabs.map(item => {
+              const isActive = filter === item.key
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => onFilter(item.key)}
+                  className={isActive ? 'is-active' : ''}
+                >
+                  {item.label}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
 
-      <div className={`${isMobile ? '' : 'flex-1 overflow-y-auto '}px-2 pb-2 space-y-0.5`}>
+      <div className={`todo-list-scroll${isMobile ? '' : ' flex-1 overflow-y-auto'}`}>
         {active.map(todo => (
           <TodoItem
             key={todo.id}
             todo={todo}
             selected={todo.id === selectedId}
-            onSelect={() => onSelect(todo.id)}
+            featured={!isMobile && todo.id === resolvedFeaturedId}
+            onSelect={() => isMobile ? onSelect(todo.id) : onFeature(todo.id)}
+            onOpen={isMobile ? undefined : () => onSelect(todo.id)}
             onToggle={() => onToggle(todo.id)}
             onEdit={onEdit}
           />
         ))}
+
+        {insightTodo && (
+          <button type="button" className="todo-list-insight" onClick={() => onSelect(insightTodo.id)}>
+            <Sparkles />
+            <span>
+              <b>{t('todo.insightTitle')}</b>
+              <p>{insightTodo.ai_strategy}</p>
+            </span>
+          </button>
+        )}
 
         {done.length > 0 && (
           <>
@@ -152,25 +177,12 @@ export default function TodoList({ todos, filter, onFilter, selectedId, onSelect
         )}
       </div>
 
-      {!isMobile && (
-        <div className="p-2" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-          <button
-            onClick={() => setShowModal(true)}
-            className="sidebar-item"
-            style={{ color: 'var(--text-secondary)', fontWeight: 500, gap: 6 }}
-          >
-            <Plus size={14} />
-            {t('todo.addTodoFooter')}
-          </button>
-        </div>
-      )}
-
       {showModal && (
         <AddTodoModal
           onClose={() => setShowModal(false)}
           onSave={async data => { await onAdd(data) }}
         />
       )}
-    </aside>
+    </section>
   )
 }

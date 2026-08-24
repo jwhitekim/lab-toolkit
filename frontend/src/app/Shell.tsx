@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import type { LucideIcon } from 'lucide-react'
-import { Braces, CalendarDays, FileSearch, Languages, LayoutDashboard, ListTodo, Network } from 'lucide-react'
+import { Braces, CalendarDays, FileSearch, Languages, LayoutDashboard, ListTodo, LogOut, Network } from 'lucide-react'
 import { ShellNavContext, type ActiveApp } from '@/shared/hooks/useShellNav'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useT } from '@/shared/i18n'
@@ -48,6 +49,8 @@ function mobileKeyFor(app: MainApp): MobileNavKey {
 
 export default function Shell() {
   const t = useT()
+  const navigate = useNavigate()
+  const { username = '' } = useParams()
   const isMobile = useIsMobile()
   const [active, setActiveState] = useState<ActiveApp>('todo')
   const [lastPlanApp, setLastPlanApp] = useState<'todo' | 'calendar'>(loadLastPlanApp)
@@ -79,8 +82,40 @@ export default function Shell() {
   const [mobileIndicatorRect, setMobileIndicatorRect] = useState<{ x: number; width: number } | null>(null)
   const [isDraggingMobile, setIsDraggingMobile] = useState(false)
   const [mobileDragTarget, setMobileDragTarget] = useState<MobileNavKey | null>(null)
+  const [loggingOut, setLoggingOut] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
   const mobileGestureRef = useRef<{ startX: number; moved: boolean; target: MobileNavKey } | null>(null)
   const suppressMobileClickRef = useRef(false)
+
+  useEffect(() => {
+    if (!userMenuOpen) return
+    const handleOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) setUserMenuOpen(false)
+    }
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setUserMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handleOutside)
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('mousedown', handleOutside)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [userMenuOpen])
+
+  const handleLogout = async () => {
+    if (loggingOut) return
+    setLoggingOut(true)
+    setUserMenuOpen(false)
+    try {
+      const response = await fetch('/logout', { method: 'DELETE' })
+      if (!response.ok) throw new Error('logout failed')
+      navigate('/', { replace: true })
+    } catch {
+      setLoggingOut(false)
+    }
+  }
 
   useLayoutEffect(() => {
     if (!isMobile || isDraggingMobile) return
@@ -213,7 +248,42 @@ export default function Shell() {
             <span>{t(`shell.nav.${key}`)}</span>
           </button>)}
         </nav>
-        <div className="shell-topbar-end"><LanguageSwitcher /></div>
+        <div className="shell-topbar-end">
+          <div ref={userMenuRef} className="shell-user-menu">
+            <button
+              type="button"
+              className="shell-user-button"
+              onClick={() => setUserMenuOpen(open => !open)}
+              aria-label={t('shell.accountMenu')}
+              aria-expanded={userMenuOpen}
+              aria-haspopup="menu"
+            >
+              {username.slice(0, 1).toUpperCase() || 'V'}
+            </button>
+            {userMenuOpen && (
+              <div className="shell-user-popover" role="menu">
+                <div className="shell-user-identity">
+                  <span className="shell-user-avatar">{username.slice(0, 1).toUpperCase() || 'V'}</span>
+                  <div><strong>{username}</strong><small>veloo workspace</small></div>
+                </div>
+                <div className="shell-user-setting">
+                  <span>{t('shell.language')}</span>
+                  <LanguageSwitcher />
+                </div>
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="shell-user-logout"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                >
+                  <LogOut />
+                  <span>{loggingOut ? t('shell.loggingOut') : t('shell.logout')}</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </header>
 
       <main className="shell-content">

@@ -1,5 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
-import { ArrowRight, CheckCircle2, ListTodo, Sparkles, Zap } from 'lucide-react'
+import { useState, useCallback, useEffect } from 'react'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ko'
 import 'dayjs/locale/en'
@@ -14,44 +13,37 @@ import FocusPanel from './FocusPanel'
 import * as api from '@/shared/api/client'
 import './Todo.css'
 
-const LIST_MIN = 280
-const LIST_MAX = 680
-const LIST_DEFAULT = 340
-
 // dayjs 'LL' 같은 로케일 포맷에 쓰는 태그. i18n의 BCP-47 태그(ko-KR 등)와는
 // 형식이 달라 별도로 매핑한다.
 const DAYJS_LOCALE: Record<string, string> = { ko: 'ko', en: 'en', zh: 'zh-cn' }
 
-function TodoOverview({ todos, onSelect }: { todos: Todo[]; onSelect: (id: number) => void }) {
+function TodoSummarySidebar({
+  todos,
+}: {
+  todos: Todo[]
+}) {
   const t = useT()
   const active = todos.filter(todo => !todo.done)
   const urgent = active.filter(todo => todo.priority === 'urgent')
   const completed = todos.filter(todo => todo.done).length
   const completionRate = todos.length ? Math.round((completed / todos.length) * 100) : 0
-  const next = active.slice(0, 3)
 
   return (
-    <section className="todo-overview">
-      <div className="todo-overview-inner">
-        <header className="todo-page-heading">
-          <div>
-            <span className="todo-overview-kicker">Today at a glance</span>
-            <h1>{t('todo.overview.heroTitle')}</h1>
-            <p className="todo-overview-lead">{t('todo.overview.heroDescription')}</p>
-          </div>
-          <span className="todo-ai-badge"><Sparkles size={14} /> {t('todo.overview.aiBadge')}</span>
-        </header>
-        <div className="todo-stat-grid">
-          <article className="todo-stat-card"><div className="todo-stat-label"><ListTodo size={14} />{t('todo.overview.inProgress')}</div><div className="todo-stat-value">{active.length}</div></article>
-          <article className="todo-stat-card"><div className="todo-stat-label"><Zap size={14} />{t('todo.overview.urgentItems')}</div><div className="todo-stat-value">{urgent.length}</div></article>
-          <article className="todo-stat-card"><div className="todo-stat-label"><CheckCircle2 size={14} />{t('todo.overview.completionRate')}</div><div className="todo-stat-value">{completionRate}%</div><div className="todo-progress"><div className="todo-progress-fill" style={{ width: `${completionRate}%` }} /></div></article>
-        </div>
-        <div className="todo-next-card">
-          <div className="todo-next-head"><strong>{t('todo.overview.nextTodo')}</strong><span>{active.length} items</span></div>
-          {next.length > 0 ? next.map(todo => <button key={todo.id} type="button" className="todo-overview-item" onClick={() => onSelect(todo.id)}><span className="todo-overview-dot" /><span>{todo.name}</span><ArrowRight size={14} /></button>) : <div className="todo-overview-empty">{t('todo.overview.emptyActive')}</div>}
-        </div>
+    <aside className="todo-summary-sidebar">
+      <strong>{t('todo.summary.today')}</strong>
+      <div className="todo-summary-progress" aria-label={`${t('todo.overview.completionRate')} ${completionRate}%`}>
+        <span style={{ width: `${completionRate}%` }} />
       </div>
-    </section>
+      <small>{completed} / {todos.length} {t('todo.summary.complete')}</small>
+      <div className="todo-summary-stat">
+        <span>{t('todo.overview.inProgress')}</span>
+        <b>{active.length}</b>
+      </div>
+      <div className="todo-summary-stat">
+        <span>{t('todo.overview.urgentItems')}</span>
+        <b>{urgent.length}</b>
+      </div>
+    </aside>
   )
 }
 
@@ -62,7 +54,7 @@ export default function TodoPage() {
   const isMobile = useIsMobile()
   const [filter, setFilter] = useState<NavFilter>('all')
   const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [listWidth, setListWidth] = useState(LIST_DEFAULT)
+  const [featuredId, setFeaturedId] = useState<number | null>(null)
 
   const { todos, loading, reload, addTodo, editTodo, removeTodo, toggleDone, refresh, toastError, clearToastError } = useTodos(filter)
 
@@ -94,32 +86,6 @@ export default function TodoPage() {
     window.addEventListener('popstate', onPopState)
     return () => window.removeEventListener('popstate', onPopState)
   }, [isMobile])
-
-  const dragRef = useRef<{ startX: number; startW: number } | null>(null)
-
-  const handleResizerMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    dragRef.current = { startX: e.clientX, startW: listWidth }
-    document.documentElement.classList.add('is-resizing')
-
-    const onMove = (ev: MouseEvent) => {
-      if (!dragRef.current) return
-      // The list is docked on the right, so moving its left edge to the left
-      // increases the panel width (and moving it right decreases it).
-      const delta = ev.clientX - dragRef.current.startX
-      setListWidth(Math.max(LIST_MIN, Math.min(LIST_MAX, dragRef.current.startW - delta)))
-    }
-
-    const onUp = () => {
-      dragRef.current = null
-      document.documentElement.classList.remove('is-resizing')
-      document.removeEventListener('mousemove', onMove)
-      document.removeEventListener('mouseup', onUp)
-    }
-
-    document.addEventListener('mousemove', onMove)
-    document.addEventListener('mouseup', onUp)
-  }, [listWidth])
 
   const handleAdd = async (data: { name: string; memo: string; priority: Priority; deadline: string }) => {
     const todo = await addTodo(data)
@@ -239,7 +205,9 @@ export default function TodoPage() {
           filter={filter}
           onFilter={setFilter}
           selectedId={selectedId}
+          featuredId={featuredId}
           onSelect={openTodo}
+          onFeature={setFeaturedId}
           onToggle={handleToggleDone}
           onEdit={(id, name) => handleUpdate(id, { name })}
           onAdd={handleAdd}
@@ -252,40 +220,35 @@ export default function TodoPage() {
 
   return (
     <>
-    <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
-      <div className="todo-desktop-layout flex flex-1 overflow-hidden">
-        {loading && todos.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center" style={{ background: 'var(--bg-base)' }}>
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{t('todo.loading')}</span>
-          </div>
-        ) : selectedTodo ? (
-          <FocusPanel
-            todo={selectedTodo}
-            {...focusPanelProps}
-          />
-        ) : (
-          <TodoOverview todos={todos} onSelect={setSelectedId} />
-        )}
-
-        <div
-          onMouseDown={handleResizerMouseDown}
-          className="w-1 flex-shrink-0 cursor-col-resize transition-colors"
-          style={{ background: 'var(--border-subtle)' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--bg-additive-hover)' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--border-subtle)' }}
-        />
-
-        <TodoList
-          todos={todos}
-          filter={filter}
-          onFilter={setFilter}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-          onToggle={handleToggleDone}
-          onEdit={(id, name) => handleUpdate(id, { name })}
-          onAdd={handleAdd}
-          width={listWidth}
-        />
+    <div className="todo-desktop-frame">
+      <div className="todo-desktop-layout">
+        <TodoSummarySidebar todos={todos} />
+        <main className="todo-desktop-content">
+          {loading && todos.length === 0 ? (
+            <div className="todo-desktop-loading">
+              <span>{t('todo.loading')}</span>
+            </div>
+          ) : selectedTodo ? (
+            <FocusPanel
+              todo={selectedTodo}
+              {...focusPanelProps}
+              onBack={closeTodo}
+            />
+          ) : (
+            <TodoList
+              todos={todos}
+              filter={filter}
+              onFilter={setFilter}
+              selectedId={selectedId}
+              featuredId={featuredId}
+              onSelect={setSelectedId}
+              onFeature={setFeaturedId}
+              onToggle={handleToggleDone}
+              onEdit={(id, name) => handleUpdate(id, { name })}
+              onAdd={handleAdd}
+            />
+          )}
+        </main>
       </div>
     </div>
     {toast}
