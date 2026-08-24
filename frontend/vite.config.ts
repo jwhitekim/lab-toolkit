@@ -52,10 +52,15 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       proxy: {
+        '/api': apiUrl,
+        '/login': apiUrl,
+        '/logout': apiUrl,
+        '/register': apiUrl,
         '/paper': apiUrl,
         '/translate': apiUrl,
         '/model-review': apiUrl,
         '/todo': apiUrl,
+        '/contextor': apiUrl,
       },
     },
   }

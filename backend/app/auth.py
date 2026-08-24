@@ -1,8 +1,10 @@
 """인증 미들웨어, 유틸리티, 라우터"""
 import os
+import re
 import secrets
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
+from urllib.parse import quote
 
 import bcrypt as _bcrypt
 from fastapi import APIRouter, Request
@@ -39,7 +41,9 @@ LOCKOUT_MINUTES = 15
 
 _API_PREFIXES = ("/paper/", "/translate/", "/model-review/", "/todo/", "/contextor/")
 _OPEN_PATHS = {
+    "/",
     "/login",
+    "/signup",
     "/logout",
     "/register",
     "/api/me",
@@ -54,6 +58,24 @@ _OPEN_PATHS = {
     "/sw.js",
 }
 _OPEN_PREFIXES = ("/assets/", "/workbox-")
+
+USERNAME_RE = re.compile(r"^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?$")
+RESERVED_USERNAMES = {
+    "admin",
+    "api",
+    "assets",
+    "contextor",
+    "login",
+    "logout",
+    "model-review",
+    "paper",
+    "pricing",
+    "register",
+    "settings",
+    "signup",
+    "todo",
+    "translate",
+}
 
 
 def _get_ip(request: Request) -> str:
@@ -112,7 +134,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
             return JSONResponse(
                 {"error": "세션이 만료됐습니다. 다시 로그인해주세요."}, status_code=401
             )
-        return RedirectResponse(url="/login")
+        redirect_path = path
+        if request.url.query:
+            redirect_path = f"{redirect_path}?{request.url.query}"
+        return RedirectResponse(url=f"/login?redirect={quote(redirect_path, safe='')}")
 
 
 router = APIRouter()
@@ -130,13 +155,24 @@ class LoginRequest(BaseModel):
 
 @router.post("/register")
 async def register(req: RegisterRequest):
+    username = req.username.strip().lower()
+    if not USERNAME_RE.fullmatch(username):
+        return JSONResponse(
+            {"error": "사용자명은 영문 소문자, 숫자, 하이픈을 사용해 3~30자로 입력해주세요."},
+            status_code=400,
+        )
+    if username in RESERVED_USERNAMES:
+        return JSONResponse({"error": "사용할 수 없는 사용자명입니다."}, status_code=400)
+    if len(req.password) < 8:
+        return JSONResponse({"error": "비밀번호는 8자 이상 입력해주세요."}, status_code=400)
+
     db = get_supabase()
-    existing = db.table("users").select("id").eq("username", req.username).execute()
+    existing = db.table("users").select("id").eq("username", username).execute()
     if existing.data:
         return JSONResponse({"error": "이미 사용 중인 사용자명입니다."}, status_code=409)
     pw_hash = _hash_pw(req.password)
     db.table("users").insert({
-        "username": req.username,
+        "username": username,
         "password_hash": pw_hash,
         "is_approved": False,
     }).execute()
@@ -153,10 +189,11 @@ async def login(req: LoginRequest, request: Request):
         )
 
     db = get_supabase()
+    username = req.username.strip().lower()
     result = (
         db.table("users")
         .select("id, password_hash, is_approved")
-        .eq("username", req.username)
+        .eq("username", username)
         .execute()
     )
     user = result.data[0] if result.data else None

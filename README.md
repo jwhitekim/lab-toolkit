@@ -13,7 +13,8 @@ FastAPI + React SPA로 논문 분석, 번역, 모델 리뷰, 할 일 관리를 �
 | Todo | `/todo` | 연구 할 일, 단계, 우선순위, AI 전략 |
 | Calendar | `/todo` | 할 일 기반 타임블로킹 캘린더 + 주간 리뷰 |
 
-모든 앱은 `veloo.page/:username` 단일 URL에서 사이드바 메뉴로 전환합니다.
+공개 홈페이지는 `/`, 로그인과 가입은 `/login`·`/signup`, 모든 앱은
+`/:username` 작업 공간에서 메뉴로 전환합니다.
 
 ## 기술 스택
 
@@ -69,9 +70,10 @@ docker run --env-file .env -p 9000:9000 veloo
 
 ## 인증
 
-- `/register` 가입 후 관리자가 Supabase에서 `is_approved = true` 승인 필요
+- `/signup` 가입 신청 후 관리자가 Supabase에서 `is_approved = true` 승인 필요
 - 로그인 성공 시 30일 만료 httpOnly 쿠키 발급
 - IP 기준 5회 실패 시 15분 차단
+- 사용자명은 영문 소문자·숫자·하이픈으로 구성된 3~30자이며 시스템 경로는 예약어로 차단
 - 스키마: `backend/schema.sql`을 Supabase SQL Editor에서 실행
 
 ## 버전 관리

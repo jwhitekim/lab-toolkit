@@ -5,6 +5,7 @@
     "save": "저장",
     "saving": "저장 중...",
     "delete": "삭제",
+    "edit": "수정",
     "clear": "지우기",
     "recentHistory": "최근 기록",
     "sessionExpired": "세션이 만료되었습니다.",
@@ -40,13 +41,89 @@
       "model-review": "Model"
     },
     "language": "언어",
+    "accountMenu": "계정 메뉴",
+    "logout": "로그아웃",
+    "loggingOut": "로그아웃 중...",
     "weeklyReview": "Weekly Review"
+  },
+  "landing": {
+    "navAria": "홈페이지 메뉴",
+    "nav": {
+      "features": "기능",
+      "workflow": "사용 방법",
+      "login": "로그인",
+      "start": "회원가입",
+      "workspace": "내 작업 공간"
+    },
+    "eyebrow": "AI research workspace",
+    "heroTitle": "연구의 모든 순간을",
+    "heroAccent": "하나의 흐름으로.",
+    "heroDescription": "계획부터 논문 분석, 번역과 모델 학습까지. 흩어진 연구 도구를 하나의 집중된 작업 공간에서 연결하세요.",
+    "openWorkspace": "작업 공간 열기",
+    "startBeta": "베타 시작하기",
+    "explore": "기능 살펴보기",
+    "betaNote": "가입 신청 후 관리자 승인으로 안전하게 시작합니다.",
+    "previewAria": "Veloo 제품 화면 미리보기",
+    "preview": {
+      "today": "오늘의 진행률",
+      "complete": "완료",
+      "focus": "집중 시간",
+      "papers": "분석한 논문",
+      "plan": "Today’s plan",
+      "heading": "오늘의 연구 흐름",
+      "task1": "Diffusion 논문 핵심 정리",
+      "task2": "모델 구조 비교 분석",
+      "task3": "실험 결과 및 다음 단계 정리",
+      "insightTitle": "AI 실행 제안",
+      "insight": "오후 실험 전에 모델 차이를 표로 정리하면 결과 해석이 더 빨라집니다."
+    },
+    "proofAria": "Veloo의 핵심 연구 과정",
+    "proof": "One workspace for",
+    "features": {
+      "eyebrow": "Built for deep work",
+      "title": "연구에 필요한 도구만, 더 긴밀하게",
+      "description": "앱 사이를 오가는 시간을 줄이고 생각과 실행의 맥락을 그대로 이어갑니다.",
+      "plan": { "title": "계획과 캘린더", "description": "할 일을 실행 가능한 단계로 나누고 연구 일정을 한눈에 관리합니다." },
+      "paper": { "title": "논문 핵심 분석", "description": "제목이나 URL만으로 연구 문제, 방법, 결론과 저널 정보를 빠르게 파악합니다." },
+      "translate": { "title": "맥락을 지키는 번역", "description": "ML·DL 문맥에 맞춘 자연스러운 번역으로 읽기의 흐름을 유지합니다." },
+      "model": { "title": "모델 구조 학습", "description": "아키텍처 이미지를 분석하고 직접 설명한 뒤 AI 피드백으로 이해도를 높입니다." },
+      "concept": { "title": "개념 컨텍스트", "description": "낯선 용어와 표현을 연구 맥락에 맞춰 구조화하고 다시 활용합니다." }
+    },
+    "workflow": {
+      "eyebrow": "A continuous workflow",
+      "title": "생각이 끊기지 않는 연구 과정",
+      "description": "Veloo는 개별 AI 기능의 모음이 아니라, 오늘 해야 할 일에서 연구 결과까지 이어지는 하나의 작업 공간입니다.",
+      "step1": { "title": "오늘의 연구를 계획하세요", "description": "우선순위와 마감을 정하고 AI가 제안한 실행 단계로 막연한 일을 구체화합니다." },
+      "step2": { "title": "자료를 읽고 이해하세요", "description": "논문 분석, 번역, 개념 정리를 오가며 필요한 맥락을 빠르게 확보합니다." },
+      "step3": { "title": "배운 것을 실행으로 연결하세요", "description": "모델을 설명하고 피드백을 받은 뒤 다음 할 일과 일정에 바로 반영합니다." }
+    },
+    "cta": {
+      "eyebrow": "Private beta",
+      "title": "연구의 다음 흐름을 지금 시작하세요.",
+      "description": "베타 액세스를 신청하고 Veloo의 작업 공간을 먼저 경험해보세요.",
+      "button": "베타 액세스 신청"
+    },
+    "footer": "Research tools, thoughtfully connected."
   },
   "login": {
     "tagline": "Enter with intent",
     "enter": "Enter",
     "tabLogin": "로그인",
     "tabRegister": "계정 만들기",
+    "backHome": "홈으로 돌아가기",
+    "welcomeTitle": "다시 연구의\n흐름으로.",
+    "signupTitle": "더 나은 연구\n루틴의 시작.",
+    "welcomeDescription": "Veloo에 로그인하고 계획, 분석, 학습을 한곳에서 이어가세요.",
+    "signupDescription": "베타 계정을 신청하고 연구를 위한 집중된 작업 공간을 경험해보세요.",
+    "quote": "좋은 연구 도구는 생각을 대신하지 않고, 생각이 이어지도록 돕습니다.",
+    "accountAccess": "Account access",
+    "betaAccess": "Private beta",
+    "loginDescription": "계정 정보를 입력해 작업 공간을 여세요.",
+    "registerDescription": "사용자명과 비밀번호로 베타 액세스를 신청하세요.",
+    "usernameLabel": "사용자명",
+    "passwordLabel": "비밀번호",
+    "passwordHint": "8자 이상 입력해주세요.",
+    "registeredTitle": "신청이 완료됐습니다",
     "registeredMessage": "가입 요청이 접수됐습니다.",
     "registeredNote": "관리자 승인 후 로그인할 수 있습니다.",
     "backToLogin": "로그인으로 돌아가기",
@@ -208,6 +285,13 @@
     "newUpload": "새 논문 업로드"
   },
   "todo": {
+    "todayPlan": "Today’s plan",
+    "researchFlow": "오늘의 연구 흐름",
+    "insightTitle": "AI 실행 제안",
+    "summary": {
+      "today": "오늘의 진행률",
+      "complete": "완료"
+    },
     "priority": {
       "urgent": "긴급",
       "mid": "보통",
@@ -222,6 +306,7 @@
     "filterAriaLabel": "Todo 필터",
     "addButton": "추가",
     "addTodoFooter": "할 일 추가",
+    "openDetail": "세부 할 일 보기",
     "activeCount": "{{count}}개 진행 중",
     "noTodos": "할 일이 없습니다",
     "completedToggle": "완료됨",
