@@ -121,12 +121,12 @@
      공간을 예약해서 스크롤바 유무와 무관하게 폭이 고정되게 한다 (Todo.css와 동일 패턴). */
   scrollbar-gutter: stable;
   background: var(--bg-canvas);
+  padding: 0 var(--page-gutter) var(--page-section-gap);
 }
 
 .paper-results-rail {
   width: min(100%, var(--page-reading-max));
   margin-inline: auto;
-  padding: 0 var(--page-gutter) var(--page-section-gap);
 }
 
 /* Two columns only once a paper is loaded: metadata context panel + analysis.
