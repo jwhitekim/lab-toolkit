@@ -148,7 +148,22 @@ class GeminiProvider(AIProvider):
             contents=self._contents(user, images),
             config=self._config(system, max_tokens),
         )
-        return (response.text or "").strip()
+        text = (response.text or "").strip()
+        if not text:
+            # response.text가 None/빈 문자열이면 조용히 넘어가지 않는다 — 안전 필터
+            # 차단이나 max_tokens 부족으로 candidate가 비어도 예외가 안 나서, 그동안은
+            # 호출부(_parse_json 등)에서야 JSONDecodeError로 터져 원인 파악이 어려웠다.
+            finish_reason = None
+            try:
+                finish_reason = response.candidates[0].finish_reason
+            except (AttributeError, IndexError, TypeError):
+                pass
+            raise HTTPException(
+                status_code=502,
+                detail=f"Gemini 응답이 비어있습니다 (finish_reason={finish_reason}). "
+                       f"max_tokens 부족이나 안전 필터 차단일 수 있습니다.",
+            )
+        return text
 
     async def stream(self, system, user, max_tokens=512, tier="smart"):
         async for chunk in await self._client.aio.models.generate_content_stream(

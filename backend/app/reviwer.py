@@ -176,7 +176,7 @@ async def feedback(req: FeedbackRequest, request: Request):
                 user_explanation=req.user_explanation.replace("<", "&lt;").replace(">", "&gt;"),
                 ai_explanation=json.dumps(req.ai_explanation, ensure_ascii=False, indent=2),
             ),
-            max_tokens=800,
+            max_tokens=2000,
             tier="smart",
         )
         feedback_json = _parse_json(response_text)

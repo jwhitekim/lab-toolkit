@@ -5,7 +5,7 @@ import { useT, useDateLocale } from '@/shared/i18n'
 import PageHeader from '@/shared/components/PageHeader'
 import StatePanel from '@/shared/components/StatePanel'
 import * as api from './api'
-import type { ExplanationJSON, FeedbackJSON, ArchHistoryItem } from './api'
+import type { ExplanationJSON, ExplanationModule, ExplanationFlowStep, FeedbackJSON, ArchHistoryItem } from './api'
 import './ArchTrainer.css'
 
 const C = {
@@ -41,6 +41,7 @@ export default function ArchTrainer() {
   const FEEDBACK_LABELS: Record<keyof FeedbackJSON, string> = {
     correct:    t('reviewer.feedback.correct'),
     missing:    t('reviewer.feedback.missing'),
+    incorrect:  t('reviewer.feedback.incorrect'),
     suggestion: t('reviewer.feedback.suggestion'),
   }
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -272,9 +273,10 @@ export default function ArchTrainer() {
             <div style={{ marginBottom: 20 }}>
               <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.2px', color: C.textMuted, marginBottom: 10 }}>{t('reviewer.aiExplanationLabel')}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {(Object.keys(SECTION_LABELS) as (keyof ExplanationJSON)[]).map(key => (
-                  <SectionBlock key={key} label={SECTION_LABELS[key]} content={explanation[key]} />
-                ))}
+                <SectionBlock label={SECTION_LABELS.overview} content={explanation.overview} />
+                <ModuleListBlock label={SECTION_LABELS.modules} items={explanation.modules} />
+                <FlowListBlock label={SECTION_LABELS.data_flow} items={explanation.data_flow} />
+                <SectionBlock label={SECTION_LABELS.contribution} content={explanation.contribution} />
               </div>
             </div>
 
@@ -282,9 +284,10 @@ export default function ArchTrainer() {
             <div>
               <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.2px', color: C.textMuted, marginBottom: 10 }}>{t('reviewer.feedbackLabel')}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {(Object.keys(FEEDBACK_LABELS) as (keyof FeedbackJSON)[]).map(key => (
-                  <SectionBlock key={key} label={FEEDBACK_LABELS[key]} content={feedback[key]} />
-                ))}
+                <ListBlock label={FEEDBACK_LABELS.correct} items={feedback.correct} />
+                <ListBlock label={FEEDBACK_LABELS.missing} items={feedback.missing} />
+                <ListBlock label={FEEDBACK_LABELS.incorrect} items={feedback.incorrect} />
+                <SectionBlock label={FEEDBACK_LABELS.suggestion} content={feedback.suggestion} />
               </div>
             </div>
 
@@ -307,6 +310,60 @@ function SectionBlock({ label, content }: { label: string; content: string }) {
         {label}
       </div>
       <p style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.75, margin: 0 }}>{content}</p>
+    </div>
+  )
+}
+
+// correct/missing/incorrect처럼 "문자열 배열"인 필드용 — 백엔드 프롬프트 스키마가
+// 배열인데 예전엔 SectionBlock에 그대로 넘겨 bullet 없이 이어붙여 렌더링됐었다.
+function ListBlock({ label, items }: { label: string; items: string[] }) {
+  if (!items?.length) return null
+  return (
+    <div style={{ borderRadius: 'var(--radius-md)', padding: '10px 14px', background: 'var(--bg-additive)' }}>
+      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: 6, color: 'var(--text-secondary)' }}>
+        {label}
+      </div>
+      <ul style={{ margin: 0, paddingLeft: 18, fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.75 }}>
+        {items.map((item, i) => <li key={i}>{item}</li>)}
+      </ul>
+    </div>
+  )
+}
+
+// modules는 {name, role, operation} 객체 배열 — 예전엔 SectionBlock에 객체를 그대로
+// 넘겨서 React error #31("Objects are not valid as a React child")로 죽던 필드.
+function ModuleListBlock({ label, items }: { label: string; items: ExplanationModule[] }) {
+  if (!items?.length) return null
+  return (
+    <div style={{ borderRadius: 'var(--radius-md)', padding: '10px 14px', background: 'var(--bg-additive)' }}>
+      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: 6, color: 'var(--text-secondary)' }}>
+        {label}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {items.map((m, i) => (
+          <div key={i} style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.6 }}>
+            <strong>{m.name}</strong>
+            {m.role && <span style={{ color: 'var(--text-secondary)' }}> — {m.role}</span>}
+            {m.operation && <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>{m.operation}</div>}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// data_flow는 {step, description} 객체 배열 — modules와 같은 이유로 별도 렌더링 필요.
+function FlowListBlock({ label, items }: { label: string; items: ExplanationFlowStep[] }) {
+  if (!items?.length) return null
+  const sorted = [...items].sort((a, b) => a.step - b.step)
+  return (
+    <div style={{ borderRadius: 'var(--radius-md)', padding: '10px 14px', background: 'var(--bg-additive)' }}>
+      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: 6, color: 'var(--text-secondary)' }}>
+        {label}
+      </div>
+      <ol style={{ margin: 0, paddingLeft: 18, fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.75 }}>
+        {sorted.map(s => <li key={s.step}>{s.description}</li>)}
+      </ol>
     </div>
   )
 }

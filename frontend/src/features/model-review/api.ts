@@ -2,16 +2,28 @@ import { translate } from '@/shared/i18n'
 
 const BASE = '/model-review'
 
+export interface ExplanationModule {
+  name: string
+  role: string
+  operation: string
+}
+
+export interface ExplanationFlowStep {
+  step: number
+  description: string
+}
+
 export interface ExplanationJSON {
   overview: string
-  modules: string
-  data_flow: string
+  modules: ExplanationModule[]
+  data_flow: ExplanationFlowStep[]
   contribution: string
 }
 
 export interface FeedbackJSON {
-  correct: string
-  missing: string
+  correct: string[]
+  missing: string[]
+  incorrect: string[]
   suggestion: string
 }
 
