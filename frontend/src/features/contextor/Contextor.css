@@ -29,7 +29,7 @@
   padding: 0 11px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--bg-additive) 34%, var(--bg-base));
+  background: var(--surface-well);
 }
 
 .contextor-search-icon {
@@ -128,9 +128,9 @@
 .contextor-empty-heading p { margin: 9px 0 0; color: var(--text-secondary); font-size: 13px; line-height: 1.65; }
 .contextor-suggestions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 17px; }
 .contextor-suggestions button { height: 30px; padding: 0 11px; border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border-subtle)); border-radius: var(--radius-pill); background: var(--accent-soft); color: var(--accent); cursor: pointer; font: inherit; font-size: 11px; font-weight: 650; }
-.contextor-suggestions button:hover { background: var(--accent); color: #fff; }
+.contextor-suggestions button:hover { background: var(--accent); color: var(--selected-text); }
 .contextor-guide { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.contextor-guide article { min-height: 132px; padding: 19px; border: 1px solid var(--border-subtle); border-radius: 15px; background: color-mix(in srgb, var(--bg-base) 88%, var(--accent-soft)); }
+.contextor-guide article { min-height: 132px; padding: 19px; border: 1px solid var(--border-subtle); border-radius: 15px; background: var(--surface-tint-card); }
 .contextor-guide article > svg { width: 20px; height: 20px; color: var(--accent); }
 .contextor-guide strong { display: block; margin-top: 16px; color: var(--text-primary); font-size: 14px; }
 .contextor-guide p { margin: 6px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.55; }
@@ -150,20 +150,12 @@
   gap: 16px;
 }
 
-.contextor-query {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 26px;
-  line-height: 1.2;
-  font-weight: var(--fw-semibold);
-}
-
 .contextor-note {
   margin: 0;
   padding: 14px 16px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--bg-additive) 34%, var(--bg-base));
+  background: var(--surface-well);
   color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.6;
@@ -250,9 +242,6 @@
 
   .contextor-searchbar { height: var(--page-control-h); padding: 0 11px; }
   .contextor-input { font-size: 16px; }
-  .contextor-query {
-    font-size: 19px;
-  }
 
   .contextor-cases {
     grid-template-columns: 1fr;

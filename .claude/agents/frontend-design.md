@@ -34,10 +34,19 @@ description: "veloo.page 프론트엔드의 시각 디자인/레이아웃/CSS �
 - 페이지 레이아웃 레일 규칙(`--page-reading-max`/`--page-content-max`)은 "리서치 도구(Papers,
   Translate, Models, Concepts)"에만 적용된다. Todo/Calendar는 이 레일 밖의 별도 레이아웃이다 —
   섞어서 적용하지 않는다.
+- **여러 영역(헤더/검색바/결과 본문 등)이 같은 레일 폭으로 정렬돼야 하면, CSS 값이 같다고
+  끝난 게 아니다.** 그중 하나만 `overflow-y: auto`로 스크롤되면 스크롤바 유무에 따라 실제
+  렌더링 폭이 달라져 정렬이 어긋난다(`docs/design-system.md` "페이지 레이아웃" 섹션 참고,
+  Mac 오버레이 스크롤바에서는 안 보이고 Windows에서만 보임 — 실제로 이 프로젝트에서 발생한
+  사례). `overflow-y: auto`를 쓰는 컨테이너에는 항상 `scrollbar-gutter: stable`을 같이 건다.
 - 다크 모드는 구현되어 있지 않다(`docs/design-system.md` 참고) — `dark:` 클래스나 다크 모드
   분기를 새로 추가하지 않는다.
 - 변경 후 `cd frontend && npm run build`(tsc 타입체크 + vite build)로 검증한다. 실패하면
   커밋하지 않고 원인을 보고한다.
+- **정렬/폭 관련 변경은 빌드 성공만으로 끝내지 않는다.** CSS 값을 눈으로 맞춰봤다고 실제
+  렌더링도 맞는다는 보장이 없다(위 scrollbar-gutter 사례 참고). 가능하면 브라우저에서
+  `getBoundingClientRect()`로 정렬 대상 요소들의 `left`/`right`를 직접 재서 확인한다 — 스크린샷
+  눈대중보다 확실하다.
 
 ## 입력/출력 프로토콜
 - 입력: 변경 요청(구체적 화면/컴포넌트 + 원하는 결과), 또는 스크린샷

@@ -20,6 +20,53 @@
   --border-subtle:      #cfd3cd;
   --shadow-card:        0 2px 8px rgba(24, 25, 48, .07), 0 1px 2px rgba(24, 25, 48, .05);
 
+  /* 공개(비-앱) 페이지 캔버스 — Marketing/Auth가 각자 #f7f8f4를 하드코딩하고 있었음.
+     앱 캔버스(--bg-canvas #f6f7f4)와 1/255 차이라 사실상 같지만, 공개 페이지의 의도된
+     별도 톤일 수 있어 강제 통합하지 않고 두 파일이 공유하는 하나의 토큰으로만 묶음. */
+  --surface-public:     #f7f8f4;
+
+  /* 옅은 입력/웰 표면 — 검색바·번역 원문 패널·설명 노트가 각자
+     color-mix(--bg-additive 34%, --bg-base)를 반복하던 것(리서치 도구 4곳 동일값). */
+  --surface-well:       color-mix(in srgb, var(--bg-additive) 34%, var(--bg-base));
+
+  /* 액센트가 옅게 밴 안내 카드 표면 — Papers/Translate/Concepts/Models의
+     가이드·워크플로우·기능 카드가 같은 역할인데 86~88%로 미세하게 어긋나 있던 것을 통일. */
+  --surface-tint-card:  color-mix(in srgb, var(--bg-base) 88%, var(--accent-soft));
+
+  /* 액센트 포커스/호버 링 — 버튼·체크박스·입력 포커스에 반복되던
+     0 0 0 4px rgba(accent,.1) 계열(3~4px, .08~.1로 미세하게 어긋나 있던 것)을 하나로 통일.
+     pulse 애니메이션의 확장 글로우(7px, alpha 0)는 의도된 1회성 효과라 토큰화하지 않음. */
+  --focus-ring-accent:  0 0 0 4px rgba(18, 135, 106, .1);
+
+  /* 떠 있는 팝오버/플로팅 패널 그림자 — Translator 사전 패널과 Shell 사용자 메뉴가
+     0 18px 48~50px 의 거의 같은 그림자를 각자 하드코딩하던 것. (Shell 쪽 적용은
+     예정된 라우팅/네비게이션 리팩터에서 함께 처리) */
+  --shadow-popover:     0 18px 48px rgba(29, 36, 33, .16);
+
+  /* 다크 패널(마케팅 CTA, 로그인 히어로 등 라이트 페이지 안의 다크 서피스) —
+     marketing-cta(#17221d)와 auth-story(#18231e)가 서로 독립적으로 만들어졌는데
+     본문/보조/포인트 텍스트 값이 완전히 같아서(#aebbb4, #8ed0b7) 토큰화함. */
+  --surface-inverse:          #17221d;
+  --text-inverse-primary:     #ffffff;
+  --text-inverse-secondary:   #aebbb4;
+  --text-inverse-accent:      #8ed0b7;
+  --text-inverse-muted:       #829189;
+
+  /* 리스트형 화면(Todo, 그리고 이를 그대로 재현한 마케팅 프리뷰 목업) 전용 웜그레이 —
+     --bg-additive/--border-subtle보다 옅고 따뜻해 두 파일에서 각자 반복 등장. */
+  --list-border:          #e7eae5;
+  --list-well-bg:         #fafbf9;
+  --list-track-bg:        #e7ebe6;
+  --list-item-divider:    #edf0eb;
+  --list-input-border:    #e1e5df;
+  --list-checkbox-border: #c9d0ca;
+
+  /* "AI 인사이트" 강조 배경 3단계 — Todo 카드와 마케팅 프리뷰 애니메이션이 동일한
+     3색을 각자 하드코딩하고 있었음(#edf6f1 → #e8f4ee → #e2f1e9). */
+  --insight-wash-1: #edf6f1;
+  --insight-wash-2: #e8f4ee;
+  --insight-wash-3: #e2f1e9;
+
   /* Spacing */
   --space-xs:   4px;
   --space-sm:   8px;

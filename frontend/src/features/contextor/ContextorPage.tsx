@@ -118,8 +118,6 @@ export default function Contextor() {
 
           {!sessionExpired && !loading && result && (
             <div className="contextor-result">
-              <h2 className="contextor-query">{result.query}</h2>
-
               {!result.hasMlUsage ? (
                 <p className="contextor-note">{result.note || t('contextor.noMlUsage')}</p>
               ) : (

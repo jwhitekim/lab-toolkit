@@ -14,7 +14,7 @@
   padding: 0 11px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--bg-additive) 34%, var(--bg-base));
+  background: var(--surface-well);
 }
 
 .paper-search-icon {
@@ -97,7 +97,7 @@
 .paper-empty-heading h2 { margin: 0; color: var(--text-primary); font-size: 22px; letter-spacing: -0.025em; }
 .paper-empty-heading p { max-width: 580px; margin: 9px 0 0; color: var(--text-secondary); font-size: 13px; line-height: 1.65; }
 .paper-workflow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.paper-workflow article { position: relative; min-height: 150px; padding: 20px; border: 1px solid var(--border-subtle); border-radius: 15px; background: color-mix(in srgb, var(--bg-base) 86%, var(--accent-soft)); }
+.paper-workflow article { position: relative; min-height: 150px; padding: 20px; border: 1px solid var(--border-subtle); border-radius: 15px; background: var(--surface-tint-card); }
 .paper-workflow article > svg { width: 20px; height: 20px; color: var(--accent); }
 .paper-workflow-number { position: absolute; top: 18px; right: 18px; color: var(--text-disabled); font-size: 11px; font-weight: 700; }
 .paper-workflow strong { display: block; margin-top: 18px; color: var(--text-primary); font-size: 14px; }
@@ -108,18 +108,70 @@
   background: var(--bg-canvas);
 }
 
-.paper-main > * {
+/* Desktop results share ONE reading rail with the header + search bar so all
+   three align on the same left/right baseline (design-system.md: Papers uses
+   --page-reading-max). The rail owns width + horizontal padding + scroll. */
+.paper-results--desktop {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  /* 헤더/검색바는 스크롤이 없어 항상 전체 폭을 쓰는데, 이 영역만 내용이 길어지면
+     스크롤바가 생겨 그만큼 폭이 줄어든다. Windows 등 클래식(비오버레이) 스크롤바
+     환경에서 결과 레일이 헤더/검색바보다 살짝 좁아지고 밀리는 원인이었다 — 항상
+     공간을 예약해서 스크롤바 유무와 무관하게 폭이 고정되게 한다 (Todo.css와 동일 패턴). */
+  scrollbar-gutter: stable;
+  background: var(--bg-canvas);
+}
+
+.paper-results-rail {
   width: min(100%, var(--page-reading-max));
   margin-inline: auto;
+  padding: 0 var(--page-gutter) var(--page-section-gap);
 }
 
-.paper-main--desktop {
+/* Two columns only once a paper is loaded: metadata context panel + analysis.
+   260px keeps the panel narrower than the 240px nav so it reads as a context
+   panel rather than a second sidebar, and leaves the analysis column a ~670px
+   reading width. */
+.paper-results-rail--split {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.paper-main--desktop { min-width: 0; }
+
+/* Mobile results: single column, metadata card stacked above analysis. */
+.paper-results--mobile {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 0 var(--page-gutter) 64px;
+  scrollbar-gutter: stable;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--page-gutter) 32px;
 }
 
-.paper-main--mobile {
-  padding: 0 var(--page-gutter) 32px;
+.paper-main--mobile { min-width: 0; }
+
+/* Paper metadata = current-paper context panel: a bordered card on the base
+   surface, not the old full-height --bg-additive gray plane, and distinct from
+   the flat-canvas navigation sidebar. Sticky so it stays while analysis scrolls. */
+.paper-context-panel {
+  align-self: start;
+  position: sticky;
+  top: 0;
+  padding: 20px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-base);
+  color: var(--text-primary);
+}
+
+.paper-context-panel--mobile {
+  position: static;
+  margin-bottom: var(--page-section-gap);
 }
 
 @media (max-width: 640px) {

@@ -84,6 +84,7 @@
 **규칙**
 - Papers·Concepts는 `--page-reading-max`, Translate·Models는 `--page-content-max` 레일을 사용하고 레일 자체를 `margin-inline: auto`로 중앙 배치한다.
 - 헤더, 검색/입력, 초기 안내와 결과 본문은 같은 레일을 사용해 왼쪽 시작선과 오른쪽 끝선을 맞춘다.
+- **레일 폭이 같은 `width: min(100%, --page-*-max); margin-inline: auto` 값이어도, 그중 하나만 `overflow-y: auto`로 스크롤되면 실제 렌더링 폭이 어긋난다.** 스크롤 안 되는 헤더/검색바는 항상 전체 폭을 쓰는데, 스크롤되는 결과 영역은 콘텐츠가 길어져 스크롤바가 생기는 순간 그만큼 폭이 줄기 때문 — Mac 오버레이 스크롤바에서는 안 보이고 Windows 클래식 스크롤바에서만 보여서 놓치기 쉽다(`PaperAnalyzerPage.tsx` 실제 발생 사례, 2026-08-25). **레일 안에서 `overflow-y: auto`를 쓰는 컨테이너는 반드시 `scrollbar-gutter: stable`을 같이 써서 스크롤바 유무와 무관하게 폭을 고정할 것** (`Todo.css`의 `.todo-list-scroll`이 기존 예시).
 - 중앙 정렬은 콘텐츠 블록의 배치에만 적용한다. 제목, 설명, 입력값, 카드 내부 문장은 좌측 정렬을 유지한다.
 - 페이지 헤더의 아래 간격이 이미 `--page-section-gap`을 담당하므로 본문에 별도 상단 패딩을 중복하지 않는다.
 - 검색창과 검색 전 초기 안내는 같은 `--page-reading-max` 폭을 사용한다. 초기 안내를 남은 화면의 세로 중앙에 놓지 않고 검색창 바로 아래에서 시작한다.
