@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useT } from '@/shared/i18n'
-import Shell from './Shell'
 
 type GuardState = 'checking' | 'ready'
 
@@ -51,5 +50,5 @@ export default function ProtectedWorkspace() {
     )
   }
 
-  return <Shell />
+  return <Outlet />
 }

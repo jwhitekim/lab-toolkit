@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ko'
 import 'dayjs/locale/en'
@@ -17,7 +18,11 @@ import './Todo.css'
 // 형식이 달라 별도로 매핑한다.
 const DAYJS_LOCALE: Record<string, string> = { ko: 'ko', en: 'en', zh: 'zh-cn' }
 
-function TodoSummarySidebar({
+// 데스크톱 전역 워크스페이스 사이드바(Tasks/Calendar/... 네비게이션)와 별개로
+// 이 페이지만의 두 번째 사이드바를 두지 않기 위해, 진행률 요약은 세로 aside가
+// 아니라 본문 상단의 가로 요약 바로 배치한다 (Navigation | Status Sidebar | Content
+// 3단 구조를 피하기 위함 — WorkspaceLayout의 좌측 사이드바가 이미 Navigation을 담당).
+function TodoSummaryBar({
   todos,
 }: {
   todos: Todo[]
@@ -29,21 +34,25 @@ function TodoSummarySidebar({
   const completionRate = todos.length ? Math.round((completed / todos.length) * 100) : 0
 
   return (
-    <aside className="todo-summary-sidebar">
-      <strong>{t('todo.summary.today')}</strong>
-      <div className="todo-summary-progress" aria-label={`${t('todo.overview.completionRate')} ${completionRate}%`}>
-        <span style={{ width: `${completionRate}%` }} />
+    <div className="todo-summary-bar">
+      <div className="todo-summary-bar-progress">
+        <strong>{t('todo.summary.today')}</strong>
+        <div className="todo-summary-progress" aria-label={`${t('todo.overview.completionRate')} ${completionRate}%`}>
+          <span style={{ width: `${completionRate}%` }} />
+        </div>
+        <small>{completed} / {todos.length} {t('todo.summary.complete')}</small>
       </div>
-      <small>{completed} / {todos.length} {t('todo.summary.complete')}</small>
-      <div className="todo-summary-stat">
-        <span>{t('todo.overview.inProgress')}</span>
-        <b>{active.length}</b>
+      <div className="todo-summary-bar-stats">
+        <div className="todo-summary-stat">
+          <span>{t('todo.overview.inProgress')}</span>
+          <b>{active.length}</b>
+        </div>
+        <div className="todo-summary-stat">
+          <span>{t('todo.overview.urgentItems')}</span>
+          <b>{urgent.length}</b>
+        </div>
       </div>
-      <div className="todo-summary-stat">
-        <span>{t('todo.overview.urgentItems')}</span>
-        <b>{urgent.length}</b>
-      </div>
-    </aside>
+    </div>
   )
 }
 
@@ -52,8 +61,10 @@ export default function TodoPage() {
   const { language } = useLanguage()
   dayjs.locale(DAYJS_LOCALE[language])
   const isMobile = useIsMobile()
+  const navigate = useNavigate()
+  const { username = '', taskId } = useParams()
   const [filter, setFilter] = useState<NavFilter>('all')
-  const [selectedId, setSelectedId] = useState<number | null>(null)
+  const selectedId = taskId ? Number(taskId) : null
   const [featuredId, setFeaturedId] = useState<number | null>(null)
 
   const { todos, loading, reload, addTodo, editTodo, removeTodo, toggleDone, refresh, toastError, clearToastError } = useTodos(filter)
@@ -67,25 +78,16 @@ export default function TodoPage() {
 
   const selectedTodo = todos.find(t => t.id === selectedId) ?? null
 
-  // 모바일은 목록→상세가 실제로는 같은 화면 안에서 상태만 바뀌는 거라, 브라우저
-  // 히스토리에 아무 흔적이 없음 — 스와이프 뒤로가기/하드웨어 뒤로가기가 안 먹힘.
-  // 상세를 열 때 history entry를 하나 쌓고, popstate(스와이프 포함)로 닫히게 함.
+  // 목록↔상세 전환은 라우트 이동이다 (/:username/tasks ↔ /:username/tasks/:taskId).
+  // 브라우저 back/forward, 새로고침, 딥링크, 스와이프 뒤로가기 모두 라우터가 기본으로
+  // 처리해주므로 예전처럼 pushState/popstate를 직접 다룰 필요가 없다.
   const openTodo = useCallback((id: number) => {
-    if (isMobile) window.history.pushState({ velooTodoDetail: true }, '')
-    setSelectedId(id)
-  }, [isMobile])
+    navigate(`/${username}/tasks/${id}`)
+  }, [navigate, username])
 
   const closeTodo = useCallback(() => {
-    if (isMobile) window.history.back()
-    else setSelectedId(null)
-  }, [isMobile])
-
-  useEffect(() => {
-    if (!isMobile) return
-    const onPopState = () => setSelectedId(null)
-    window.addEventListener('popstate', onPopState)
-    return () => window.removeEventListener('popstate', onPopState)
-  }, [isMobile])
+    navigate(`/${username}/tasks`)
+  }, [navigate, username])
 
   const handleAdd = async (data: { name: string; memo: string; priority: Priority; deadline: string }) => {
     const todo = await addTodo(data)
@@ -221,35 +223,35 @@ export default function TodoPage() {
   return (
     <>
     <div className="todo-desktop-frame">
-      <div className="todo-desktop-layout">
-        <TodoSummarySidebar todos={todos} />
-        <main className="todo-desktop-content">
-          {loading && todos.length === 0 ? (
-            <div className="todo-desktop-loading">
-              <span>{t('todo.loading')}</span>
-            </div>
-          ) : selectedTodo ? (
-            <FocusPanel
-              todo={selectedTodo}
-              {...focusPanelProps}
-              onBack={closeTodo}
-            />
-          ) : (
+      <main className="todo-desktop-content">
+        {loading && todos.length === 0 ? (
+          <div className="todo-desktop-loading">
+            <span>{t('todo.loading')}</span>
+          </div>
+        ) : selectedTodo ? (
+          <FocusPanel
+            todo={selectedTodo}
+            {...focusPanelProps}
+            onBack={closeTodo}
+          />
+        ) : (
+          <>
+            <TodoSummaryBar todos={todos} />
             <TodoList
               todos={todos}
               filter={filter}
               onFilter={setFilter}
               selectedId={selectedId}
               featuredId={featuredId}
-              onSelect={setSelectedId}
+              onSelect={openTodo}
               onFeature={setFeaturedId}
               onToggle={handleToggleDone}
               onEdit={(id, name) => handleUpdate(id, { name })}
               onAdd={handleAdd}
             />
-          )}
-        </main>
-      </div>
+          </>
+        )}
+      </main>
     </div>
     {toast}
     </>

@@ -21,6 +21,11 @@
       "contextor": "概念",
       "model-review": "模型"
     },
+    "navGroup": {
+      "work": "工作",
+      "research": "研究",
+      "knowledge": "知识"
+    },
     "workspace": {
       "plan": "计划",
       "research": "研究",
@@ -218,7 +223,8 @@
     },
     "feedback": {
       "correct": "理解正确的部分",
-      "missing": "错误或遗漏的部分",
+      "missing": "遗漏的部分",
+      "incorrect": "理解错误的部分",
       "suggestion": "更准确的表述"
     },
     "enterDescriptionError": "请输入说明。",

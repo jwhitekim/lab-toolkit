@@ -21,6 +21,11 @@
       "contextor": "Concepts",
       "model-review": "Models"
     },
+    "navGroup": {
+      "work": "Work",
+      "research": "Research",
+      "knowledge": "Knowledge"
+    },
     "workspace": {
       "plan": "Plan",
       "research": "Research",
@@ -218,7 +223,8 @@
     },
     "feedback": {
       "correct": "Correctly Understood",
-      "missing": "Incorrect or Missing Details",
+      "missing": "Missing Details",
+      "incorrect": "Misunderstood Details",
       "suggestion": "Suggestions for Accuracy"
     },
     "enterDescriptionError": "Please enter a description.",

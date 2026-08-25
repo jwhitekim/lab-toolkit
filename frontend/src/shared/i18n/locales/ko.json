@@ -21,6 +21,11 @@
       "contextor": "Concepts",
       "model-review": "Models"
     },
+    "navGroup": {
+      "work": "업무",
+      "research": "리서치",
+      "knowledge": "지식"
+    },
     "workspace": {
       "plan": "Plan",
       "research": "Research",
@@ -241,7 +246,8 @@
     },
     "feedback": {
       "correct": "잘 이해한 부분",
-      "missing": "틀리거나 빠진 부분",
+      "missing": "빠진 부분",
+      "incorrect": "잘못 이해한 부분",
       "suggestion": "더 정확한 표현"
     },
     "enterDescriptionError": "설명을 입력해주세요.",
