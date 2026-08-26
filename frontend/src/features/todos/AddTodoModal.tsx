@@ -51,7 +51,7 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
       >
         {/* Modal header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-0">
-          <h2 className="text-[14px] font-semibold text-gray-800">{t('todo.modal.title')}</h2>
+          <h2 className="text-[length:var(--fs-label)] [font-weight:var(--fw-semibold)] text-gray-800">{t('todo.modal.title')}</h2>
           <button
             onClick={onClose}
             className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-black/5 transition-colors"
@@ -68,7 +68,7 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
             onChange={e => setName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSave()}
             placeholder={t('todo.modal.namePlaceholder')}
-            className="w-full text-[16px] font-medium placeholder:text-gray-300 bg-transparent outline-none text-gray-900 border-b pb-2 transition-colors focus:border-[var(--selected-bg)]"
+            className="w-full text-[length:var(--fs-input)] [font-weight:var(--fw-medium)] placeholder:text-gray-300 bg-transparent outline-none text-gray-900 border-b pb-2 transition-colors focus:border-[var(--selected-bg)]"
             style={{ borderColor: 'var(--border)' }}
           />
 
@@ -78,19 +78,19 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
             onChange={e => setMemo(e.target.value)}
             placeholder={t('todo.modal.memoPlaceholder')}
             rows={3}
-            className="w-full text-[16px] placeholder:text-gray-300 bg-transparent outline-none resize-none text-gray-700 rounded-lg px-3 py-2.5 transition-colors"
+            className="w-full text-[length:var(--fs-input)] placeholder:text-gray-300 bg-transparent outline-none resize-none text-gray-700 rounded-lg px-3 py-2.5 transition-colors"
             style={{ background: 'var(--list)' }}
           />
 
           {/* Priority pills */}
           <div>
-            <div className="text-[11px] text-gray-400 mb-2">{t('todo.modal.priorityLabel')}</div>
+            <div className="text-[length:var(--fs-meta)] text-gray-400 mb-2">{t('todo.modal.priorityLabel')}</div>
             <div className="flex gap-2">
               {priorities.map(p => (
                 <button
                   key={p.value}
                   onClick={() => setPriority(p.value)}
-                  className="flex-1 py-1.5 rounded-lg text-[12px] font-medium border transition-colors"
+                  className="flex-1 py-1.5 rounded-lg text-[length:var(--fs-small)] [font-weight:var(--fw-medium)] border transition-colors"
                   style={priority === p.value
                     ? { background: 'var(--selected-bg)', borderColor: 'var(--selected-bg)', color: 'var(--selected-text)' }
                     : { background: 'transparent', borderColor: 'var(--border-subtle)', color: 'var(--text-secondary)' }}
@@ -103,12 +103,12 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
 
           {/* Deadline */}
           <div>
-            <div className="text-[11px] text-gray-400 mb-2">{t('todo.modal.deadlineLabel')}</div>
+            <div className="text-[length:var(--fs-meta)] text-gray-400 mb-2">{t('todo.modal.deadlineLabel')}</div>
             <input
               type="date"
               value={deadline}
               onChange={e => setDeadline(e.target.value)}
-              className="w-full text-[16px] rounded-lg px-3 py-2 outline-none border bg-transparent text-gray-700 focus:border-[var(--selected-bg)] transition-colors"
+              className="w-full text-[length:var(--fs-input)] rounded-lg px-3 py-2 outline-none border bg-transparent text-gray-700 focus:border-[var(--selected-bg)] transition-colors"
               style={{ borderColor: 'var(--input-border)' }}
             />
           </div>
@@ -121,14 +121,14 @@ export default function AddTodoModal({ onClose, onSave }: Props) {
         >
           <button
             onClick={onClose}
-            className="px-4 py-2 text-[13px] text-gray-500 hover:bg-black/5 rounded-lg transition-colors"
+            className="px-4 py-2 text-[length:var(--fs-body)] text-gray-500 hover:bg-black/5 rounded-lg transition-colors"
           >
             {t('common.cancel')}
           </button>
           <button
             onClick={handleSave}
             disabled={!name.trim() || saving}
-            className="px-4 py-2 text-[13px] bg-[var(--selected-bg)] text-[var(--selected-text)] hover:opacity-90 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1.5"
+            className="px-4 py-2 text-[length:var(--fs-body)] bg-[var(--selected-bg)] text-[var(--selected-text)] hover:opacity-90 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1.5"
           >
             {saving ? (
               <>

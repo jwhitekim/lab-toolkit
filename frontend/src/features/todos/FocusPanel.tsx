@@ -21,7 +21,7 @@ interface Props {
 
 function SectionHeader({ label, action }: { label: string; action?: React.ReactNode }) {
   return (
-    <div className="text-[11px] font-semibold text-gray-400 mb-2 uppercase tracking-wider flex items-center justify-between">
+    <div className="text-[length:var(--fs-meta)] [font-weight:var(--fw-semibold)] text-gray-400 mb-2 uppercase tracking-wider flex items-center justify-between">
       <span>{label}</span>
       {action}
     </div>
@@ -77,7 +77,7 @@ export default function FocusPanel({
   if (!todo) {
     return (
       <div className="flex-1 flex items-center justify-center" style={{ background: 'var(--panel)' }}>
-        <p className="text-[13px] text-gray-400">{t('todo.detail.selectTodo')}</p>
+        <p className="text-[length:var(--fs-body)] text-gray-400">{t('todo.detail.selectTodo')}</p>
       </div>
     )
   }
@@ -144,7 +144,7 @@ export default function FocusPanel({
         <div className="px-4 py-2 flex-shrink-0 border-b" style={{ borderColor: 'var(--border)' }}>
           <button
             onClick={onBack}
-            style={{ fontSize: 13, color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-sans)', display: 'flex', alignItems: 'center', gap: 4 }}
+            style={{ fontSize: 'var(--fs-body)', color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'var(--font-sans)', display: 'flex', alignItems: 'center', gap: 4 }}
           >
             {t('todo.detail.backToList')}
           </button>
@@ -157,21 +157,21 @@ export default function FocusPanel({
             <input
               value={editName}
               onChange={e => setEditName(e.target.value)}
-              className="w-full text-[16px] font-semibold border-b pb-1 outline-none border-[var(--selected-bg)] bg-transparent text-gray-900"
+              className="w-full text-[length:var(--fs-input)] [font-weight:var(--fw-semibold)] border-b pb-1 outline-none border-[var(--selected-bg)] bg-transparent text-gray-900"
             />
             <textarea
               value={editMemo}
               onChange={e => setEditMemo(e.target.value)}
               rows={10}
               placeholder={t('todo.detail.memoPlaceholder')}
-              className="w-full border rounded-lg px-3 py-2 text-[16px] outline-none focus:border-[var(--selected-bg)] resize-none bg-transparent text-gray-700"
+              className="w-full border rounded-lg px-3 py-2 text-[length:var(--fs-input)] outline-none focus:border-[var(--selected-bg)] resize-none bg-transparent text-gray-700"
               style={{ borderColor: 'var(--input-border)'}}
             />
             <div className="flex gap-3">
               <select
                 value={editPriority}
                 onChange={e => setEditPriority(e.target.value as Priority)}
-                className="border rounded px-2 py-1 text-[16px] outline-none bg-transparent text-gray-700"
+                className="border rounded px-2 py-1 text-[length:var(--fs-input)] outline-none bg-transparent text-gray-700"
                 style={{ borderColor: 'var(--input-border)' }}
               >
                 <option value="urgent">{t('todo.priority.urgent')}</option>
@@ -182,28 +182,28 @@ export default function FocusPanel({
                 type="date"
                 value={editDeadline}
                 onChange={e => setEditDeadline(e.target.value)}
-                className="border rounded px-2 py-1 text-[16px] outline-none flex-1 bg-transparent text-gray-700"
+                className="border rounded px-2 py-1 text-[length:var(--fs-input)] outline-none flex-1 bg-transparent text-gray-700"
                 style={{ borderColor: 'var(--input-border)' }}
               />
             </div>
             <div className="flex gap-2">
-              <button onClick={saveEdit} className="px-3 py-1.5 text-[12px] bg-[var(--selected-bg)] text-[var(--selected-text)] rounded-lg">{t('common.save')}</button>
-              <button onClick={() => setEditMode(false)} className="px-3 py-1.5 text-[12px] text-gray-500 hover:bg-black/5 rounded-lg">{t('common.cancel')}</button>
+              <button onClick={saveEdit} className="px-3 py-1.5 text-[length:var(--fs-small)] bg-[var(--selected-bg)] text-[var(--selected-text)] rounded-lg">{t('common.save')}</button>
+              <button onClick={() => setEditMode(false)} className="px-3 py-1.5 text-[length:var(--fs-small)] text-gray-500 hover:bg-black/5 rounded-lg">{t('common.cancel')}</button>
             </div>
           </div>
         ) : (
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] px-1.5 py-0.5 rounded font-medium" style={priorityStyle[todo.priority]}>
+                <span className="text-[length:var(--fs-caption)] px-1.5 py-0.5 rounded [font-weight:var(--fw-medium)]" style={priorityStyle[todo.priority]}>
                   {priorityLabel[todo.priority]}
                 </span>
-                {todo.deadline && <span className="text-[11px] text-gray-400">{todo.deadline}</span>}
+                {todo.deadline && <span className="text-[length:var(--fs-meta)] text-gray-400">{todo.deadline}</span>}
                 {steps.length > 0 && (
-                  <span className="text-[11px] text-gray-400">{t('todo.detail.stepsCompleted', { done: completedSteps, total: steps.length })}</span>
+                  <span className="text-[length:var(--fs-meta)] text-gray-400">{t('todo.detail.stepsCompleted', { done: completedSteps, total: steps.length })}</span>
                 )}
               </div>
-              <h2 className="text-[15px] font-semibold leading-snug text-gray-900">{todo.name}</h2>
+              <h2 className="text-[length:var(--fs-title)] [font-weight:var(--fw-semibold)] leading-snug text-gray-900">{todo.name}</h2>
             </div>
             <div className="flex gap-1 flex-shrink-0">
               <button
@@ -229,7 +229,7 @@ export default function FocusPanel({
           <div>
             <SectionHeader label={t('todo.detail.memoContext')} />
             <p
-              className="text-[13px] text-gray-700 leading-relaxed rounded-lg px-3 py-2.5"
+              className="text-[length:var(--fs-body)] text-gray-700 leading-relaxed rounded-lg px-3 py-2.5"
               style={{ background: 'var(--list)', whiteSpace: 'pre-wrap' }}
             >
               {todo.memo}
@@ -242,7 +242,7 @@ export default function FocusPanel({
           <SectionHeader
             label={t('todo.detail.aiSteps')}
             action={regeneratingSteps ? (
-              <span className="text-[10px] text-gray-500 flex items-center gap-1">
+              <span className="text-[length:var(--fs-caption)] text-gray-500 flex items-center gap-1">
                 <RefreshCw size={10} className="animate-spin" />
                 {t('todo.detail.regenerating')}
               </span>
@@ -250,7 +250,7 @@ export default function FocusPanel({
               <button
                 onClick={handleGenerateSteps}
                 disabled={generatingSteps || regeneratingSteps}
-                className="flex items-center gap-1 text-[10px] text-gray-500 hover:text-gray-800 disabled:opacity-50 font-normal normal-case"
+                className="flex items-center gap-1 text-[length:var(--fs-caption)] text-gray-500 hover:text-gray-800 disabled:opacity-50 [font-weight:var(--fw-regular)] normal-case"
               >
                 <RefreshCw size={10} className={generatingSteps ? 'animate-spin' : ''} />
                 {generatingSteps ? t('todo.detail.generating') : t('todo.detail.aiRegenerate')}
@@ -280,7 +280,7 @@ export default function FocusPanel({
                 onChange={e => setNewStep(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleAddStep()}
                 placeholder={t('todo.detail.addStepPlaceholder')}
-                className="flex-1 text-[16px] text-gray-500 px-2 py-1.5 border-b outline-none focus:border-[var(--selected-bg)] bg-transparent transition-colors"
+                className="flex-1 text-[length:var(--fs-input)] text-gray-500 px-2 py-1.5 border-b outline-none focus:border-[var(--selected-bg)] bg-transparent transition-colors"
                 style={{ borderColor: 'var(--border)' }}
               />
               <button onClick={handleAddStep} disabled={!newStep.trim()} className="text-gray-700 disabled:opacity-30">
@@ -293,7 +293,7 @@ export default function FocusPanel({
             <button
               onClick={handleGenerateSteps}
               disabled={generatingSteps || regeneratingSteps}
-              className="mt-2 w-full py-2 text-[12px] text-gray-600 border border-dashed rounded-lg hover:bg-[var(--bg-additive)] transition-colors"
+              className="mt-2 w-full py-2 text-[length:var(--fs-small)] text-gray-600 border border-dashed rounded-lg hover:bg-[var(--bg-additive)] transition-colors"
               style={{ borderColor: 'var(--border-subtle)' }}
             >
               {t('todo.detail.autoGenerateSteps')}
@@ -309,7 +309,7 @@ export default function FocusPanel({
               <button
                 onClick={() => onGenerateStrategy(todo)}
                 disabled={generatingStrategy}
-                className="flex items-center gap-1 text-[10px] text-gray-500 hover:text-gray-800 disabled:opacity-50 font-normal normal-case"
+                className="flex items-center gap-1 text-[length:var(--fs-caption)] text-gray-500 hover:text-gray-800 disabled:opacity-50 [font-weight:var(--fw-regular)] normal-case"
               >
                 <RefreshCw size={10} className={generatingStrategy ? 'animate-spin' : ''} />
                 {generatingStrategy ? t('todo.detail.generating') : t('todo.detail.regenerate')}
@@ -321,13 +321,13 @@ export default function FocusPanel({
             <StrategySkeleton />
           ) : todo.ai_strategy ? (
             <p
-              className="text-[13px] text-gray-700 leading-relaxed rounded-lg px-3 py-2.5"
+              className="text-[length:var(--fs-body)] text-gray-700 leading-relaxed rounded-lg px-3 py-2.5"
               style={{ background: 'var(--bg-additive)' }}
             >
               {todo.ai_strategy}
             </p>
           ) : (
-            <p className="text-[12px] text-gray-400 italic">{t('todo.detail.noStrategy')}</p>
+            <p className="text-[length:var(--fs-small)] text-gray-400 italic">{t('todo.detail.noStrategy')}</p>
           )}
         </div>
       </div>
@@ -336,17 +336,17 @@ export default function FocusPanel({
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-[2px]">
           <div className="rounded-xl shadow-xl p-6 w-80" style={{ background: 'var(--panel)' }}>
-            <p className="text-[14px] text-gray-700 mb-4">{t('todo.detail.deleteConfirm')}</p>
+            <p className="text-[length:var(--fs-label)] text-gray-700 mb-4">{t('todo.detail.deleteConfirm')}</p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-3 py-1.5 text-[13px] text-gray-500 hover:bg-black/5 rounded-lg"
+                className="px-3 py-1.5 text-[length:var(--fs-body)] text-gray-500 hover:bg-black/5 rounded-lg"
               >
                 {t('common.cancel')}
               </button>
               <button
                 onClick={async () => { await onDelete(todo.id); setShowDeleteConfirm(false) }}
-                className="px-3 py-1.5 text-[13px] text-[var(--selected-text)] bg-[var(--c-error)] hover:opacity-90 rounded-lg"
+                className="px-3 py-1.5 text-[length:var(--fs-body)] text-[var(--selected-text)] bg-[var(--c-error)] hover:opacity-90 rounded-lg"
               >
                 {t('common.delete')}
               </button>
@@ -396,7 +396,7 @@ function StepRow({ step, onToggle, onDelete }: { step: Step; onToggle: () => voi
         )}
       </button>
       <span
-        className={`flex-1 text-[13px] transition-all duration-300 ${
+        className={`flex-1 text-[length:var(--fs-body)] transition-all duration-300 ${
           step.done ? 'line-through text-gray-400' : 'text-gray-700'
         }`}
       >

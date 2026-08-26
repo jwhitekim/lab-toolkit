@@ -177,7 +177,7 @@ export default function TodoPage() {
     <div style={{
       position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
       background: '#1f2937', color: '#f9fafb', borderRadius: 8,
-      padding: '10px 16px', fontSize: 13, zIndex: 9999,
+      padding: '10px 16px', fontSize: 'var(--fs-body)', zIndex: 9999,
       boxShadow: '0 4px 12px rgba(0,0,0,0.25)', pointerEvents: 'none',
     }}>
       {toastError}
@@ -191,7 +191,7 @@ export default function TodoPage() {
         <div className="flex flex-col h-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
           {loading && !selectedTodo ? (
             <div className="flex-1 flex items-center justify-center">
-              <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{t('todo.loading')}</span>
+              <span style={{ fontSize: 'var(--fs-body)', color: 'var(--text-secondary)' }}>{t('todo.loading')}</span>
             </div>
           ) : (
             <FocusPanel
