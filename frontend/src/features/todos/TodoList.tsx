@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import type { Todo, NavFilter, Priority } from '@/shared/types'
 import TodoItem from './TodoItem'
 import AddTodoModal from './AddTodoModal'
+import { NAV_FILTERS } from './navFilters'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useT } from '@/shared/i18n'
 
@@ -19,12 +20,10 @@ interface Props {
 
 export default function TodoList({ todos, filter, onFilter, selectedId, onSelect, onToggle, onAdd }: Props) {
   const t = useT()
-  const filterTabs: { label: string; key: NavFilter }[] = [
-    { label: t('todo.filters.today'), key: 'today' },
-    { label: t('todo.filters.week'),  key: 'week' },
-    { label: t('todo.filters.all'),   key: 'all' },
-    { label: t('todo.filters.memo'),  key: 'memo' },
-  ]
+  const filterTabs: { label: string; key: NavFilter }[] = NAV_FILTERS.map(key => ({
+    key,
+    label: t(`todo.filters.${key}`),
+  }))
   const [showModal, setShowModal] = useState(false)
   const [showCompleted, setShowCompleted] = useState(false)
   const isMobile = useIsMobile()

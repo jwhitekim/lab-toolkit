@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ko'
@@ -22,13 +22,6 @@ const DAYJS_LOCALE: Record<string, string> = { ko: 'ko', en: 'en', zh: 'zh-cn' }
 // 이 페이지만의 두 번째 사이드바를 두지 않기 위해, 진행률 요약은 세로 aside가
 // 아니라 본문 상단의 가로 요약 바로 배치한다 (Navigation | Status Sidebar | Content
 // 3단 구조를 피하기 위함 — WorkspaceLayout의 좌측 사이드바가 이미 Navigation을 담당).
-const SUMMARY_LABEL_KEY: Record<NavFilter, string> = {
-  today: 'todo.summary.today',
-  week: 'todo.summary.week',
-  all: 'todo.summary.all',
-  memo: 'todo.summary.memo',
-}
-
 function TodoSummaryBar({
   todos,
   filter,
@@ -45,7 +38,7 @@ function TodoSummaryBar({
   return (
     <div className="todo-summary-bar">
       <div className="todo-summary-bar-progress">
-        <strong>{t(SUMMARY_LABEL_KEY[filter])}</strong>
+        <strong>{t(`todo.summary.${filter}`)}</strong>
         <div className="todo-summary-progress" aria-label={`${t('todo.overview.completionRate')} ${completionRate}%`}>
           <span style={{ width: `${completionRate}%` }} />
         </div>
@@ -84,6 +77,15 @@ export default function TodoPage() {
   }, [toastError, clearToastError])
   const { generateSteps, generatingSteps } = useAi()
 
+  // handleAdd의 스텝 생성 폴링(아래) 타이머 — 언마운트 시 정리하기 위해 ref로 들고 있는다.
+  const pollTimersRef = useRef<{ interval?: ReturnType<typeof setInterval>; timeout?: ReturnType<typeof setTimeout> }>({})
+  useEffect(() => {
+    return () => {
+      if (pollTimersRef.current.interval) clearInterval(pollTimersRef.current.interval)
+      if (pollTimersRef.current.timeout) clearTimeout(pollTimersRef.current.timeout)
+    }
+  }, [])
+
   const selectedTodo = todos.find(t => t.id === selectedId) ?? null
 
   // 목록↔상세 전환은 라우트 이동이다 (/:username/tasks ↔ /:username/tasks/:taskId).
@@ -117,7 +119,8 @@ export default function TodoPage() {
         await reload()
       }
     }, 3000)
-    setTimeout(() => clearInterval(poll), 60_000) // 1분 후 자동 중단
+    pollTimersRef.current.interval = poll
+    pollTimersRef.current.timeout = setTimeout(() => clearInterval(poll), 60_000) // 1분 후 자동 중단
   }
 
   const handleToggleStep = useCallback(async (stepId: number) => {

@@ -187,6 +187,8 @@
 .todo-item-check svg { width: 12px; height: 10px; }
 .todo-item.is-done .todo-item-check { border-color: var(--accent); background: var(--accent); }
 .todo-item-main { min-width: 0; }
+.todo-item-select { width: 100%; display: block; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; font: inherit; text-align: left; }
+.todo-item-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 3px; }
 .todo-item-title { overflow: hidden; margin: 0; color: var(--text-primary); font-size: var(--fs-label); font-weight: var(--fw-semibold); line-height: var(--lh-snug); text-overflow: ellipsis; white-space: nowrap; }
 .todo-item.is-done .todo-item-title { color: var(--text-disabled); text-decoration: line-through; }
 .todo-item-meta { display: flex; align-items: center; gap: 7px; margin-top: 4px; color: var(--text-disabled); font-family: var(--font-mono); font-size: var(--fs-meta); font-weight: var(--fw-medium); }

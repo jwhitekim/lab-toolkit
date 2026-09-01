@@ -25,6 +25,11 @@ export default function TodoItem({ todo, selected, onSelect, onToggle }: Props) 
     onToggle()
   }
 
+  const selectItem = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onSelect()
+  }
+
   const deadline = todo.deadline
     ? (/^\d{4}-\d{2}-\d{2}$/.test(todo.deadline) ? dayjs(todo.deadline).format('M/D') : todo.deadline)
     : null
@@ -43,13 +48,20 @@ export default function TodoItem({ todo, selected, onSelect, onToggle }: Props) 
       </button>
 
       <div className="todo-item-main">
-        <p className="todo-item-title">{todo.name}</p>
-        {(deadline || totalSteps > 0) && (
-          <span className="todo-item-meta">
-            {deadline && <span>{deadline}</span>}
-            {totalSteps > 0 && <span>{t('todo.detail.stepsCompleted', { done: completedSteps, total: totalSteps })}</span>}
-          </span>
-        )}
+        <button
+          type="button"
+          className="todo-item-select"
+          onClick={selectItem}
+          aria-current={selected ? 'true' : undefined}
+        >
+          <p className="todo-item-title">{todo.name}</p>
+          {(deadline || totalSteps > 0) && (
+            <span className="todo-item-meta">
+              {deadline && <span>{deadline}</span>}
+              {totalSteps > 0 && <span>{t('todo.detail.stepsCompleted', { done: completedSteps, total: totalSteps })}</span>}
+            </span>
+          )}
+        </button>
         {todo.memo && <p className="todo-item-memo">{todo.memo}</p>}
       </div>
 

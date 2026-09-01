@@ -15,6 +15,8 @@ export interface Todo {
   priority: Priority
   deadline: string
   done: boolean
+  // 백엔드는 계속 채워서 내려주지만(POST /api/ai/generate-strategy), 프론트엔드 AI 전략
+  // UI를 제거(2026-09-01)한 뒤로 화면에서 읽는 곳은 없음 — API 응답 형태만 반영하는 필드.
   ai_strategy: string
   created_at: string
   updated_at: string
