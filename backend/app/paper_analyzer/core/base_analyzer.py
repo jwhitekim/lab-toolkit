@@ -1,4 +1,4 @@
-import json
+from backend.app.ai_provider import JSON_OUTPUT_CONTRACT, extract_json
 
 PROMPT_TEMPLATE = """다음은 논문의 초록입니다.
 
@@ -7,10 +7,7 @@ PROMPT_TEMPLATE = """다음은 논문의 초록입니다.
 
 아래 항목을 한국어로 작성하세요. 초록에 직접 언급되지 않더라도 내용을 바탕으로 합리적으로 추론해도 됩니다.
 
-<output_contract>
-반드시 JSON만 출력합니다.
-마크다운, 코드펜스, 추가 설명을 출력하지 않습니다.
-</output_contract>
+{output_contract}
 
 <schema>
 {{
@@ -42,14 +39,8 @@ EMPTY_RESULT = {
 
 
 def parse_json_response(raw: str) -> dict:
-    raw = raw.strip()
-    if raw.startswith("```"):
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
-        raw = raw.strip()
-    return json.loads(raw)
+    return extract_json(raw)
 
 
 def build_prompt(abstract: str) -> str:
-    return PROMPT_TEMPLATE.format(abstract=abstract)
+    return PROMPT_TEMPLATE.format(abstract=abstract, output_contract=JSON_OUTPUT_CONTRACT)

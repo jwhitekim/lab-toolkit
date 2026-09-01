@@ -1,15 +1,14 @@
-import json
 import logging
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from supabase import Client
 from backend.app.database import get_supabase
-from backend.app.ai_provider import get_ai_provider
+from backend.app.ai_provider import get_ai_provider, extract_json, JSON_OUTPUT_CONTRACT
 import schemas
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
 # ── Context Layer 1 + 2: Role & Rules
-_STEPS_SYSTEM = """\
+_STEPS_SYSTEM = f"""\
 <role>
 AI/ML 연구실 업무를 실행 가능한 단계로 나누는 연구 작업 플래너.
 </role>
@@ -39,15 +38,12 @@ AI/ML 연구실 업무를 실행 가능한 단계로 나누는 연구 작업 플
 - 연구실 작업 스타일 유지
 </style>
 
-<output_contract>
-반드시 JSON만 출력합니다.
-마크다운, 코드펜스, 추가 설명을 출력하지 않습니다.
-</output_contract>
+{JSON_OUTPUT_CONTRACT}
 
 <schema>
-{
+{{
   "steps": ["실행 가능한 작업 단위 문장", "..."]
-}
+}}
 </schema>
 """
 
@@ -115,14 +111,10 @@ def generate_steps(req: schemas.GenerateStepsRequest):
         ),
         max_tokens=512,
     )
-    if raw.startswith("```"):
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
     try:
-        return json.loads(raw)
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=500, detail=f"AI returned invalid JSON: {raw}")
+        return extract_json(raw)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=f"AI returned invalid JSON: {e}")
 
 
 def _write_steps_to_db(todo_id: int, steps: list[str], sb: Client) -> None:
@@ -149,11 +141,7 @@ def _run_generate_steps(req: schemas.GenerateStepsRequest) -> None:
             ),
             max_tokens=512,
         )
-        if raw.startswith("```"):
-            raw = raw.split("```")[1]
-            if raw.startswith("json"):
-                raw = raw[4:]
-        steps = json.loads(raw).get("steps", [])
+        steps = extract_json(raw).get("steps", [])
         _write_steps_to_db(req.todo_id, steps, sb)
     except Exception:
         logging.exception("Background step generation failed for todo_id=%s", req.todo_id)
@@ -170,6 +158,9 @@ def generate_steps_async(
     return {"status": "generating"}
 
 
+# 2026-09-01: 프론트엔드의 AI 전략 UI(FocusPanel "AI 전략" 섹션, TodoList 인사이트 카드)를
+# 제거하면서 이 엔드포인트는 현재 프론트엔드 호출자가 없다. 되살리기 쉽도록 의도적으로 남겨둠 —
+# 삭제 대상 아님.
 @router.post("/generate-strategy")
 def generate_strategy(req: schemas.GenerateStrategyRequest, sb: Client = Depends(get_supabase)):
     provider = get_ai_provider()

@@ -43,6 +43,8 @@ class TodoUpdate(BaseModel):
     priority: Optional[str] = None
     deadline: Optional[str] = None
     done: Optional[bool] = None
+    # POST /api/ai/generate-strategy가 채우는 필드 — 프론트엔드 AI 전략 UI 제거(2026-09-01)
+    # 이후 호출자는 없지만, 엔드포인트를 되살리기 쉽도록 의도적으로 남겨둠.
     ai_strategy: Optional[str] = None
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
@@ -52,7 +54,7 @@ class TodoUpdate(BaseModel):
 class TodoOut(TodoBase):
     id: int
     done: bool
-    ai_strategy: str
+    ai_strategy: str  # 프론트엔드 미사용 — TodoUpdate.ai_strategy 주석 참고
     created_at: datetime
     updated_at: datetime
     steps: List[StepOut] = []

@@ -8,6 +8,7 @@ selected via the AI_PROVIDER env var ("claude" | "gemini"), defaulting to
 "claude".
 """
 import base64
+import json
 import os
 from abc import ABC, abstractmethod
 from typing import AsyncIterator
@@ -196,3 +197,33 @@ def get_ai_provider() -> AIProvider:
             detail=f"Unknown AI_PROVIDER '{name}'. Valid options: {list(_PROVIDERS)}",
         )
     return provider_cls()
+
+
+# ── JSON 응답 프롬프트/파싱 공용 헬퍼 ──────────────────────────────
+# JSON을 응답으로 요구하는 서브앱(todo, paper_analyzer 등)이 프롬프트 문구와
+# 파싱 로직을 각자 새로 베껴 쓰지 않도록 여기 하나로 모은다.
+
+JSON_OUTPUT_CONTRACT = """\
+<output_contract>
+반드시 JSON만 출력합니다.
+마크다운, 코드펜스, 추가 설명을 출력하지 않습니다.
+</output_contract>"""
+
+
+def extract_json(raw: str) -> dict:
+    """AI 응답에서 JSON 객체만 안전하게 추출.
+
+    코드펜스(```json ... ```)나 프롬프트의 <schema> 같은 태그가 응답에
+    섞여 나와도, 첫 '{'부터 마지막 '}'까지만 잘라 파싱하므로 코드펜스
+    제거만 하는 방식보다 견고하다.
+    """
+    raw = raw.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1] if "```" in raw[3:] else raw.strip("`")
+        if raw.startswith("json"):
+            raw = raw[4:]
+    start = raw.find("{")
+    end = raw.rfind("}")
+    if start == -1 or end == -1:
+        raise ValueError(f"AI 응답에서 JSON 객체를 찾지 못했습니다: {raw}")
+    return json.loads(raw[start:end + 1])
