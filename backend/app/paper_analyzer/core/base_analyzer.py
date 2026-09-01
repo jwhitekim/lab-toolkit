@@ -7,7 +7,12 @@ PROMPT_TEMPLATE = """다음은 논문의 초록입니다.
 
 아래 항목을 한국어로 작성하세요. 초록에 직접 언급되지 않더라도 내용을 바탕으로 합리적으로 추론해도 됩니다.
 
-다음 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
+<output_contract>
+반드시 JSON만 출력합니다.
+마크다운, 코드펜스, 추가 설명을 출력하지 않습니다.
+</output_contract>
+
+<schema>
 {{
   "keywords": ["핵심 키워드 3~5개 (영문 또는 한문 혼용 가능)"],
   "domain": "이 논문이 속하는 연구 분야 (한 단어 또는 짧은 구, 예: ECG-classification, NLP, computer-vision, RL)",
@@ -19,7 +24,8 @@ PROMPT_TEMPLATE = """다음은 논문의 초록입니다.
   "conclusion": "주요 결론 및 기여 (2~3문장, 성능 수치·비교 실험·의의 포함)",
   "relevance": "PRML 연구실과의 관련성 (높음/중간/낮음 중 하나)",
   "relevance_reason": "관련성 판단 근거 (1~2문장)"
-}}"""
+}}
+</schema>"""
 
 EMPTY_RESULT = {
     "keywords": [],

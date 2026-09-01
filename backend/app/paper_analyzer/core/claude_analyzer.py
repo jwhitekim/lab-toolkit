@@ -7,7 +7,12 @@ _TITLE_PROMPT = """다음 논문의 제목만 주어집니다. 제목에서 유�
 논문 제목: {title}
 DOI: {doi}
 
-다음 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
+<output_contract>
+반드시 JSON만 출력합니다.
+마크다운, 코드펜스, 추가 설명을 출력하지 않습니다.
+</output_contract>
+
+<schema>
 {{
   "keywords": ["핵심 키워드 3~5개"],
   "domain": "이 논문이 속하는 연구 분야 (한 단어 또는 짧은 구)",
@@ -19,7 +24,8 @@ DOI: {doi}
   "conclusion": "제목 기반으로 추정되는 기여 (2~3문장, 추론임을 명시)",
   "relevance": "PRML 연구실과의 관련성 (높음/중간/낮음 중 하나)",
   "relevance_reason": "관련성 판단 근거 (1~2문장)"
-}}"""
+}}
+</schema>"""
 
 
 def analyze_paper(abstract: str, title: str = "", doi: str = "") -> dict:
