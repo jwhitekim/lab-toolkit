@@ -20,14 +20,15 @@ AI/ML 연구실 업무를 실행 가능한 단계로 나누는 연구 작업 플
 </task>
 
 <constraints>
+- MEMO에 등장하는 구체적인 대상(파일명, 도구, 데이터셋, 모듈명, 논문명 등)을 최소 하나 이상 step 문구에 직접 반영할 것
+- MEMO가 비어있지 않다면, 그 내용과 무관하게 어떤 TODO에도 붙을 법한 뻔한 단계(예: "자료 조사", "계획 수립", "결과 정리")만 나열하지 말 것
 - 동일한 의미의 step을 중복 생성하지 말 것
 - 개념 설명이 아니라 실제 수행 작업 단위로 작성
 - abstraction level을 일관되게 유지
-- 비슷한 의미의 step을 반복 생성하지 말 것
-- 같은 학습 목표를 다른 표현으로 중복 생성하지 말 것
 - 개념 설명과 실행 작업을 섞지 말 것
 - TODO를 "완료 가능한 workflow" 기준으로만 분해할 것
-- 최대 5개 step 유지
+- 정확히 3~4개의 step만 출력할 것 (5개 이상 금지). 그 이상 떠오르더라도 성격이 겹치는 step은 하나로 합칠 것
+- 출력하기 전에 step 개수를 스스로 세어 4개를 넘으면 병합해서 줄일 것
 - 새로운 아이디어를 계속 추가하지 말 것
 </constraints>
 
@@ -39,9 +40,15 @@ AI/ML 연구실 업무를 실행 가능한 단계로 나누는 연구 작업 플
 </style>
 
 <output_contract>
-JSON만 출력:
-{"steps": ["...", "..."]}
+반드시 JSON만 출력합니다.
+마크다운, 코드펜스, 추가 설명을 출력하지 않습니다.
 </output_contract>
+
+<schema>
+{
+  "steps": ["실행 가능한 작업 단위 문장", "..."]
+}
+</schema>
 """
 
 _STRATEGY_SYSTEM = """\
@@ -77,22 +84,20 @@ AI/ML 연구실 일정 우선순위를 조언하는 연구 스케줄 보조자.
 # ── Context Layer 3: Few-shot
 _STEPS_EXAMPLES = """\
 EXAMPLE_1:
-  input:  TODO="Transformer 논문 리뷰" / PRIORITY=mid / DEADLINE=2일
+  input:  TODO="Transformer 논문 리뷰" / MEMO="Attention Is All You Need, 랩미팅 발표용, self-attention 수식 파트 위주로" / PRIORITY=mid / DEADLINE=2일
   output: {"steps": [
-    "논문의 레퍼런스 및 관련 작업 조사",
-    "논문 전체 읽기 및 주요 아이디어 요약",
-    "세부 내용 분석 및 이해",
-    "논문과 기존 연구 비교 및 비판적 평가",
-    "리뷰 작성 및 피드백 수집"
+    "Attention Is All You Need에서 self-attention 수식(Q/K/V, scaled dot-product) 파트 정독",
+    "self-attention 수식을 랩미팅 발표 슬라이드용 다이어그램으로 정리",
+    "관련 후속 연구와 비교해 비판 포인트 정리",
+    "랩미팅 발표 스크립트 작성"
   ]}
 
 EXAMPLE_2:
-  input:  TODO="실험 코드 디버깅" / PRIORITY=urgent / DEADLINE=오늘
+  input:  TODO="실험 코드 디버깅" / MEMO="train.py에서 loss가 NaN 뜸, mixed precision 켠 뒤부터" / PRIORITY=urgent / DEADLINE=오늘
   output: {"steps": [
-    "에러 로그 분석하여 문제 원인 파악",
-    "문제가 발생하는 코드 부분 식별",
-    "해당 코드 부분 수정 및 테스트",
-    "수정한 코드로 전체 실험 실행하여 문제 해결 확인"
+    "train.py에서 mixed precision 활성화 이후 NaN 발생 지점 로그로 특정",
+    "해당 지점의 gradient/scale 값 확인해 원인 파악 및 수정",
+    "mixed precision 켠 상태로 재실행해 NaN 재발 여부 확인"
   ]}"""
 
 
