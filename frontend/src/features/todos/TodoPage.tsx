@@ -22,10 +22,19 @@ const DAYJS_LOCALE: Record<string, string> = { ko: 'ko', en: 'en', zh: 'zh-cn' }
 // 이 페이지만의 두 번째 사이드바를 두지 않기 위해, 진행률 요약은 세로 aside가
 // 아니라 본문 상단의 가로 요약 바로 배치한다 (Navigation | Status Sidebar | Content
 // 3단 구조를 피하기 위함 — WorkspaceLayout의 좌측 사이드바가 이미 Navigation을 담당).
+const SUMMARY_LABEL_KEY: Record<NavFilter, string> = {
+  today: 'todo.summary.today',
+  week: 'todo.summary.week',
+  all: 'todo.summary.all',
+  memo: 'todo.summary.memo',
+}
+
 function TodoSummaryBar({
   todos,
+  filter,
 }: {
   todos: Todo[]
+  filter: NavFilter
 }) {
   const t = useT()
   const active = todos.filter(todo => !todo.done)
@@ -36,7 +45,7 @@ function TodoSummaryBar({
   return (
     <div className="todo-summary-bar">
       <div className="todo-summary-bar-progress">
-        <strong>{t('todo.summary.today')}</strong>
+        <strong>{t(SUMMARY_LABEL_KEY[filter])}</strong>
         <div className="todo-summary-progress" aria-label={`${t('todo.overview.completionRate')} ${completionRate}%`}>
           <span style={{ width: `${completionRate}%` }} />
         </div>
@@ -65,16 +74,15 @@ export default function TodoPage() {
   const { username = '', taskId } = useParams()
   const [filter, setFilter] = useState<NavFilter>('all')
   const selectedId = taskId ? Number(taskId) : null
-  const [featuredId, setFeaturedId] = useState<number | null>(null)
 
-  const { todos, loading, reload, addTodo, editTodo, removeTodo, toggleDone, refresh, toastError, clearToastError } = useTodos(filter)
+  const { todos, loading, reload, addTodo, editTodo, removeTodo, toggleDone, toastError, clearToastError } = useTodos(filter)
 
   useEffect(() => {
     if (!toastError) return
     const t = setTimeout(clearToastError, 3000)
     return () => clearTimeout(t)
   }, [toastError, clearToastError])
-  const { generateSteps, generateStrategy, generatingSteps, generatingStrategy } = useAi()
+  const { generateSteps, generatingSteps } = useAi()
 
   const selectedTodo = todos.find(t => t.id === selectedId) ?? null
 
@@ -101,17 +109,6 @@ export default function TodoPage() {
       priority: todo.priority,
       deadline: todo.deadline,
     }).catch(() => {});
-    // 전략 생성 (fire-and-forget)
-    ;(async () => {
-      try {
-        const allTodos = await api.getTodos()
-        const updated = await api.generateStrategy({
-          todo_id: todo.id,
-          todos: allTodos.map((t: Todo) => ({ id: t.id, name: t.name, priority: t.priority, deadline: t.deadline, done: t.done })),
-        })
-        refresh(updated)
-      } catch { /* 조용히 실패 */ }
-    })()
     const poll = setInterval(async () => {
       const updated = await api.getTodos()
       const t = updated.find((t: { id: number }) => t.id === todo.id)
@@ -140,13 +137,6 @@ export default function TodoPage() {
 
   const handleGenerateSteps = useCallback(async (todo: Todo) => generateSteps(todo), [generateSteps])
 
-  const handleGenerateStrategy = useCallback(async (todo: Todo) => {
-    const allTodos = await api.getTodos()
-    const updated = await generateStrategy(todo, allTodos)
-    refresh(updated)
-    return updated
-  }, [generateStrategy, refresh])
-
   const handleUpdate = useCallback(async (id: number, data: Partial<Todo>) => {
     await editTodo(id, data)
   }, [editTodo])
@@ -168,9 +158,7 @@ export default function TodoPage() {
     onAddStep: handleAddStep,
     onDeleteStep: handleDeleteStep,
     onGenerateSteps: handleGenerateSteps,
-    onGenerateStrategy: handleGenerateStrategy,
     generatingSteps,
-    generatingStrategy,
   }
 
   const toast = toastError ? (
@@ -207,11 +195,8 @@ export default function TodoPage() {
           filter={filter}
           onFilter={setFilter}
           selectedId={selectedId}
-          featuredId={featuredId}
           onSelect={openTodo}
-          onFeature={setFeaturedId}
           onToggle={handleToggleDone}
-          onEdit={(id, name) => handleUpdate(id, { name })}
           onAdd={handleAdd}
         />
       )}
@@ -236,17 +221,14 @@ export default function TodoPage() {
           />
         ) : (
           <>
-            <TodoSummaryBar todos={todos} />
+            <TodoSummaryBar todos={todos} filter={filter} />
             <TodoList
               todos={todos}
               filter={filter}
               onFilter={setFilter}
               selectedId={selectedId}
-              featuredId={featuredId}
               onSelect={openTodo}
-              onFeature={setFeaturedId}
               onToggle={handleToggleDone}
-              onEdit={(id, name) => handleUpdate(id, { name })}
               onAdd={handleAdd}
             />
           </>

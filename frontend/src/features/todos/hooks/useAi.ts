@@ -4,7 +4,6 @@ import * as api from '@/shared/api/client'
 
 export function useAi() {
   const [generatingSteps, setGeneratingSteps] = useState(false)
-  const [generatingStrategy, setGeneratingStrategy] = useState(false)
 
   const generateSteps = async (todo: Todo) => {
     setGeneratingSteps(true)
@@ -20,17 +19,5 @@ export function useAi() {
     }
   }
 
-  const generateStrategy = async (todo: Todo, todos: Todo[]) => {
-    setGeneratingStrategy(true)
-    try {
-      return await api.generateStrategy({
-        todo_id: todo.id,
-        todos: todos.map(t => ({ id: t.id, name: t.name, priority: t.priority, deadline: t.deadline, done: t.done })),
-      })
-    } finally {
-      setGeneratingStrategy(false)
-    }
-  }
-
-  return { generateSteps, generateStrategy, generatingSteps, generatingStrategy }
+  return { generateSteps, generatingSteps }
 }

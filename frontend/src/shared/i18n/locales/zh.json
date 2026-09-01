@@ -270,9 +270,11 @@
   "todo": {
     "todayPlan": "Today’s plan",
     "researchFlow": "今日研究流程",
-    "insightTitle": "AI 行动建议",
     "summary": {
       "today": "今日进度",
+      "week": "本周进度",
+      "all": "全部进度",
+      "memo": "备注进度",
       "complete": "已完成"
     },
     "priority": {
@@ -325,9 +327,6 @@
       "aiRegenerate": "AI 重新生成",
       "addStepPlaceholder": "+ 添加步骤",
       "autoGenerateSteps": "通过 AI 自动生成步骤",
-      "aiStrategy": "AI 策略",
-      "regenerate": "重新生成",
-      "noStrategy": "暂无策略。请尝试点击重新生成。",
       "deleteConfirm": "确认删除此待办吗？"
     },
     "errors": {

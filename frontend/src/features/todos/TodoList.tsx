@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, Plus, Sparkles } from 'lucide-react'
+import { ChevronDown, Plus } from 'lucide-react'
 import dayjs from 'dayjs'
 import type { Todo, NavFilter, Priority } from '@/shared/types'
 import TodoItem from './TodoItem'
@@ -12,15 +12,12 @@ interface Props {
   filter: NavFilter
   onFilter: (f: NavFilter) => void
   selectedId: number | null
-  featuredId: number | null
   onSelect: (id: number) => void
-  onFeature: (id: number) => void
   onToggle: (id: number) => void
-  onEdit: (id: number, name: string) => void
   onAdd: (data: { name: string; memo: string; priority: Priority; deadline: string }) => Promise<void>
 }
 
-export default function TodoList({ todos, filter, onFilter, selectedId, featuredId, onSelect, onFeature, onToggle, onEdit, onAdd }: Props) {
+export default function TodoList({ todos, filter, onFilter, selectedId, onSelect, onToggle, onAdd }: Props) {
   const t = useT()
   const filterTabs: { label: string; key: NavFilter }[] = [
     { label: t('todo.filters.today'), key: 'today' },
@@ -35,11 +32,6 @@ export default function TodoList({ todos, filter, onFilter, selectedId, featured
   const active = todos.filter(todo => !todo.done)
   const done = todos.filter(todo => todo.done)
   const completionRate = todos.length ? Math.round((done.length / todos.length) * 100) : 0
-  const resolvedFeaturedId = active.some(todo => todo.id === featuredId)
-    ? featuredId
-    : (active[0]?.id ?? null)
-  const featuredTodo = active.find(todo => todo.id === resolvedFeaturedId)
-  const insightTodo = featuredTodo?.ai_strategy.trim() ? featuredTodo : undefined
 
   return (
     <section
@@ -124,23 +116,10 @@ export default function TodoList({ todos, filter, onFilter, selectedId, featured
             key={todo.id}
             todo={todo}
             selected={todo.id === selectedId}
-            featured={!isMobile && todo.id === resolvedFeaturedId}
-            onSelect={() => isMobile ? onSelect(todo.id) : onFeature(todo.id)}
-            onOpen={isMobile ? undefined : () => onSelect(todo.id)}
+            onSelect={() => onSelect(todo.id)}
             onToggle={() => onToggle(todo.id)}
-            onEdit={onEdit}
           />
         ))}
-
-        {insightTodo && (
-          <button type="button" className="todo-list-insight" onClick={() => onSelect(insightTodo.id)}>
-            <Sparkles />
-            <span>
-              <b>{t('todo.insightTitle')}</b>
-              <p>{insightTodo.ai_strategy}</p>
-            </span>
-          </button>
-        )}
 
         {done.length > 0 && (
           <>
@@ -161,7 +140,6 @@ export default function TodoList({ todos, filter, onFilter, selectedId, featured
                 selected={todo.id === selectedId}
                 onSelect={() => onSelect(todo.id)}
                 onToggle={() => onToggle(todo.id)}
-                onEdit={onEdit}
               />
             ))}
           </>

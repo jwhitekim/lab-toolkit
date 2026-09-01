@@ -293,9 +293,11 @@
   "todo": {
     "todayPlan": "Today’s plan",
     "researchFlow": "오늘의 연구 흐름",
-    "insightTitle": "AI 실행 제안",
     "summary": {
       "today": "오늘의 진행률",
+      "week": "이번주 진행률",
+      "all": "전체 진행률",
+      "memo": "메모함 진행률",
       "complete": "완료"
     },
     "priority": {
@@ -348,9 +350,6 @@
       "aiRegenerate": "AI 재생성",
       "addStepPlaceholder": "+ 단계 추가",
       "autoGenerateSteps": "AI로 단계 자동 생성",
-      "aiStrategy": "AI 전략",
-      "regenerate": "재생성",
-      "noStrategy": "전략이 아직 없습니다. 재생성을 눌러보세요.",
       "deleteConfirm": "이 할 일을 삭제할까요?"
     },
     "errors": {

@@ -13,9 +13,7 @@ interface Props {
   onAddStep: (todoId: number, text: string, orderIndex?: number) => Promise<void>
   onDeleteStep: (stepId: number) => Promise<void>
   onGenerateSteps: (todo: Todo) => Promise<{ steps: string[] }>
-  onGenerateStrategy: (todo: Todo) => Promise<Todo>
   generatingSteps: boolean
-  generatingStrategy: boolean
   onBack?: () => void
 }
 
@@ -41,15 +39,6 @@ function StepSkeleton() {
   )
 }
 
-function StrategySkeleton() {
-  return (
-    <div className="space-y-2 py-1">
-      <div className="h-3 rounded animate-pulse bg-gray-200 w-full" />
-      <div className="h-3 rounded animate-pulse bg-gray-200 w-4/5" />
-    </div>
-  )
-}
-
 export default function FocusPanel({
   todo,
   onUpdate,
@@ -58,9 +47,7 @@ export default function FocusPanel({
   onAddStep,
   onDeleteStep,
   onGenerateSteps,
-  onGenerateStrategy,
   generatingSteps,
-  generatingStrategy,
   onBack,
 }: Props) {
   const t = useT()
@@ -298,36 +285,6 @@ export default function FocusPanel({
             >
               {t('todo.detail.autoGenerateSteps')}
             </button>
-          )}
-        </div>
-
-        {/* Strategy */}
-        <div>
-          <SectionHeader
-            label={t('todo.detail.aiStrategy')}
-            action={
-              <button
-                onClick={() => onGenerateStrategy(todo)}
-                disabled={generatingStrategy}
-                className="flex items-center gap-1 text-[length:var(--fs-caption)] text-gray-500 hover:text-gray-800 disabled:opacity-50 [font-weight:var(--fw-regular)] normal-case"
-              >
-                <RefreshCw size={10} className={generatingStrategy ? 'animate-spin' : ''} />
-                {generatingStrategy ? t('todo.detail.generating') : t('todo.detail.regenerate')}
-              </button>
-            }
-          />
-
-          {generatingStrategy ? (
-            <StrategySkeleton />
-          ) : todo.ai_strategy ? (
-            <p
-              className="text-[length:var(--fs-body)] text-gray-700 leading-relaxed rounded-lg px-3 py-2.5"
-              style={{ background: 'var(--bg-additive)' }}
-            >
-              {todo.ai_strategy}
-            </p>
-          ) : (
-            <p className="text-[length:var(--fs-small)] text-gray-400 italic">{t('todo.detail.noStrategy')}</p>
           )}
         </div>
       </div>

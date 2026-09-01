@@ -270,9 +270,11 @@
   "todo": {
     "todayPlan": "Today's plan",
     "researchFlow": "Today's research flow",
-    "insightTitle": "AI action insight",
     "summary": {
       "today": "Today's progress",
+      "week": "This week's progress",
+      "all": "Overall progress",
+      "memo": "Notes progress",
       "complete": "complete"
     },
     "priority": {
@@ -325,9 +327,6 @@
       "aiRegenerate": "AI Regenerate",
       "addStepPlaceholder": "+ Add step",
       "autoGenerateSteps": "Auto-generate steps with AI",
-      "aiStrategy": "AI Strategy",
-      "regenerate": "Regenerate",
-      "noStrategy": "No strategy yet. Try clicking regenerate.",
       "deleteConfirm": "Are you sure you want to delete this task?"
     },
     "errors": {
