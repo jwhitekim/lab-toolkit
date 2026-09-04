@@ -1,4 +1,5 @@
 #Requires -RunAsAdministrator
+# Configures Windows port forwarding to the current WSL instance.
 $ErrorActionPreference = "Stop"
 
 $ListenAddress = "192.168.219.105"

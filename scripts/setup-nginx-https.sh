@@ -4,10 +4,10 @@ set -eu
 usage() {
   cat <<'EOF'
 Usage:
-  ./setup-veloo-linux.sh <domain> <certificate-email>
+  ./scripts/setup-nginx-https.sh <domain> <certificate-email>
 
 Example:
-  ./setup-veloo-linux.sh veloo.page kimjunhee2483@gmail.com
+  ./scripts/setup-nginx-https.sh veloo.page kimjunhee2483@gmail.com
 
 The application is expected to be available on 127.0.0.1:9000 (override with APP_PORT).
 Router TCP ports 80 and 443 must point to this server.
@@ -71,7 +71,8 @@ if ! docker info >/dev/null 2>&1; then
 fi
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-cd "$SCRIPT_DIR"
+PROJECT_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
+cd "$PROJECT_ROOT"
 
 echo "Domain:      $DOMAIN"
 echo "Application: http://127.0.0.1:$APP_PORT"
