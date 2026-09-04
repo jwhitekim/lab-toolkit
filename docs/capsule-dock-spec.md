@@ -95,17 +95,54 @@ transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
 ```css
 height: 50px;              /* 캡슐 바(58px) 안쪽, 위아래 4px 패딩 */
 border-radius: 9999px;
-border: 1px solid rgba(255, 255, 255, 0.48);
-background: linear-gradient(135deg, rgba(255,255,255,.58), rgba(255,255,255,.24));
+border: 1px solid rgba(255, 255, 255, 0.9);
+background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(255,255,255,.74));
 backdrop-filter: blur(8px) saturate(160%);
-box-shadow: inset 0 1px 0 rgba(255,255,255,.72),
-            inset 0 -1px 0 rgba(0,0,0,.08),
-            0 2px 8px rgba(0,0,0,.14);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.95),
+            inset 0 -1px 0 rgba(0,0,0,.1),
+            0 0 10px 1px color-mix(in srgb, var(--accent) 16%, transparent),
+            0 4px 12px rgba(0,0,0,.18);
 transition: transform 0.3s cubic-bezier(0.4,0,0.2,1),
             width 0.3s cubic-bezier(0.4,0,0.2,1);
 ```
 - 폭 = 해당 탭 버튼의 `offsetWidth` 그대로 (세그먼트 폭 추종 원칙).
 - **드래그 중(`is-dragging`)에는 `transition: none`.**
+- **2026-09-04 명도 대비 보강** — 원래 배경(`rgba(255,255,255,.58/.24)`)이 캡슐 바 배경
+  (`rgba(255,255,255,.56/.32)`)과 거의 같은 흰색이라 인디케이터가 실사용 화면에서 거의 안 보였음
+  (하단 "표면 반사광" 항목 참고). 인디케이터 자체를 바보다 훨씬 밝고 불투명하게 올리고, 그림자를
+  더 뚜렷하게, `color-mix(in srgb, var(--accent) 16%, transparent)` 글로우로 "선택됨"이 확실히
+  드러나게 했다. **처음엔 `0 0 0 5px`(blur 없는 링)로 넣었다가, 캡슐 하나가 아니라 흰 캡슐+초록
+  캡슐 두 겹이 겹쳐 보인다는 피드백으로 `0 0 10px 1px`(퍼지는 글로우)로 교체함(2026-09-04).**
+
+**표면 반사광(스페큘러 하이라이트, `::before`+`::after`)** — 2026-09-04 추가, 같은 날 두 번
+교체(① mix-blend 방식 → ② 알파-블렌드 단색 흰색 → ③ 밝은 띠+그림자 띠 페어). 고정 광원 아래로
+유리 캡슐이 지나가는 느낌을 내기 위해, 인디케이터가 독 트랙 안에서 좌우로 이동 가능한 범위
+(`x` ∈ `[0, trackWidth - width]`) 중 지금 어디 있는지를 0~100%로 환산해 `--sheen-x` CSS 변수로
+넘긴다(계산은 `MobileCapsuleNavigation.tsx`의 `sheenPercent()`, 매 렌더 시 JS로 실측 — 위치/폭
+계산과 동일 원칙). 두 레이어 다 `--sheen-x`를 따라 함께 움직인다.
+
+```css
+/* ① 사선 빛줄기(그림자-하이라이트-그림자 페어 — 흰 캡슐 위에서도 명암 대비로 보이게) */
+background: linear-gradient(115deg, transparent 18%, rgba(0,0,0,.07) 34%, rgba(255,255,255,1) 48%, rgba(0,0,0,.05) 60%, transparent 76%);
+background-size: 240% 240%;
+background-position: var(--sheen-x, 50%) 50%;
+
+/* ② 상단 글린트(볼록 유리 특유의 작은 반사점) */
+background: radial-gradient(ellipse 70% 60% at 50% 20%, rgba(255,255,255,1), transparent 72%);
+background-size: 55% 42%;
+background-position: var(--sheen-x, 50%) 0%;
+opacity: .85;
+```
+
+- **`mix-blend-mode`를 쓰지 않는다.** 독 배경이 이미 옅은 흰색이라 soft-light 등 블렌드 기반
+  하이라이트는 흰색 위에 흰색이 되어 거의 안 보였음(2026-09-04 실사용 확인).
+- **흰색 하이라이트 단독으로도 부족했다** — 인디케이터 배경 자체가 밝아진 뒤에도(위 항목) 흰
+  하이라이트만으로는 명도 차이가 잘 안 보여서, 밝은 띠 양옆에 옅은 검은 그림자 띠를 짝지어
+  베벨(bevel)처럼 보이게 했다. 레퍼런스 영상(App Store 탭바)의 강한 반사 느낌은 사실 하이라이트
+  자체보다 뒤에 비치는 원색·어두운 배경과의 대비에서 나오는데, veloo 독은 뒤 배경이 거의 흰색이라
+  그 대비가 없다 — 그림자 띠 페어링은 그 대비를 캡슐 표면 안에서 인위적으로 만들어내는 절충안.
+- 드래그 중에는 인디케이터 본체와 마찬가지로 `transition: none` — 손가락을 실시간 추적.
+- `overflow: hidden`을 쓰지 않는다 — 배경은 `border-radius: inherit`만으로 캡슐 모양에 자동 클리핑되고, `overflow: hidden`을 걸면 인디케이터 바깥 `box-shadow`가 잘려버림.
 
 ### 제스처 — 드래그로 탭 이동
 

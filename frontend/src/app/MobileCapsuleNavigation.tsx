@@ -37,7 +37,7 @@ export default function MobileCapsuleNavigation() {
   const tabsRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const tabRefs = useRef<Partial<Record<MobilePrimaryKey, HTMLButtonElement | null>>>({})
-  const [indicatorRect, setIndicatorRect] = useState<{ x: number; width: number } | null>(null)
+  const [indicatorRect, setIndicatorRect] = useState<{ x: number; width: number; trackWidth: number } | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [dragTarget, setDragTarget] = useState<MobilePrimaryKey | null>(null)
   const gestureRef = useRef<{ startX: number; moved: boolean; target: MobilePrimaryKey } | null>(null)
@@ -47,7 +47,8 @@ export default function MobileCapsuleNavigation() {
     if (isDragging) return
     const sync = () => {
       const button = tabRefs.current[activeMobileKey]
-      if (button) setIndicatorRect({ x: button.offsetLeft, width: button.offsetWidth })
+      const track = trackRef.current
+      if (button && track) setIndicatorRect({ x: button.offsetLeft, width: button.offsetWidth, trackWidth: track.clientWidth })
     }
     sync()
     const tabs = tabsRef.current
@@ -85,7 +86,7 @@ export default function MobileCapsuleNavigation() {
     const pointerX = clientX - rect.left - width / 2
     const x = Math.min(last.offsetLeft + last.offsetWidth - width, Math.max(first.offsetLeft, pointerX))
     const target = nearestTab(clientX)
-    setIndicatorRect({ x, width })
+    setIndicatorRect({ x, width, trackWidth: track.clientWidth })
     setDragTarget(target)
     if (gestureRef.current) gestureRef.current.target = target
   }
@@ -116,7 +117,8 @@ export default function MobileCapsuleNavigation() {
     }
     const snapKey = gesture?.moved && !cancelled ? gesture.target : activeMobileKey
     const button = tabRefs.current[snapKey]
-    if (button) setIndicatorRect({ x: button.offsetLeft, width: button.offsetWidth })
+    const track = trackRef.current
+    if (button && track) setIndicatorRect({ x: button.offsetLeft, width: button.offsetWidth, trackWidth: track.clientWidth })
     setIsDragging(false)
     setDragTarget(null)
   }
@@ -145,7 +147,18 @@ export default function MobileCapsuleNavigation() {
           onPointerCancel={event => finishGesture(event, true)}
         >
           <div ref={trackRef} className="shell-mobile-tabs-track">
-            {indicatorRect && <div className="shell-mobile-tab-indicator" style={{ width: indicatorRect.width, transform: `translateX(${indicatorRect.x}px)` }} />}
+            {indicatorRect && (
+              <div
+                className="shell-mobile-tab-indicator"
+                style={{
+                  width: indicatorRect.width,
+                  transform: `translateX(${indicatorRect.x}px)`,
+                  // 캡슐이 독 안 어디에 있는지(0~100%)에 따라 표면 반사광(스페큘러 하이라이트)
+                  // 위치를 바꾼다 — 고정된 광원 아래로 유리 캡슐이 지나가는 느낌을 낸다.
+                  ['--sheen-x' as string]: `${sheenPercent(indicatorRect)}%`,
+                } as React.CSSProperties}
+              />
+            )}
             {MOBILE_NAV.map(({ key, Icon, label }) => (
               <button
                 key={key}
@@ -164,6 +177,14 @@ export default function MobileCapsuleNavigation() {
       </div>
     </>
   )
+}
+
+// 인디케이터가 독 트랙 안에서 좌우로 이동할 수 있는 범위(0~trackWidth-width) 중
+// 현재 어디에 있는지를 0~100%로 환산 — 표면 반사광 위치 계산에 쓴다.
+function sheenPercent({ x, width, trackWidth }: { x: number; width: number; trackWidth: number }) {
+  const range = trackWidth - width
+  if (range <= 0) return 50
+  return Math.min(100, Math.max(0, (x / range) * 100))
 }
 
 // Plan 스위처 아이콘은 WORKSPACE_NAV_ITEMS에서 그대로 가져와 하드코딩 중복을 피한다.
