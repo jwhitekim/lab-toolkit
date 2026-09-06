@@ -1,5 +1,28 @@
+import type { ComponentType, SVGProps } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { Braces, CalendarDays, FileSearch, LayoutDashboard, Languages, ListTodo, Network } from 'lucide-react'
+// 모바일 하단 독 5개 아이콘 전용 — lucide는 순수 스트로크(선형) 아이콘 세트라 "선택 시 면형으로
+// 바뀌는" 요구를 못 채워서(2026-09-06), outline/solid 쌍을 모두 제공하는 heroicons를 이 5개
+// 아이콘에 한해 추가로 쓴다. 데스크톱 사이드바(WORKSPACE_NAV)는 기존 lucide 그대로 유지.
+import {
+  Squares2X2Icon,
+  DocumentMagnifyingGlassIcon,
+  GlobeAltIcon,
+  CpuChipIcon,
+  LightBulbIcon,
+} from '@heroicons/react/24/outline'
+import {
+  Squares2X2Icon as Squares2X2IconSolid,
+  DocumentMagnifyingGlassIcon as DocumentMagnifyingGlassIconSolid,
+  CpuChipIcon as CpuChipIconSolid,
+  LightBulbIcon as LightBulbIconSolid,
+} from '@heroicons/react/24/solid'
+// GlobeAltIcon의 solid 버전은 그물눈처럼 작은 조각을 이어붙인 모자이크 구조라, 20px 크기에서는
+// 조각 사이 틈(선)이 안티앨리어싱으로 뭉개져 그냥 민짜 원처럼 보인다("선택하면 오히려 밋밋해짐"
+// — 다른 아이콘과 정반대 효과, 2026-09-06 피드백). 이 아이콘만 solid로 안 바꾸고 outline을
+// 그대로 쓰되, CSS(`.shell-mobile-tab.is-active svg`)로 선만 굵게 해서 "선택됨"을 표현한다.
+
+type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>
 
 // Primary Navigation — 서로 독립적인 제품 영역. Desktop Sidebar와 Mobile Capsule
 // Navigation이 이 하나의 정보 구조를 공유한다 (route는 항상 같고, 표현 방식만 다름).
@@ -52,12 +75,12 @@ export const WORKSPACE_NAV_ITEMS: NavItem[] = WORKSPACE_NAV.flatMap(group => gro
 // (모바일에서 하단 독 슬롯이 5개까지가 자연스럽다는 기존 결정 — capsule-dock-spec.md)
 export type MobilePrimaryKey = 'plan' | 'papers' | 'translate' | 'models' | 'concepts'
 
-export const MOBILE_NAV: { key: MobilePrimaryKey; label: string; Icon: LucideIcon }[] = [
-  { key: 'plan', label: 'Plan', Icon: LayoutDashboard },
-  { key: 'papers', label: 'Paper', Icon: FileSearch },
-  { key: 'translate', label: 'Trans', Icon: Languages },
-  { key: 'models', label: 'Models', Icon: Network },
-  { key: 'concepts', label: 'Concepts', Icon: Braces },
+export const MOBILE_NAV: { key: MobilePrimaryKey; label: string; Icon: HeroIcon; IconSolid: HeroIcon }[] = [
+  { key: 'plan', label: 'Plan', Icon: Squares2X2Icon, IconSolid: Squares2X2IconSolid },
+  { key: 'papers', label: 'Paper', Icon: DocumentMagnifyingGlassIcon, IconSolid: DocumentMagnifyingGlassIconSolid },
+  { key: 'translate', label: 'Trans', Icon: GlobeAltIcon, IconSolid: GlobeAltIcon },
+  { key: 'models', label: 'Models', Icon: CpuChipIcon, IconSolid: CpuChipIconSolid },
+  { key: 'concepts', label: 'Concepts', Icon: LightBulbIcon, IconSolid: LightBulbIconSolid },
 ]
 
 export function mobilePrimaryFor(navKey: NavKey): MobilePrimaryKey {
