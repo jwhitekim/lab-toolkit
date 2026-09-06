@@ -10,40 +10,24 @@ Doing research usually means bouncing between a PDF reader, a translator, a
 notes app, a to-do list, and a calendar — each one forgetting what you were
 doing in the last one. Veloo puts the parts that actually matter for reading
 and producing research into one workspace, under one login, sharing one
-history: read a paper, translate the parts that don't parse, look up a term
-you keep half-understanding, quiz yourself on an architecture diagram, and
-turn what you learned into a scheduled task — without leaving the tab.
+history.
 
-## What's inside
+## Features
 
-- **Paper Analyzer** — Upload a PDF or search by title/URL. Semantic Scholar
-  fills in metadata and author info, Claude summarizes the problem, method,
-  and conclusion, and a bundled SJR dataset scores the venue's journal
-  quality — so you can tell a strong result from a weak venue before you
-  invest an hour reading it.
-- **Translator** — Streaming English → Korean translation tuned for
-  ML/DL/CV/NLP writing: it knows to leave formulas and proper nouns alone and
-  keep field-specific terms in English where a literal translation would
-  just be confusing.
-- **Contextor** — Paste an English word or short phrase and get back how it's
-  actually used across different ML/DL contexts, structured instead of a
-  single flattened definition — for the terms that mean five different
-  things depending on which paper you're in.
-- **Model Review** — Upload an architecture diagram, get an AI-generated
-  reference explanation of how the pieces connect, then write your own
-  explanation and have it graded and corrected. A self-quiz loop for
-  actually understanding a diagram instead of skimming past it.
-- **Plan (Todo + Calendar)** — Research tasks with sub-steps, priorities, and
-  AI-suggested breakdowns and strategy, plus a drag-and-drop weekly
-  time-blocking calendar and review — so what you just read or learned turns
-  into something scheduled, not just another open tab.
+- [x] **Paper Analyzer** — upload/search a paper, get an AI summary and a
+      journal quality score before you invest time reading it
+- [x] **Translator** — streaming EN → KO translation tuned for ML/DL/CV/NLP
+      writing
+- [x] **Contextor** — a term's meaning broken out by which paper/subfield
+      you're reading, not one flattened definition
+- [x] **Model Review** — upload an architecture diagram, explain it
+      yourself, get it graded against an AI reference explanation
+- [x] **Plan (Todo + Calendar)** — research tasks with AI-suggested
+      breakdowns, plus a drag-and-drop weekly calendar
 
-## One workspace, not six tabs
-
-Every approved account gets a personal workspace at `/:username` with all
-five tools one click apart, sharing the same login and history — the point
-isn't any single tool, it's not having to re-explain your context every time
-you switch between them.
+Every approved account gets all five one click apart at `/:username`,
+sharing one login and one history — see [docs/features.md](docs/features.md)
+for the full write-up of each module.
 
 ## Getting started
 
@@ -85,3 +69,14 @@ SQL Editor. Full environment variable list is in `CLAUDE.md`.
 - **AI** — Anthropic Claude, with Gemini as a swappable provider
 - **DB** — Supabase (auth + per-tool history)
 - **Deploy** — Docker, Cloudflare Tunnel, GitHub Actions
+
+## Docs
+
+- [Feature details](docs/features.md)
+- [API spec](docs/API.md)
+- [Changelog](CHANGELOG.md)
+- [Design system](docs/design-system.md)
+
+## License
+
+[MIT](LICENSE)
