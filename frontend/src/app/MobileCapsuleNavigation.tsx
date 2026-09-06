@@ -109,6 +109,9 @@ export default function MobileCapsuleNavigation() {
     const gesture = gestureRef.current
     if (!gesture) return
     if (!gesture.moved && Math.abs(event.clientX - gesture.startX) < 5) return
+    // 브라우저가 이 움직임을 자체 스크롤/스와이프 제스처로 가로채면 pointercancel이 발생해
+    // 손 뗀 것처럼 처리되며 원래 탭 위치로 스냅돼버린다("알약을 놓친다") — 명시적으로 막는다.
+    event.preventDefault()
     gesture.moved = true
     setIsDragging(true)
     moveIndicator(event.clientX)

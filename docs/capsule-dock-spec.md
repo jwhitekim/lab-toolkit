@@ -79,7 +79,7 @@ transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
 | 블러 | `blur(24px) saturate(175%)` |
 | 테두리 | `1px solid rgba(255,255,255,.5)` |
 | 그림자 | `inset 0 1px 0 rgba(255,255,255,.72)`, `inset 0 -0.5px 0 rgba(0,0,0,.08)`, `0 5px 20px rgba(0,0,0,.13)` |
-| `touch-action` | `pan-y` (좌우 드래그를 스크롤로 뺏기지 않게) |
+| `touch-action` | `none` (2026-09-06, 원래 `pan-y`였음 — 드래그 중 브라우저가 세로 스크롤/스와이프로 오인해 가로채면 `pointercancel`로 원래 탭에 스냅되는 버그("알약을 놓친다")가 있어 제스처를 JS가 완전히 독점하도록 변경. `handlePointerMove`의 `event.preventDefault()`와 세트) |
 | `backdrop-filter` 미지원 폴백 | `rgba(246,246,248,.94)` 불투명 배경 |
 
 ### 탭 아이템 (`.shell-mobile-tab`)
@@ -105,7 +105,8 @@ transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
 **재질/색 — 2026-09-05 최종**: 실제 인스타그램 앱의 터치 피드백을 그대로 재현한다.
 - **평소(정지)**: 진한 그레이, 테두리·블러 없음.
 - **손가락이 닿아있는 동안(`is-pressed`, 탭이든 드래그든 `pointerdown`~`pointerup`)**: 연한
-  그레이로 바뀌고, **바(`.shell-mobile-tabs`) 전체가 살짝 부푼다**(`transform: scale(1.03)`).
+  그레이로 바뀌고, **바(`.shell-mobile-tabs`) 전체가 살짝 부푼다**(`transform: scale(1.05)`,
+  2026-09-06에 `1.03`에서 상향 — "부푸는 정도를 조금 더 키워달라"는 요청).
   인디케이터는 바의 자식이라 별도 계산 없이 부모 scale을 따라 같은 비율로 같이 커진다.
 
 ```css
@@ -123,7 +124,7 @@ transition: transform .3s cubic-bezier(.4,0,.2,1),
 background: rgba(205, 207, 216, 0.55);      /* 터치 중: 연한 그레이 */
 
 /* .shell-mobile-tabs.is-pressed */
-transform: scale(1.03);                     /* 바 전체가 살짝 부풂 — 인디케이터도 자식이라 같이 커짐 */
+transform: scale(1.05);                     /* 바 전체가 살짝 부풂 — 인디케이터도 자식이라 같이 커짐 */
 ```
 - **폭 = 탭 버튼 `offsetWidth`에서 좌우 각 3px씩 인셋**(`INDICATOR_INSET`,
   `MobileCapsuleNavigation.tsx`의 `indicatorRectFor()`) — 5개 탭 세그먼트 폭이 전부 동일하게
@@ -162,9 +163,9 @@ transform: scale(1.03);                     /* 바 전체가 살짝 부풂 — �
 iOS `UISegmentedControl`의 네이티브 드래그 동작을 웹 포인터 이벤트로 재현.
 
 1. `onPointerDown`: 포인터 캡처(`setPointerCapture`), 시작 좌표·최근접 탭 기록.
-2. `onPointerMove`: 시작점에서 5px 이상 움직이면 "드래그 시작" 확정 — 5px 미만은 단순 탭으로 간주. 드래그 중엔 인디케이터가 포인터 x좌표를 실시간 추적, 양끝 탭 경계에서 클램프.
+2. `onPointerMove`: 시작점에서 5px 이상 움직이면 "드래그 시작" 확정 — 5px 미만은 단순 탭으로 간주. 이 순간 `event.preventDefault()`도 호출한다(2026-09-06 추가). 드래그 중엔 인디케이터가 포인터 x좌표를 실시간 추적, 양끝 탭 경계에서 클램프.
 3. `onPointerUp`: 실제로 드래그했다면 가장 가까운 탭으로 전환(`selectMobileItem`). 클릭 이벤트 중복 방지를 위해 `suppressMobileClickRef`를 짧게 세워둠.
-4. `onPointerCancel`: 브라우저가 제스처를 가로챌 때도 동일하게 마무리.
+4. `onPointerCancel`: 브라우저가 제스처를 가로챌 때도 동일하게 마무리 — 단, `cancelled=true`라 `activeMobileKey`(원래 탭)로 스냅되고 `selectMobileItem`은 호출 안 됨. 이 콜백 자체가 자주 발생하면(=드래그를 자주 "놓침") 사용자 경험상 버그이므로, `touch-action: none` + `preventDefault()`로 애초에 브라우저가 제스처를 가로채지 못하게 막는 것이 근본 대책(2026-09-06, "알약을 놓친다"는 피드백으로 추가).
 
 ### Plan 스위처 (`.shell-plan-switcher`)
 
