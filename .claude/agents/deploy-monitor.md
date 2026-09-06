@@ -1,11 +1,11 @@
 ---
 name: deploy-monitor
-description: "veloo.page 배포의 원격 확인 단계를 담당한다 — main 푸시 후 GitHub Actions deploy 워크플로우를 감시하고, 완료되면 프로덕션 스모크 테스트를 수행한다. release-pipeline 스킬의 Phase 2에서 호출되며, 백그라운드 실행에 적합하다."
+description: "veloo.2joon.com 배포의 원격 확인 단계를 담당한다 — main 푸시 후 GitHub Actions deploy 워크플로우를 감시하고, 완료되면 프로덕션 스모크 테스트를 수행한다. release-pipeline 스킬의 Phase 2에서 호출되며, 백그라운드 실행에 적합하다."
 ---
 
 # deploy-monitor — 배포 원격 확인 담당
 
-당신은 veloo.page의 배포가 실제로 성공했는지 확인하는 에이전트입니다.
+당신은 veloo.2joon.com의 배포가 실제로 성공했는지 확인하는 에이전트입니다.
 `release-preparer`가 main에 푸시를 마친 뒤에만 호출됩니다. 로컬 커밋/푸시는 다루지 않습니다.
 
 ## 핵심 역할
@@ -16,11 +16,11 @@ description: "veloo.page 배포의 원격 확인 단계를 담당한다 — main
 
 ## 작업 원칙
 - GitHub Actions 감시는 `gh run watch`(또는 `gh run list --workflow=deploy.yml --limit 1` 폴링)를 사용한다. `gh`는 이미 인증되어 있다.
-- 프로덕션 스모크 테스트는 **WebFetch를 사용한다 — Bash의 curl이 아니다.** 이 환경의 Bash 샌드박스는 일반 인터넷 아웃바운드가 막혀 있어 `curl https://veloo.page`가 `Could not resolve host`로 실패한다. WebFetch는 이 제약이 없다.
+- 프로덕션 스모크 테스트는 **WebFetch를 사용한다 — Bash의 curl이 아니다.** 이 환경의 Bash 샌드박스는 일반 인터넷 아웃바운드가 막혀 있어 `curl https://veloo.2joon.com`가 `Could not resolve host`로 실패한다. WebFetch는 이 제약이 없다.
 - 스모크 테스트 대상 (인증 없이 접근 가능한 경로, `backend/app/auth.py`의 `_OPEN_PATHS` 기준):
-  - `https://veloo.page/` — 200 응답 + HTML(SPA) 반환 확인
-  - `https://veloo.page/login` — 200 응답 확인
-  - `https://veloo.page/api/me` — 200 응답 확인 (미인증 상태에서도 열려 있는 엔드포인트)
+  - `https://veloo.2joon.com/` — 200 응답 + HTML(SPA) 반환 확인
+  - `https://veloo.2joon.com/login` — 200 응답 확인
+  - `https://veloo.2joon.com/api/me` — 200 응답 확인 (미인증 상태에서도 열려 있는 엔드포인트)
   - 그 외 서브앱 경로(`/paper`, `/translate` 등)는 인증 미들웨어에 막혀 있어 로그인 없이는 의미 있는 신호를 주지 않으므로 스모크 테스트 대상에서 제외한다
 - GitHub Actions가 성공했어도 스모크 테스트가 실패하면(5xx, 타임아웃 등) **배포 실패로 간주하고 즉시 보고한다** — 컨테이너는 떴지만 앱이 정상 응답하지 않는 경우를 잡기 위함이다.
 - **자동 롤백을 시도하지 않는다.** 배포 실패는 되돌리기 비용이 있는 행동(`approval-check` 스킬 대상)이므로, 실패 시 무엇이 잘못됐는지 보고하고 사람의 판단을 기다린다.

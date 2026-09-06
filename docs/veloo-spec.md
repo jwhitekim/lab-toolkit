@@ -13,7 +13,7 @@
 | 프로젝트명 | Veloo (벨루) |
 | 한 줄 소개 | 논문 읽기·번역·용어 이해·모델 학습·일정 관리를 하나의 워크스페이스로 묶은 AI 기반 연구 툴킷 |
 | 개발 형태 | 개인 프로젝트 (1인 개발), Claude Code 활용 |
-| 배포 상태 | 프라이빗 베타 운영 중 (veloo.page, 가입 승인제) |
+| 배포 상태 | 프라이빗 베타 운영 중 (veloo.2joon.com, 가입 승인제) |
 | 기술 스택 | FastAPI(Python) + React/TypeScript(Vite) + Supabase + Claude/Gemini API |
 
 ---
@@ -91,7 +91,7 @@ Veloo는 승인된 계정마다 `/:username` 개인 워크스페이스를 제공
 
 ## 7. 운영 현황
 
-- 라이브 데모: veloo.page — 프라이빗 베타, 가입 요청은 수동 승인
+- 라이브 데모: veloo.2joon.com — 프라이빗 베타, 가입 요청은 수동 승인
 - 현재는 개인 API 키와 개인 Supabase 프로젝트로 운영되는 개인 배포판이며, 공유 랩 도구는 아님
 - GitHub 저장소: `.claude`, `backend`, `frontend`, `docs`, `scripts` 등으로 구성, 224회 커밋 진행
 

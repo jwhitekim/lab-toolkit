@@ -2,7 +2,7 @@
 
 **Languages:** English | [한국어](README_KO.md)
 
-**Live demo:** <https://veloo.page/> — private beta; sign-up requests are
+**Live demo:** <https://veloo.2joon.com/> — private beta; sign-up requests are
 approved manually, so access isn't instant. It's a personal deployment run on
 the maintainer's own API keys and Supabase project — not a shared lab tool.
 

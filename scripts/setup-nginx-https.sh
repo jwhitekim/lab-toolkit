@@ -7,7 +7,7 @@ Usage:
   ./scripts/setup-nginx-https.sh <domain> <certificate-email>
 
 Example:
-  ./scripts/setup-nginx-https.sh veloo.page kimjunhee2483@gmail.com
+  ./scripts/setup-nginx-https.sh veloo.2joon.com kimjunhee2483@gmail.com
 
 The application is expected to be available on 127.0.0.1:9000 (override with APP_PORT).
 Router TCP ports 80 and 443 must point to this server.
