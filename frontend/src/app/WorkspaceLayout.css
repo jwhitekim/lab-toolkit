@@ -334,14 +334,42 @@
        ("알약을 놓친다")가 있었다. 이 독은 좁고 늘 뜬 상태라 여기서 시작하는 세로 스크롤을
        허용해줄 실익이 거의 없으니, 제스처를 전부 JS(핸들러)가 독점하게 막아버린다. */
     touch-action: none;
-    transition: transform 0.15s ease-out;
+    /* 2026-09-06: scale(부풀기)과 드래그 러버밴드(모서리 스트레치)를 동시에 걸 수 있어야 해서
+       두 값을 CSS 변수로 합성한다 — 인라인 스타일로 직접 transform을 주면 .is-pressed의 scale을
+       덮어써버리므로, MobileCapsuleNavigation.tsx는 --shell-edge-scale/transform-origin만
+       imperatively 갱신하고 scale은 계속 클래스(.is-pressed)가 담당한다.
+       처음엔 바 전체를 translateX로 밀어내는 방식이었는데, "바가 통째로 옮겨가지 말고 반대쪽
+       모서리는 고정된 채 미는 쪽 굴곡선만 늘어나 끌려가는 느낌이어야 한다"는 피드백으로
+       scaleX + transform-origin(반대쪽 끝 고정) 방식으로 교체함. */
+    --shell-edge-scale: 1;
+    --shell-press-scale: 1;
+    transform-origin: center center;
+    transform: scale(var(--shell-press-scale)) scaleX(var(--shell-edge-scale));
+    /* 2026-09-06: 드래그 내내 transform이 매 프레임 바뀌는 요소라 will-change로 미리
+       컴포지팅 레이어 승격을 예약해둔다 — 애니메이션 시작 시점의 승격 비용(끊김)을 줄임. */
+    will-change: transform;
+    transition:
+      transform 0.15s ease-out,
+      filter 0.15s ease-out;
   }
 
   /* 2026-09-05: 실제 인스타그램 앱 터치 동작 재현 — 손가락이 닿아있는 동안(탭이든 드래그든)
      바 전체가 살짝 부푼다. 인디케이터는 이 바의 자식이라 별도 계산 없이 같은 비율로 같이
-     커진다(부모 transform:scale의 자연스러운 효과). */
+     커진다(부모 transform:scale의 자연스러운 효과).
+     2026-09-06: 드래그로 양 끝을 넘어서려 하면, 미는 쪽 모서리(굴곡선)만 그쪽으로 늘어나
+     끌려가는 러버밴드 효과 추가 — --shell-edge-scale/transform-origin은 moveIndicator()가
+     매 프레임 갱신(반대쪽 끝을 transform-origin으로 고정해서 그쪽은 안 움직임). */
   .shell-mobile-tabs.is-pressed {
-    transform: scale(1.05);
+    --shell-press-scale: 1.05;
+  }
+
+  /* 2026-09-06: "밝아짐"은 인디케이터/활성 아이콘만이 아니라 바 전체(안의 아이콘 5개 전부,
+     인디케이터 포함)가 한 덩어리로 반응해야 한다는 피드백 — 자식 각각에 is-pressed 클래스를
+     따로 붙이는 대신, 부모(.shell-mobile-tabs) 하나에 filter를 걸어서 안의 모든 렌더링 내용이
+     자동으로 같이 밝아지게 한다(개별 조합보다 훨씬 단순). 드래그 중엔 밝아지지 않고 원래 색
+     그대로 유지 — 탭(누르기만)일 때만 적용("드래그 중엔 밝아지면 안 된다"는 피드백). */
+  .shell-mobile-tabs.is-pressed:not(.is-dragging) {
+    filter: brightness(1.45);
   }
 
   .shell-mobile-tabs-track {
@@ -358,10 +386,11 @@
      들어간 캡슐이 아니라, 바 표면 위에 얹혀 위쪽으로만 튀어나온 볼록 렌즈다(아래쪽은 바 안쪽
      경계에 맞춰짐 — 위아래 대칭 돌출이 아님). 모서리는 네 군데 다른 반경(스퀴클)으로도 시도했다가
      캡슐 굴곡이 깨져 보인다는 피드백으로 기존 바와 동일한 완전한 pill(`9999px`)로 되돌림.
-     색·재질은 실제 인스타그램 앱 터치 동작을 재현 — 평소엔 진한 그레이, 손가락이 닿아있는 동안
-     (`is-pressed`, MobileCapsuleNavigation.tsx)엔 연한 그레이로 바뀐다(goo 필터로 "물방울처럼
-     늘어나는" 연출도 시도했었으나, 테두리만 있는 투명 도형엔 goo 기법 자체가 안 맞아서 — 격리
-     테스트에서 도형이 사라지거나 뭉개짐 — 포기하고 이 단순한 색 전환 방식으로 교체함). */
+     2026-09-06: 색을 `#C4C4C4` 고정값으로 확정 — 눌렀을 때 더 밝은 회색으로 "바꾸는" 방식 대신,
+     `filter: brightness()`로 지금 색 그대로 밝기만 올린다. 이러면 인디케이터(캡슐)뿐 아니라 그
+     위에 얹힌 아이콘(`.shell-mobile-tab.is-active`, 같은 순간 `is-pressed`도 같이 붙음)까지
+     "캡슐 전체가 밝아지는" 느낌으로 함께 반응한다 — 색상 자체를 스와핑하면 아이콘까지 같이
+     밝아지게 만들 수 없어서(서로 다른 엘리먼트) 이 방식으로 바꿈. */
   .shell-mobile-tab-indicator {
     position: absolute;
     /* 2026-09-05: "바 위로 튀어나온 렌즈" 컨셉 자체를 접었다 — 5개 탭이 flex:1 20%로 폭이
@@ -375,19 +404,18 @@
     left: 0;
     height: 44px;
     border-radius: 9999px;
-    background: rgba(150, 152, 162, 0.65);
+    background: #c4c4c4;
     /* 2026-09-06: accent(그린) 톤 링 글로우 제거 — "완전히 균일한 무채색 그레이"여야 한다는
        요구사항에 맞춰 색 있는 그림자 없이 중립 드롭섀도만 남김. */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
     pointer-events: none;
+    /* 2026-09-06: 드래그 중 매 프레임 transform(x좌표)이 바뀌는 요소라 will-change로 미리
+       컴포지팅 레이어 승격을 예약해둔다. width는 실시간 드래그 중엔 안 바뀌고 탭이 바뀔 때만
+       전환되므로(레이아웃 속성이라 GPU 가속 대상은 아님) will-change 대상에서 제외. */
+    will-change: transform;
     transition:
       transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      background-color 0.15s ease-out;
-  }
-
-  .shell-mobile-tab-indicator.is-pressed {
-    background: rgba(205, 207, 216, 0.55);
+      width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* 2026-09-06: 사선 하이라이트(::before)/글린트(::after) 반사광 레이어를 완전히 제거함 —
@@ -418,7 +446,9 @@
     border: 0;
     border-radius: 9999px;
     background: transparent;
-    color: var(--text-secondary);
+    /* 2026-09-06: accent(그린) 대신 검정 계열 고정 — "선택됨"은 색이 아니라 선형→면형/굵기로
+       표현하므로 아이콘·라벨 색은 활성/비활성 구분 없이 항상 검정에 가까운 톤. */
+    color: var(--text-primary);
     cursor: pointer;
     font-family: var(--font-sans);
     transition:
@@ -433,7 +463,16 @@
   .shell-mobile-tab svg {
     width: 20px;
     height: 20px;
-    stroke-width: 2.35;
+    /* 2026-09-06: 1.6으로 낮춤(이전 2.35) — 비활성 선이 이미 두꺼워서 활성일 때 굵어지는
+       변화가 잘 안 느껴진다는 피드백. 기본을 얇게 둬야 아래 활성 규칙의 대비가 산다. */
+    stroke-width: 1.6;
+  }
+
+  /* 2026-09-06: solid 버전이 20px에서 오히려 밋밋해지는 아이콘(GlobeAltIcon 등, outline을
+     그대로 재사용 중)을 위해 — 활성 상태에서 선을 굵게 해서 "선택됨"을 표현한다. 이미 solid로
+     바뀌는 아이콘엔 stroke 자체가 없어서(fill만 있음) 이 규칙이 영향을 안 준다. */
+  .shell-mobile-tab.is-active svg {
+    stroke-width: 3;
   }
 
   .shell-mobile-tab span {
@@ -446,9 +485,6 @@
     white-space: nowrap;
   }
 
-  .shell-mobile-tab.is-active {
-    color: var(--accent);
-  }
 
   .shell-plan-switcher {
     min-height: 40px;

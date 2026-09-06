@@ -85,10 +85,43 @@ transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
 ### 탭 아이템 (`.shell-mobile-tab`)
 
 - **5개** 탭이 `flex: 1 1 20%`로 균등 분할 (탭 폭 = 독 내부 폭 ÷ 5).
-- 아이콘(20px, `stroke-width 2.35`) 위 + 라벨(10px) 아래, 세로 배치.
+- 아이콘(20px) 위 + 라벨(10px) 아래, 세로 배치.
 - 라벨은 모바일 전용 축약형: `Plan · Paper · Trans · Models · Concepts`.
-- 활성 색상은 `var(--accent)` (그린) — 비활성은 `var(--text-secondary)`.
+- **2026-09-06 색상 — accent(그린) 폐기, 항상 `var(--text-primary)`(검정 계열)**: "선택됨"은
+  색이 아니라 아이콘 자체(선형→면형, 굵기)로 표현하므로 활성/비활성 구분 없이 아이콘·라벨 색이
+  항상 같다. `stroke-width`는 비활성 `1.6px` / 활성 `3px`(`.shell-mobile-tab.is-active svg`) —
+  처음엔 비활성 `2.35px`였는데 이미 두꺼워서 활성일 때 굵어지는 변화가 잘 안 느껴진다는
+  피드백으로 비활성 쪽을 낮춰 대비를 키움.
 - `:active` 시 `scale(0.92)`로 눌리는 피드백.
+- **2026-09-06 아이콘을 heroicons로 교체, 활성=면형/비활성=선형**: 처음엔 lucide 아이콘에
+  `fill: currentColor`를 CSS로 강제해서 채우려 했는데, lucide는 순수 스트로크 세트라 아이콘마다
+  도형 구성이 달라 결과가 들쭉날쭉했다(중괄호·글자 모양처럼 열린 선 위주인 아이콘은 채울 도형이
+  거의 없어 효과가 없음). 그래서 모바일 하단 독 5개 아이콘만 outline/solid 쌍을 제공하는
+  **heroicons**(`@heroicons/react`)로 교체 — `MOBILE_NAV`의 각 항목이 `Icon`(outline)과
+  `IconSolid`(solid) 둘 다 갖고, `MobileCapsuleNavigation.tsx`가 활성 탭에만 `IconSolid`를
+  렌더링한다. 데스크톱 사이드바(`WORKSPACE_NAV`)는 그대로 lucide 유지 — 이번 교체는 모바일 하단
+  독 범위로 한정.
+
+  | 탭 | 아이콘(outline/solid 쌍) |
+  |---|---|
+  | Plan | `Squares2X2Icon` |
+  | Paper | `DocumentMagnifyingGlassIcon` |
+  | Trans | `GlobeAltIcon` — **예외, 아래 참고** |
+  | Models | `CpuChipIcon` |
+  | Concepts | `LightBulbIcon` |
+
+  **2026-09-06 GlobeAltIcon은 solid로 안 바꿈** — solid 버전 소스를 까보면 그물눈처럼 작은
+  조각을 이어붙인 모자이크 구조인데, 20px 크기에서는 조각 사이 틈(선)이 안티앨리어싱으로
+  뭉개져 그냥 민짜 원처럼 보인다("선택하면 오히려 밋밋해짐" — 다른 아이콘과 정반대 효과라는
+  피드백). 그래서 `IconSolid: GlobeAltIcon`(=outline 그대로)로 두고, 대신
+  `.shell-mobile-tab.is-active svg { stroke-width: 3; }`(비활성은 `1.6`)로 선만 굵게 해서
+  "선택됨"을 표현한다 — solid로 잘 안 바뀌는 아이콘엔 이 규칙이 일반적인 대안. 이미 solid로
+  바뀌는 아이콘은 stroke 자체가 없어서(fill만) 이 규칙의 영향을 안 받는다.
+
+  **2026-09-06 재조정** — 처음엔 Trans에 `LanguageIcon`, Concepts에 `CodeBracketIcon`을 썼는데,
+  두 아이콘 다 solid(활성) 버전 안에 가는 선 디테일(악센트 표시, 슬래시 등)이 있어서 채워졌을 때
+  오히려 outline보다 더 가늘어 보이는 문제가 있었다 — 굵고 뭉툭한 실루엣의 `GlobeAltIcon`(지구본),
+  `LightBulbIcon`(전구, "개념/아이디어" 의미도 더 잘 맞음)으로 교체.
 
 ### 인디케이터 (`.shell-mobile-tab-indicator`)
 
@@ -102,29 +135,43 @@ transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
 피드백으로 기존 바와 동일한 완전한 pill(`9999px`, 네 모서리 동일)로 되돌림 — 항상 이 굴곡을
 유지할 것.
 
-**재질/색 — 2026-09-05 최종**: 실제 인스타그램 앱의 터치 피드백을 그대로 재현한다.
-- **평소(정지)**: 진한 그레이, 테두리·블러 없음.
-- **손가락이 닿아있는 동안(`is-pressed`, 탭이든 드래그든 `pointerdown`~`pointerup`)**: 연한
-  그레이로 바뀌고, **바(`.shell-mobile-tabs`) 전체가 살짝 부푼다**(`transform: scale(1.05)`,
-  2026-09-06에 `1.03`에서 상향 — "부푸는 정도를 조금 더 키워달라"는 요청).
-  인디케이터는 바의 자식이라 별도 계산 없이 부모 scale을 따라 같은 비율로 같이 커진다.
+**재질/색 — 2026-09-06 최종**: 실제 인스타그램 앱의 터치 피드백을 그대로 재현한다.
+- **평소(정지)**: `#c4c4c4` 고정 회색, 테두리·블러 없음. 다른 색으로 스와핑하는 경우는 없다.
+- **탭(드래그 없이 누르기만, `is-pressed`)**: 색을 바꾸지 않고 `filter: brightness(1.45)`로
+  지금 색 그대로 밝기만 올린다. 이 filter는 인디케이터 하나가 아니라 **바(`.shell-mobile-tabs`)
+  자체**에 걸려있어서, 안의 배경·인디케이터·아이콘 5개 전부가 한 덩어리로 같이 밝아진다("인디케이터가
+  아니라 캡슐 전체, 아이콘 독 모두 포함해서 밝아져야 한다"는 피드백 — 처음엔 인디케이터+활성
+  아이콘에만 개별적으로 걸었다가, 부모 하나에 거는 지금 방식으로 단순화). 바(`.shell-mobile-tabs`)
+  전체도 살짝 부푼다(`--shell-press-scale: 1.05`) — 인디케이터·아이콘은 바의 자식이라 별도
+  계산 없이 부모 scale을 따라 같이 커진다.
+- **드래그 중(`is-dragging`)**: 밝기·부풀기 전부 꺼지고 `#c4c4c4` 그대로 유지된다 —
+  `.shell-mobile-tabs.is-pressed:not(.is-dragging)`로 드래그가 시작되는 순간 밝기 규칙 자체가
+  안 먹히게 만듦("드래그 중엔 밝아지면 안 되고 원래 색 그대로여야 한다"는 피드백). 대신 드래그
+  중엔 아래 "러버밴드 엣지 스트레치"가 별도로 반응한다.
 
 ```css
 /* .shell-mobile-tab-indicator */
 top: 7px;                  /* 돌출 없음 — 58px 바 안에 대칭으로 들어감((58-44)/2) */
 height: 44px;
 border-radius: 9999px;
-background: rgba(150, 152, 162, 0.65);      /* 평소: 진한 그레이 */
+background: #c4c4c4;                        /* 고정값 — 절대 다른 색으로 스와핑하지 않음 */
 box-shadow: 0 4px 12px rgba(0,0,0,.18);     /* 2026-09-06: accent 톤 링 글로우 제거, 중립 그림자만 */
 transition: transform .3s cubic-bezier(.4,0,.2,1),
-            width .3s cubic-bezier(.4,0,.2,1),
-            background-color .15s ease-out;
+            width .3s cubic-bezier(.4,0,.2,1);
 
-/* .shell-mobile-tab-indicator.is-pressed */
-background: rgba(205, 207, 216, 0.55);      /* 터치 중: 연한 그레이 */
+/* .shell-mobile-tabs — 부풀기(scale)+엣지 스트레치(scaleX)를 변수로 합성, 아래 "러버밴드" 참고 */
+--shell-edge-scale: 1;
+--shell-press-scale: 1;
+transform-origin: center center;
+transform: scale(var(--shell-press-scale)) scaleX(var(--shell-edge-scale));
+transition: transform .15s ease-out, filter .15s ease-out;
 
 /* .shell-mobile-tabs.is-pressed */
-transform: scale(1.05);                     /* 바 전체가 살짝 부풂 — 인디케이터도 자식이라 같이 커짐 */
+--shell-press-scale: 1.05;
+
+/* .shell-mobile-tabs.is-pressed:not(.is-dragging) */
+filter: brightness(1.45);                   /* 바 전체(안의 아이콘 5개 전부 포함) 공통 —
+                                                2026-09-06: 1.25→1.45 상향, "값을 더 올려달라"는 요청 */
 ```
 - **폭 = 탭 버튼 `offsetWidth`에서 좌우 각 3px씩 인셋**(`INDICATOR_INSET`,
   `MobileCapsuleNavigation.tsx`의 `indicatorRectFor()`) — 5개 탭 세그먼트 폭이 전부 동일하게
@@ -132,10 +179,9 @@ transform: scale(1.05);                     /* 바 전체가 살짝 부풂 — �
   처음엔 인셋 없이 `offsetWidth` 그대로, 그다음 5px 인셋을 시도했다가 둘 다 원형 문제가
   있었음(2026-09-05 실기기 DOM 계산값으로 확인).
 - **드래그 중(`is-dragging`)에는 인디케이터의 `transform`/`width` transition을 끈다** — 손가락
-  x좌표를 매 프레임 실시간 추적해야 하므로 0.3s 지연이 있으면 손끝을 못 따라간다. `is-pressed`
-  (배경색)는 별개로 계속 살아있음.
+  x좌표를 매 프레임 실시간 추적해야 하므로 0.3s 지연이 있으면 손끝을 못 따라간다.
 - `isPressed`는 `isDragging`(5px 이상 움직여야 켜짐)과 별개로 `pointerdown` 즉시 켜진다 — 살짝
-  눌렀다 떼는 단순 탭에도 부풀기/색 전환 피드백이 있어야 하므로.
+  눌렀다 떼는 단순 탭에도 부풀기/밝기 전환 피드백이 있어야 하므로.
 
 **폐기된 시도들 (역사, 2026-09-05 하루 동안)**:
 - ① 순백(`rgba(255,255,255,.96/.74)`) 배경 — 실사용에선 잘 보였지만, `frame_0001.png`/
@@ -148,24 +194,85 @@ transform: scale(1.05);                     /* 바 전체가 살짝 부풂 — �
   사라지거나 엉뚱한 덩어리로 뭉개짐(격리 테스트로 확인) — 기술적으로 양립 불가능해서 폐기.
 - ③ 결국 사용자가 실제 인스타그램 앱을 직접 조작해서 확인해준 진짜 동작(위 "재질/색" 항목)으로
   대체 — goo/이중 블롭 없이 색 전환 + 부모 scale만으로 훨씬 단순하게 구현됨.
+- ④ 배경을 진한 그레이(정지) ↔ 연한 그레이(`is-pressed`)로 스와핑하는 방식 — "밝아짐"을 색
+  교체로 구현했는데, 인디케이터와 아이콘이 서로 다른 엘리먼트라 색 스와핑으로는 "캡슐+아이콘이
+  같이 밝아지는" 걸 못 만들어서 `filter: brightness()` 방식으로 교체(위 "재질/색" 항목).
+- ⑤ 인디케이터/활성 아이콘 각각에 개별로 `is-pressed` 클래스를 붙이고 `filter`를 거는 방식 —
+  "인디케이터가 아니라 바 전체(아이콘 독 5개 전부)가 밝아져야 한다"는 피드백으로, 부모
+  (`.shell-mobile-tabs`) 하나에만 filter를 거는 지금 방식으로 단순화(자식 클래스 조합 불필요).
 
 **표면 반사광(스페큘러 하이라이트, `::before`+`::after`) — 2026-09-06 완전히 제거함.**
 2026-09-04에 추가해서 그날만 세 번 방식을 바꿔가며(① mix-blend → ② 알파-블렌드 단색 흰색 →
 ③ 밝은 띠+그림자 띠 페어) 유지해왔는데, "블러나 미러링 없이 처음부터 끝까지 완전히 균일한 단색
 그레이여야 한다"는 요구사항과 정면으로 상충해서 결국 완전히 걷어냄(레퍼런스: 실제 인스타그램
 탭바는 반사 효과 없는 플랫 그레이). `--sheen-x` CSS 변수와 `sheenPercent()` 계산 함수도 같이
-제거됨 — 지금 인디케이터는 순수하게 단색 배경(평소 진한 그레이 / `is-pressed` 연한 그레이)만
-가진다. 아이콘 자체는 lucide 기본값(`stroke`만 그리고 `fill: none`)이라 도형 안 뚫린 부분(문
-모양 등)이 이미 배경색 그대로 비쳐 보이므로 별도 처리 불필요.
+제거됨 — 지금 인디케이터는 순수하게 단색 고정 배경(`#c4c4c4`)만 가진다. 밝기 조정(`filter:
+brightness()`)은 인디케이터 자신이 아니라 부모 바(`.shell-mobile-tabs.is-pressed`)에 걸려있다
+(위 "재질/색" 항목 참고). 아이콘은 outline일 땐 `stroke`만 그리고 `fill: none`이라 도형 안
+뚫린 부분(문 모양 등)이 이미 배경색 그대로 비쳐 보이므로 별도 처리 불필요.
 
 ### 제스처 — 드래그로 탭 이동
 
 iOS `UISegmentedControl`의 네이티브 드래그 동작을 웹 포인터 이벤트로 재현.
 
 1. `onPointerDown`: 포인터 캡처(`setPointerCapture`), 시작 좌표·최근접 탭 기록.
-2. `onPointerMove`: 시작점에서 5px 이상 움직이면 "드래그 시작" 확정 — 5px 미만은 단순 탭으로 간주. 이 순간 `event.preventDefault()`도 호출한다(2026-09-06 추가). 드래그 중엔 인디케이터가 포인터 x좌표를 실시간 추적, 양끝 탭 경계에서 클램프.
+2. `onPointerMove`: 시작점에서 5px 이상 움직이면 "드래그 시작" 확정 — 5px 미만은 단순 탭으로 간주. 이 순간 `event.preventDefault()`도 호출한다(2026-09-06 추가). 드래그 중엔 인디케이터(캡슐)가 포인터 x좌표를 실시간 추적, 양끝 탭 경계에서 클램프. **단, 아이콘이 굵어지는/면형으로 바뀌는 것(`is-active`)은 이 실시간 추적과 분리돼 있다** — `isActive`는 `activeMobileKey`(실제 선택 확정)만 보고, 한때 있었던 `dragTarget`(드래그 중 캡슐이 지나가는 탭)은 더 이상 안 본다. 드래그 중 캡슐이 여러 탭을 스치듯 지나가도, 그 아래 아이콘들은 손을 떼서 실제로 선택되기 전까지 그대로 선형/얇은 채로 남는다(2026-09-06, "지나가기만 해도 굵어지면 안 되고 진짜 선택돼야 굵어져야 한다"는 피드백).
 3. `onPointerUp`: 실제로 드래그했다면 가장 가까운 탭으로 전환(`selectMobileItem`). 클릭 이벤트 중복 방지를 위해 `suppressMobileClickRef`를 짧게 세워둠.
 4. `onPointerCancel`: 브라우저가 제스처를 가로챌 때도 동일하게 마무리 — 단, `cancelled=true`라 `activeMobileKey`(원래 탭)로 스냅되고 `selectMobileItem`은 호출 안 됨. 이 콜백 자체가 자주 발생하면(=드래그를 자주 "놓침") 사용자 경험상 버그이므로, `touch-action: none` + `preventDefault()`로 애초에 브라우저가 제스처를 가로채지 못하게 막는 것이 근본 대책(2026-09-06, "알약을 놓친다"는 피드백으로 추가).
+
+**러버밴드 엣지 스트레치 (2026-09-06 추가, 같은 날 방식 한 번 교체)** — 드래그로 첫/마지막 탭
+경계를 넘어서려 하면 인디케이터만 경계에 멈추는 게 아니라 바(`.shell-mobile-tabs`)도 반응한다.
+**처음엔 바 전체를 `translateX`로 밀어내는 방식으로 만들었는데**, "바가 통째로 옮겨가는 게
+아니라 반대쪽 모서리는 그 자리에 고정된 채 미는 쪽 모서리(굴곡선)만 늘어나 끌려가는 느낌이어야
+한다"는 피드백으로 **`transform-origin`을 반대쪽 끝에 고정하고 `scaleX`로 미는 쪽만 늘리는
+방식**으로 교체했다.
+
+`moveIndicator()`가 클램프 전 원래 포인터 위치와 경계값의 차이(overshoot)를 구해서 `sqrt`로
+체감시킨 뒤 `EDGE_PUSH_MAX_PX`(8px)를 상한으로 늘어날 폭을 정하고, 바의 실측 폭(`offsetWidth`)
+기준으로 `scaleX` 비율을 계산해서 `--shell-edge-scale` CSS 변수 + `transform-origin`을
+imperatively 반영한다(`tabsRef.current.style.setProperty`/`.style.transformOrigin`,
+LandingPage.tsx의 커서 추적 패턴과 동일 관례). 오른쪽으로 넘어가면 `transform-origin: left
+center`(왼쪽 끝 고정, 오른쪽 굴곡선만 늘어남), 왼쪽으로 넘어가면 그 반대. 손을 떼면
+(`finishGesture`) `--shell-edge-scale`만 1로 리셋 — 바의 `transition`이 복귀도 자연스럽게
+애니메이션.
+
+**2026-09-06 `transform-origin`은 리셋하지 않는다** — 처음엔 손을 뗄 때 `transform-origin`도
+`center center`로 같이 되돌렸는데, `transform-origin`은 트랜지션이 안 되는(즉시 바뀌는) 속성이라
+scale이 줄어드는 애니메이션이 재생되는 도중에 기준점이 갑자기 바뀌면 화면이 튀는(흔들리는)
+문제가 있었다("되돌아올 때 흔들림이 있다"는 피드백). scale이 1로 완전히 돌아오면 origin이
+어디든 시각적 차이가 없고, 다음 드래그 때 `moveIndicator()`가 다시 알맞은 값으로 설정해주므로
+마지막 값 그대로 둬도 무방해서 리셋 자체를 없앰.
+
+```css
+/* .shell-mobile-tabs */
+--shell-edge-scale: 1;
+--shell-press-scale: 1;
+transform-origin: center center;              /* JS가 드래그 중엔 left/right center로 바꿈 */
+transform: scale(var(--shell-press-scale)) scaleX(var(--shell-edge-scale));
+```
+```js
+// moveIndicator() 안, overshoot 계산 후
+const push = Math.min(EDGE_PUSH_MAX_PX, Math.sqrt(Math.abs(overshoot)) * EDGE_PUSH_FACTOR)
+bar.style.transformOrigin = overshoot > 0 ? 'left center' : overshoot < 0 ? 'right center' : 'center center'
+bar.style.setProperty('--shell-edge-scale', `${(barWidth + push) / barWidth}`)
+```
+부풀기(`.is-pressed`가 `--shell-press-scale`만 갱신)와 엣지 스트레치(JS가 `--shell-edge-scale`/
+`transform-origin`만 갱신)를 이렇게 변수로 분리 합성해야 한다 — 인라인 스타일로 `transform`을
+통째로 덮어쓰면 클래스가 주는 scale이 지워지기 때문. `transform-origin`은 두 효과가 하나의
+`transform`을 공유하므로 같이 적용되는데, 부풀기(1.05)는 작아서 origin이 가장자리로 옮겨져도
+크게 티가 안 남.
+
+**성능(2026-09-06 추가)**:
+- `.shell-mobile-tabs`/`.shell-mobile-tab-indicator` 둘 다 `will-change: transform` — 드래그
+  내내 매 프레임 `transform`이 바뀌는 요소라 컴포지팅 레이어 승격을 미리 예약해서 애니메이션
+  시작 시점의 끊김을 줄인다. `width`(인디케이터가 탭 전환 시에만 바꾸는 레이아웃 속성)는
+  GPU 가속 대상이 아니라 `will-change`에서 제외.
+- `barWidth`(엣지 스트레치 비율 계산에 쓰는 바 실측 폭)는 `moveIndicator()`가 매 프레임 다시
+  읽지 않고 `handlePointerDown` 시점에 `barWidthRef`로 한 번만 캐싱한다 — `offsetWidth` 읽기는
+  강제 리플로우를 유발할 수 있는 레이아웃 읽기라, 드래그 중 반복 호출을 피함(드래그 도중 바
+  너비가 바뀔 일은 없으므로 안전).
+- `backface-visibility: hidden`은 적용 대상이 없어 안 씀 — 3D 회전(`rotateY` 등)에서 깜빡임을
+  막는 속성인데 이 컴포넌트는 회전을 전혀 쓰지 않는다.
 
 ### Plan 스위처 (`.shell-plan-switcher`)
 

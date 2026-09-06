@@ -37,14 +37,19 @@ export default function MobileCapsuleNavigation() {
   const tabsRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const tabRefs = useRef<Partial<Record<MobilePrimaryKey, HTMLButtonElement | null>>>({})
+  // offsetWidth를 읽는 건 강제 리플로우를 유발할 수 있는 레이아웃 읽기라, 드래그가 진행되는
+  // 동안(pointermove가 매 프레임 부르는 moveIndicator 안) 매번 다시 읽지 않고 제스처 시작
+  // 시점(handlePointerDown)에 한 번만 읽어서 캐싱해둔다 — 드래그 도중 바 너비가 바뀔 일은
+  // 없으므로 안전하다.
+  const barWidthRef = useRef(0)
   const [indicatorRect, setIndicatorRect] = useState<{ x: number; width: number } | null>(null)
   const [isDragging, setIsDragging] = useState(false)
-  // 실제 인스타그램 앱 터치 동작 재현: 손가락이 닿아있는 동안(탭이든 드래그든) 바 전체가 살짝
-  // 부풀고, 인디케이터도 그 비율 그대로 같이 커지며(부모 scale의 자연스러운 효과, 별도 계산 불필요)
-  // 진한 그레이 → 연한 그레이로 바뀐다. 손을 떼면 원래대로. isDragging(5px 이상 움직여야 켜짐)과
-  // 달리 isPressed는 pointerdown 즉시 켜진다 — 살짝 눌렀다 떼는 탭에도 피드백이 있어야 하므로.
+  // 실제 인스타그램 앱 터치 동작 재현: 탭(드래그 없이 누르기만)일 때 바 전체(.shell-mobile-tabs,
+  // 안의 인디케이터·아이콘 전부 포함)가 살짝 부풀고 filter: brightness()로 밝아진다(색 자체는
+  // #c4c4c4 고정, WorkspaceLayout.css 참고) — 드래그가 시작되면 밝기는 즉시 꺼지고 원래 색으로
+  // 돌아간다("드래그 중엔 밝아지면 안 된다"는 피드백). isDragging(5px 이상 움직여야 켜짐)과 달리
+  // isPressed는 pointerdown 즉시 켜진다 — 살짝 눌렀다 떼는 탭에도 피드백이 있어야 하므로.
   const [isPressed, setIsPressed] = useState(false)
-  const [dragTarget, setDragTarget] = useState<MobilePrimaryKey | null>(null)
   const gestureRef = useRef<{ startX: number; moved: boolean; target: MobilePrimaryKey } | null>(null)
   const suppressClickRef = useRef(false)
 
@@ -94,7 +99,18 @@ export default function MobileCapsuleNavigation() {
     const x = Math.min(maxX, Math.max(minX, pointerX))
     const target = nearestTab(clientX)
     setIndicatorRect({ x, width })
-    setDragTarget(target)
+    // 손가락이 양 끝(첫/마지막 탭)을 넘어서려 하면, 바 전체가 옮겨가는 게 아니라 반대쪽 모서리는
+    // 그 자리에 고정된 채 밀리는 쪽 모서리(굴곡선)만 늘어나 끌려가는 느낌을 낸다 — 넘어간
+    // 만큼(overshoot)을 감쇠시켜서(sqrt로 체감) scaleX로 그 끝만 늘리고, transform-origin을
+    // 반대쪽 끝에 고정해서 그쪽은 전혀 안 움직이게 한다.
+    const bar = tabsRef.current
+    const barWidth = barWidthRef.current
+    if (bar && barWidth) {
+      const overshoot = pointerX < minX ? pointerX - minX : pointerX > maxX ? pointerX - maxX : 0
+      const push = Math.min(EDGE_PUSH_MAX_PX, Math.sqrt(Math.abs(overshoot)) * EDGE_PUSH_FACTOR)
+      bar.style.transformOrigin = overshoot > 0 ? 'left center' : overshoot < 0 ? 'right center' : 'center center'
+      bar.style.setProperty('--shell-edge-scale', `${(barWidth + push) / barWidth}`)
+    }
     if (gestureRef.current) gestureRef.current.target = target
   }
 
@@ -102,6 +118,7 @@ export default function MobileCapsuleNavigation() {
     if (event.pointerType === 'mouse' && event.button !== 0) return
     event.currentTarget.setPointerCapture(event.pointerId)
     gestureRef.current = { startX: event.clientX, moved: false, target: nearestTab(event.clientX) }
+    barWidthRef.current = tabsRef.current?.offsetWidth ?? 0
     setIsPressed(true)
   }
 
@@ -129,8 +146,15 @@ export default function MobileCapsuleNavigation() {
     const snapKey = gesture?.moved && !cancelled ? gesture.target : activeMobileKey
     const button = tabRefs.current[snapKey]
     if (button) setIndicatorRect(indicatorRectFor(button))
+    // 손을 떼면(또는 제스처가 취소되면) 러버밴드로 늘어났던 모서리가 원래 모양으로 되돌아온다 —
+    // .shell-mobile-tabs의 transition이 이 복귀도 부드럽게 애니메이션해준다.
+    // transform-origin은 여기서 되돌리지 않는다 — transform-origin은 트랜지션이 안 되는
+    // 속성이라, scale이 줄어드는 애니메이션이 재생되는 도중에 기준점을 즉시 바꾸면 화면이
+    // 튀는(흔들리는) 문제가 있었다(2026-09-06 피드백). scale이 1로 완전히 돌아오면 origin이
+    // 어디든 시각적 차이가 없고, 다음 드래그 때 moveIndicator()가 다시 알맞게 설정해주므로
+    // 그냥 마지막 값 그대로 둬도 무방하다.
+    tabsRef.current?.style.setProperty('--shell-edge-scale', '1')
     setIsDragging(false)
-    setDragTarget(null)
     setIsPressed(false)
   }
 
@@ -160,26 +184,35 @@ export default function MobileCapsuleNavigation() {
           <div ref={trackRef} className="shell-mobile-tabs-track">
             {indicatorRect && (
               <div
-                className={`shell-mobile-tab-indicator${isPressed ? ' is-pressed' : ''}`}
+                className="shell-mobile-tab-indicator"
                 style={{
                   width: indicatorRect.width,
                   transform: `translateX(${indicatorRect.x}px)`,
                 }}
               />
             )}
-            {MOBILE_NAV.map(({ key, Icon, label }) => (
-              <button
-                key={key}
-                ref={element => { tabRefs.current[key] = element }}
-                type="button"
-                onClick={() => { if (!suppressClickRef.current) selectMobileItem(key) }}
-                className={`shell-mobile-tab${(dragTarget ?? activeMobileKey) === key ? ' is-active' : ''}`}
-                aria-current={activeMobileKey === key ? 'page' : undefined}
-              >
-                <Icon />
-                <span>{label}</span>
-              </button>
-            ))}
+            {MOBILE_NAV.map(({ key, Icon, IconSolid, label }) => {
+              // 드래그 중 인디케이터가 지나가며 "가리키는" 탭이 아니라, 실제로 선택이 확정된
+              // (activeMobileKey가 바뀐) 탭만 굵은/면형 아이콘으로 바꾼다 — 지나가기만 해도
+              // 굵어지면 "선택된 것"과 "지나가는 중"이 구분이 안 된다는 피드백(2026-09-06).
+              const isActive = activeMobileKey === key
+              // 선택된 탭만 면형(solid) 아이콘, 나머지는 선형(outline) — heroicons가 같은 도상을
+              // 두 굵기로 제공해줘서 lucide 때처럼 CSS로 채우기를 흉내 낼 필요가 없다.
+              const TabIcon = isActive ? IconSolid : Icon
+              return (
+                <button
+                  key={key}
+                  ref={element => { tabRefs.current[key] = element }}
+                  type="button"
+                  onClick={() => { if (!suppressClickRef.current) selectMobileItem(key) }}
+                  className={`shell-mobile-tab${isActive ? ' is-active' : ''}`}
+                  aria-current={activeMobileKey === key ? 'page' : undefined}
+                >
+                  <TabIcon />
+                  <span>{label}</span>
+                </button>
+              )
+            })}
           </div>
         </nav>
       </div>
@@ -192,6 +225,12 @@ export default function MobileCapsuleNavigation() {
 // 높이(WorkspaceLayout.css의 .shell-mobile-tab-indicator, 44px)보다 폭이 좁아져 다시 원형이
 // 된다 — 인셋을 3px로 줄여서 폭을 최대한 확보(2026-09-05 실제 기기 DOM 계산값으로 확인).
 const INDICATOR_INSET = 3
+
+// 드래그로 양 끝을 넘어서려 할 때 반대쪽 모서리는 고정한 채 미는 쪽 모서리만 늘어나는
+// 러버밴드 효과의 감쇠 계수 — EDGE_PUSH_FACTOR는 넘어간 픽셀(sqrt로 체감)당 늘어나는 정도,
+// EDGE_PUSH_MAX_PX는 그 늘어나는 폭(px)의 상한.
+const EDGE_PUSH_FACTOR = 1.4
+const EDGE_PUSH_MAX_PX = 8
 
 function indicatorRectFor(button: HTMLButtonElement) {
   return {
