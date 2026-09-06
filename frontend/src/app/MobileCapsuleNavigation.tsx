@@ -37,25 +37,30 @@ export default function MobileCapsuleNavigation() {
   const tabsRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const tabRefs = useRef<Partial<Record<MobilePrimaryKey, HTMLButtonElement | null>>>({})
-  const [indicatorRect, setIndicatorRect] = useState<{ x: number; width: number; trackWidth: number } | null>(null)
+  const [indicatorRect, setIndicatorRect] = useState<{ x: number; width: number } | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  // 실제 인스타그램 앱 터치 동작 재현: 손가락이 닿아있는 동안(탭이든 드래그든) 바 전체가 살짝
+  // 부풀고, 인디케이터도 그 비율 그대로 같이 커지며(부모 scale의 자연스러운 효과, 별도 계산 불필요)
+  // 진한 그레이 → 연한 그레이로 바뀐다. 손을 떼면 원래대로. isDragging(5px 이상 움직여야 켜짐)과
+  // 달리 isPressed는 pointerdown 즉시 켜진다 — 살짝 눌렀다 떼는 탭에도 피드백이 있어야 하므로.
+  const [isPressed, setIsPressed] = useState(false)
   const [dragTarget, setDragTarget] = useState<MobilePrimaryKey | null>(null)
   const gestureRef = useRef<{ startX: number; moved: boolean; target: MobilePrimaryKey } | null>(null)
   const suppressClickRef = useRef(false)
 
   useLayoutEffect(() => {
     if (isDragging) return
-    const sync = () => {
-      const button = tabRefs.current[activeMobileKey]
-      const track = trackRef.current
-      if (button && track) setIndicatorRect({ x: button.offsetLeft, width: button.offsetWidth, trackWidth: track.clientWidth })
-    }
-    sync()
-    const tabs = tabsRef.current
     const button = tabRefs.current[activeMobileKey]
-    if (!tabs || !button) return
-    const observer = new ResizeObserver(sync)
-    observer.observe(tabs)
+    const track = trackRef.current
+    if (!button || !track) return
+    setIndicatorRect(indicatorRectFor(button))
+
+    const tabs = tabsRef.current
+    const observer = new ResizeObserver(() => {
+      const b = tabRefs.current[activeMobileKey]
+      if (b) setIndicatorRect(indicatorRectFor(b))
+    })
+    if (tabs) observer.observe(tabs)
     observer.observe(button)
     return () => observer.disconnect()
   }, [activeMobileKey, isDragging])
@@ -80,13 +85,15 @@ export default function MobileCapsuleNavigation() {
     const track = trackRef.current
     const first = tabRefs.current[MOBILE_NAV[0].key]
     const last = tabRefs.current[MOBILE_NAV[MOBILE_NAV.length - 1].key]
-    const width = indicatorRect?.width ?? first?.offsetWidth
+    const width = indicatorRect?.width ?? (first ? first.offsetWidth - INDICATOR_INSET * 2 : undefined)
     if (!track || !first || !last || width == null) return
     const rect = track.getBoundingClientRect()
     const pointerX = clientX - rect.left - width / 2
-    const x = Math.min(last.offsetLeft + last.offsetWidth - width, Math.max(first.offsetLeft, pointerX))
+    const minX = first.offsetLeft + INDICATOR_INSET
+    const maxX = last.offsetLeft + last.offsetWidth - INDICATOR_INSET - width
+    const x = Math.min(maxX, Math.max(minX, pointerX))
     const target = nearestTab(clientX)
-    setIndicatorRect({ x, width, trackWidth: track.clientWidth })
+    setIndicatorRect({ x, width })
     setDragTarget(target)
     if (gestureRef.current) gestureRef.current.target = target
   }
@@ -95,6 +102,7 @@ export default function MobileCapsuleNavigation() {
     if (event.pointerType === 'mouse' && event.button !== 0) return
     event.currentTarget.setPointerCapture(event.pointerId)
     gestureRef.current = { startX: event.clientX, moved: false, target: nearestTab(event.clientX) }
+    setIsPressed(true)
   }
 
   const handlePointerMove = (event: React.PointerEvent<HTMLElement>) => {
@@ -117,10 +125,10 @@ export default function MobileCapsuleNavigation() {
     }
     const snapKey = gesture?.moved && !cancelled ? gesture.target : activeMobileKey
     const button = tabRefs.current[snapKey]
-    const track = trackRef.current
-    if (button && track) setIndicatorRect({ x: button.offsetLeft, width: button.offsetWidth, trackWidth: track.clientWidth })
+    if (button) setIndicatorRect(indicatorRectFor(button))
     setIsDragging(false)
     setDragTarget(null)
+    setIsPressed(false)
   }
 
   return (
@@ -139,7 +147,7 @@ export default function MobileCapsuleNavigation() {
       <div className="shell-mobile-dock">
         <nav
           ref={tabsRef}
-          className={`shell-mobile-tabs${isDragging ? ' is-dragging' : ''}`}
+          className={`shell-mobile-tabs${isDragging ? ' is-dragging' : ''}${isPressed ? ' is-pressed' : ''}`}
           aria-label={t('shell.workspaceAria')}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -149,14 +157,11 @@ export default function MobileCapsuleNavigation() {
           <div ref={trackRef} className="shell-mobile-tabs-track">
             {indicatorRect && (
               <div
-                className="shell-mobile-tab-indicator"
+                className={`shell-mobile-tab-indicator${isPressed ? ' is-pressed' : ''}`}
                 style={{
                   width: indicatorRect.width,
                   transform: `translateX(${indicatorRect.x}px)`,
-                  // 캡슐이 독 안 어디에 있는지(0~100%)에 따라 표면 반사광(스페큘러 하이라이트)
-                  // 위치를 바꾼다 — 고정된 광원 아래로 유리 캡슐이 지나가는 느낌을 낸다.
-                  ['--sheen-x' as string]: `${sheenPercent(indicatorRect)}%`,
-                } as React.CSSProperties}
+                }}
               />
             )}
             {MOBILE_NAV.map(({ key, Icon, label }) => (
@@ -179,12 +184,17 @@ export default function MobileCapsuleNavigation() {
   )
 }
 
-// 인디케이터가 독 트랙 안에서 좌우로 이동할 수 있는 범위(0~trackWidth-width) 중
-// 현재 어디에 있는지를 0~100%로 환산 — 표면 반사광 위치 계산에 쓴다.
-function sheenPercent({ x, width, trackWidth }: { x: number; width: number; trackWidth: number }) {
-  const range = trackWidth - width
-  if (range <= 0) return 50
-  return Math.min(100, Math.max(0, (x / range) * 100))
+// 인디케이터 폭을 탭 버튼(offsetWidth) 그대로 쓰면 세그먼트 전체를 꽉 채운다. 좁은 화면에서
+// 5개 탭 세그먼트 폭이 다 ~70px 정도로 좁아서(flex:1 20%, 탭마다 동일), 인셋을 너무 크게 주면
+// 높이(WorkspaceLayout.css의 .shell-mobile-tab-indicator, 44px)보다 폭이 좁아져 다시 원형이
+// 된다 — 인셋을 3px로 줄여서 폭을 최대한 확보(2026-09-05 실제 기기 DOM 계산값으로 확인).
+const INDICATOR_INSET = 3
+
+function indicatorRectFor(button: HTMLButtonElement) {
+  return {
+    x: button.offsetLeft + INDICATOR_INSET,
+    width: button.offsetWidth - INDICATOR_INSET * 2,
+  }
 }
 
 // Plan 스위처 아이콘은 WORKSPACE_NAV_ITEMS에서 그대로 가져와 하드코딩 중복을 피한다.
